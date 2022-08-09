@@ -1,9 +1,31 @@
 # MAP-PACER - multiple agents path planing algorithms using cloud and edge resources
 
-Comparison of path planning algorithms for multiple robots based on edge-cloud collaborative computing, cloud computing, and local computing
----
+## Description
 
-To test locally:
-    ```bash
-    docker-compose up --scale agent=<num-of-agents>
-    ```
+Comparison of path planning algorithms for multiple robots based on edge-cloud collaborative computing, cloud computing, and local computing
+
+
+## Local testing
+1) Install vagrant and virtualbox
+2) Use pre configured [machine](https://github.com/mactat/dev-vm)
+3) Start ssh session to machine: 
+```
+ssh dev-vm@localhost -p 2222
+```
+4) Clone repo
+5) Use tilt for development and testing
+```bash
+tilt up
+```
+
+This includes live cde changes and automatic deployment to local kubernetes cluster managed by `kind`.
+
+## Cloud deployment
+```bash
+to be finished
+```
+
+## Algorithms
+```bash
+to be finished
+```
