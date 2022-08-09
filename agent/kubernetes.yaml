@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: agent-deployment
+  labels:
+    app: agent
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: agent
+  template:
+    metadata:
+      labels:
+        app: agent
+    spec:
+      containers:
+      - name: agent
+        image: mactat/agent:latest
+        ports:
+        - containerPort: 8000
