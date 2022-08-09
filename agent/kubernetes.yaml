@@ -6,6 +6,7 @@ metadata:
     app: agent
 spec:
   replicas: 3
+  serviceName: agent
   selector:
     matchLabels:
       app: agent
@@ -17,5 +18,8 @@ spec:
       containers:
       - name: agent
         image: mactat/map-pacer-agent:latest
-        ports:
-        - containerPort: 8888
+        env:
+        - name: AGENTS_NUMBER
+          value: "3"
+        - name: BROKER_HOSTNAME
+          value: "broker-service"

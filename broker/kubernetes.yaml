@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broker-deployment
+  labels:
+        app: broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broker
+  template:
+    metadata:
+      labels:
+        app: broker
+    spec:
+      containers:
+      - name: broker-container
+        image: hivemq/hivemq-ce
+        resources:
+          limits:
+            memory: "0.6Gi"
+            cpu: "300m"  
+          requests:
+            memory: "0.2Gi"
+            cpu: "150m"  
+        ports:
+        - containerPort: 1883
