@@ -1,21 +1,21 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: agent-statefullset
+  name: backend-deployment
   labels:
-    app: agent
+    app: backend
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: agent
+      app: backend
   template:
     metadata:
       labels:
-        app: agent
+        app: backend
     spec:
       containers:
-      - name: agent
-        image: mactat/map-pacer-agent:latest
+      - name: backend
+        image: mactat/map-pacer-backend:latest
         ports:
         - containerPort: 8888

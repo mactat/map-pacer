@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-agent-deployment
+  labels:
+    app: cloud-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud-agent
+  template:
+    metadata:
+      labels:
+        app: cloud-agent
+    spec:
+      containers:
+      - name: cloud-agent
+        image: mactat/map-pacer-cloud-agent:latest
+        ports:
+        - containerPort: 8888

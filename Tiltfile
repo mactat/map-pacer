@@ -1,20 +1,24 @@
+# Agent
 k8s_yaml('./agent/kubernetes.yaml')
-k8s_resource('agent', port_forwards=8000,
-             resource_deps=['deploy'])
+k8s_resource('agent-statefullset', port_forwards=8021)
+docker_build('mactat/map-pacer-agent', './agent')
 
-local_resource(
-    'deploy'
-)
+# Backend
+k8s_yaml('./backend/kubernetes.yaml')
+k8s_resource('backend-deployment', port_forwards=8022)
+docker_build('mactat/map-pacer-backend', './backend')
 
-# Add a live_update rule to our docker_build
-congrats = "🎉 Congrats, you ran a live_update! 🎉"
-docker_build('example-python-image', '.', build_args={'flask_env': 'development'},
-    live_update=[
-        sync('./agent/', './agent/app'),
-        run('cd /app && pip install -r requirements.txt',
-            trigger='./requirements.txt'),
+# Frontend
+k8s_yaml('./frontend/kubernetes.yaml')
+k8s_resource('frontend-deployment', port_forwards=8023)
+docker_build('mactat/map-pacer-frontend', './frontend')
 
-        # add a congrats message!
-        run('sed -i "s/Hello cats!/{}/g" /app/templates/index.html'.
-            format(congrats)),
-])
+# Map-service
+k8s_yaml('./map-service/kubernetes.yaml')
+k8s_resource('map-service-deployment', port_forwards=8024)
+docker_build('mactat/map-pacer-map-service', './map-service')
+
+# Cloud-agent
+k8s_yaml('./cloud-agent/kubernetes.yaml')
+k8s_resource('cloud-agent-deployment', port_forwards=8025)
+docker_build('mactat/map-pacer-cloud-agent', './cloud-agent')

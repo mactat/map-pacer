@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: map-service-deployment
+  labels:
+    app: map-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: map-service
+  template:
+    metadata:
+      labels:
+        app: map-service
+    spec:
+      containers:
+      - name: map-service
+        image: mactat/map-pacer-map-service:latest
+        ports:
+        - containerPort: 8888
