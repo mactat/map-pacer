@@ -4,6 +4,11 @@
 
 Comparison of path planning algorithms for multiple robots based on edge-cloud collaborative computing, cloud computing, and local computing
 
+## Initial idea
+![Initial idea](/docs/diagrams/initial.png)
+
+## Services architecture
+![Services architecture](/docs/diagrams/services.png)
 
 ## Local testing
 1) Install vagrant and virtualbox
