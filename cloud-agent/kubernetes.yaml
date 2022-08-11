@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloud-agent-deployment
+  name: cloud-agent
   labels:
     app: cloud-agent
 spec:

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: agent-statefullset
+  name: agent
   labels:
     app: agent
 spec:
@@ -18,6 +18,13 @@ spec:
       containers:
       - name: agent
         image: mactat/map-pacer-agent:latest
+        resources:
+          limits:
+            memory: "0.6Gi"
+            cpu: "300m"  
+          requests:
+            memory: "0.2Gi"
+            cpu: "150m"  
         env:
         - name: AGENTS_NUMBER
           value: "3"

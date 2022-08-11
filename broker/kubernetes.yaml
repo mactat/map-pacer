@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: broker-deployment
+  name: broker
   labels:
         app: broker
 spec:

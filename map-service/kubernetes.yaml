@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: map-service-deployment
+  name: map-service
   labels:
     app: map-service
 spec:
