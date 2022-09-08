@@ -27,6 +27,7 @@ help:
 
 .PHONY: dev
 dev:
+	kubectl config use-context kind-kind
 	tilt up
 
 .PHONY: cloud-login
@@ -41,6 +42,14 @@ cloud-login:
 	# Check the context
 	echo "Current context:"
 	kubectl config current-context
+	kubectl config set-context --current --namespace=map-pacer
+
+# Cloud create
+# az login --use-device-code
+# az account set --subscription $(AZURE_SUBSCRIPTION_ID)
+# az group create --name $(AZURE_GROUP_NAME) --location northeurope
+# az aks create -g $(AZURE_GROUP_NAME) -n $(AZURE_CLUSTER_NAME) --node-count 4 --node-vm-size Standard_A8_v2
+# deploy application gateway
 
 .PHONY: cloud-up
 cloud-up:
@@ -56,7 +65,16 @@ cloud-down:
 cloud-deploy:
 	echo "deploying to cluster"
 	kubectl config use-context $(AZURE_CLUSTER_NAME)
+	kubectl config set-context --current --namespace=map-pacer
 	kubectl apply -f ./cloud-agent/kubernetes.yaml
+
+.PHONY: cloud-deploy-broker
+cloud-deploy-broker:
+	echo "deploying broker to cluster"
+	kubectl config use-context $(AZURE_CLUSTER_NAME)
+	kubectl config set-context --current --namespace=map-pacer
+	helm repo add hivemq https://hivemq.github.io/helm-charts
+	helm upgrade --install -f ./cloud-broker/kubernetes.yaml cloud-broker hivemq/hivemq-operator
 
 .PHONY: cloud-build
 cloud-build:
@@ -72,4 +90,5 @@ cloud-build:
 
 .PHONY: clean
 clean:
+	kubectl config use-context kind-kind
 	tilt down
