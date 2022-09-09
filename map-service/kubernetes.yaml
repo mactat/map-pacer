@@ -19,3 +19,14 @@ spec:
         image: mactat/map-pacer-map-service:latest
         ports:
         - containerPort: 8888
+        env:
+        - name: AGENTS_NUMBER
+          value: "3"
+        - name: BROKER_HOSTNAME
+          value: "broker-service"
+        - name: BROKER_PORT
+          value: "1883"
+        - name: CLOUD_BROKER_HOSTNAME
+          value: "tcp-mo2.mogenius.io"
+        - name: CLOUD_BROKER_PORT
+          value: "10106"

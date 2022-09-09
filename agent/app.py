@@ -4,6 +4,7 @@ import socket
 import paho.mqtt.client as mqtt
 import sys
 import random
+import json
 
 
 #Get environment variables
@@ -19,6 +20,7 @@ my_mates = []
 leader = None
 current_election = {}
 election = False
+current_map = []
 
 print(f"My name is {MY_NAME}, Broker: {BROKER}")
 
@@ -70,10 +72,17 @@ def election_completed(winner):
     if winner == MY_NAME:
         print(f"I am the leader({MY_NAME})")
         client_local.publish("agents/election/winner", f"{MY_NAME}", qos=2)
+        print(f"I will generate new map")
+        client_local.publish("map-service/new-map", f"10", qos=2)
     else:
         print(f"I am not the leader({MY_NAME})")
     current_election.clear()
     election = False
+
+def adopt_new_map(new_map):
+    global current_map
+    current_map = new_map
+    print(f"New map adopted")
 
 def on_subscribe(client_local, userdata, mid, granted_qos):
     print("Subscribed to topic")
@@ -83,6 +92,8 @@ def on_message(client_local, userdata, msg):
     match msg.topic:
         case "agents/discovery/start":
             client_local.publish(f"agents/discovery/hello", f"{MY_NAME}", qos=2)
+            client_local.publish(f"map-service/hello", f"{MY_NAME}", qos=2)
+            client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
 
         case "agents/discovery/hello":
             handle_discovery(msg_str)
@@ -98,9 +109,13 @@ def on_message(client_local, userdata, msg):
         case "agents/election/winner":
             election_completed(msg_str)
 
+        case "agents/map/new":
+            # map from json
+            new_map = json.loads(msg_str)
+            adopt_new_map(new_map)
         case _:
             print("Unknown topic")
-            print(f"From topic: {msg.topic} | msg: {msg.payload}")
+            print(f"From topic: {msg.topic} | msg: {msg_str}")
 
 client_local = mqtt.Client()
 client_local.username_pw_set(username="agent", password="agent-pass")
@@ -121,9 +136,6 @@ client_cloud.subscribe(f"{MY_NAME}/#", qos=2)
 
 
 start_discovery()
-
-print(f"Sending hello to cloud-agent")
-client_cloud.publish(f"cloud-agent/hello", f"Hello from {MY_NAME}!", qos=2)
 
 while 1:
     client_local.loop(0.01)
