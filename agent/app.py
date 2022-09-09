@@ -84,10 +84,21 @@ def adopt_new_map(new_map):
     current_map = new_map
     print(f"New map adopted")
 
+def send_info_backend():
+    global current_map, leader, my_mates
+    print(f"Sending info to backend")
+    data = {
+        "leader": MY_NAME,
+        "agents": my_mates+ [MY_NAME],
+        "map": current_map
+    }
+    client_cloud.publish("backend/agents-info", json.dumps(data), qos=2)
+
 def on_subscribe(client_local, userdata, mid, granted_qos):
     print("Subscribed to topic")
 
 def on_message(client_local, userdata, msg):
+    global election, leader
     msg_str = msg.payload.decode()
     match msg.topic:
         case "agents/discovery/start":
@@ -113,6 +124,10 @@ def on_message(client_local, userdata, msg):
             # map from json
             new_map = json.loads(msg_str)
             adopt_new_map(new_map)
+
+        case "agents/info/all":
+            if leader == MY_NAME: send_info_backend()
+
         case _:
             print("Unknown topic")
             print(f"From topic: {msg.topic} | msg: {msg_str}")
