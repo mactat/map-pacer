@@ -133,6 +133,7 @@ client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT)
 client_local.subscribe(f"{MY_NAME}/#", qos=2)
 client_local.subscribe(f"agents/#", qos=2)
 client_cloud.subscribe(f"{MY_NAME}/#", qos=2)
+client_cloud.subscribe(f"agents/#", qos=2)
 
 
 start_discovery()
