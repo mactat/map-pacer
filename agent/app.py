@@ -3,6 +3,7 @@ import os
 import socket
 import paho.mqtt.client as mqtt
 import sys
+import random
 
 
 #Get environment variables
@@ -13,17 +14,93 @@ BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
 NUM_OF_AGENTS= int(os.environ.get('AGENTS_NUMBER'))
 
-my_number = int(MY_NAME[-1])
-num_of_mates = NUM_OF_AGENTS -1
-my_mates = [(my_number + i)%3 for i in range(1, num_of_mates + 1)]
+# State, should be moved somewhere else
+my_mates = []
+leader = None
+current_election = {}
+election = False
 
-print(f"My name is {MY_NAME}, Broker: {BROKER}, Number of agents: {NUM_OF_AGENTS}")
+print(f"My name is {MY_NAME}, Broker: {BROKER}")
+
+def start_discovery():
+    print(f"Starting local discovery")
+    my_mates.clear()
+    client_local.publish("agents/discovery/start", f"Initiate discovery!", qos=2)
+
+def handle_discovery(candidate):
+    if candidate != MY_NAME and candidate not in my_mates:
+        my_mates.append(candidate)
+        print(f"My name: {MY_NAME}, My_mates: {my_mates}")
+    if len(my_mates) == NUM_OF_AGENTS - 1:
+        # find better way to initiate election
+        print(f"Discovery completed")
+        start_election()
+
+def start_election():
+    global election, leader
+    if election: return
+    print(f"Starting election")
+    leader = None
+    client_local.publish("agents/election/start", f"Starting election", qos=2)
+    election = True
+
+def send_vote():
+    global election, leader
+    election = True
+    print(f"There is new election, preparing my vote")
+    # get random number
+    random.seed()
+    vote = random.randint(0, 100)
+    # send vote
+    client_local.publish("agents/election/vote", f"{MY_NAME}, {vote}", qos=2)
+
+def receive_vote(agent, vote):
+    print(f"Receiving vote")
+    current_election[agent] = vote
+    if len(current_election) == len(my_mates):
+        # find winner
+        winner = max(current_election, key=current_election.get)
+        election_completed(winner)
+
+def election_completed(winner):
+    global election, leader
+    if not election: return
+    print(f"Election completed, winner is {winner}")
+    leader = winner
+    if winner == MY_NAME:
+        print(f"I am the leader({MY_NAME})")
+        client_local.publish("agents/election/winner", f"{MY_NAME}", qos=2)
+    else:
+        print(f"I am not the leader({MY_NAME})")
+    current_election.clear()
+    election = False
 
 def on_subscribe(client_local, userdata, mid, granted_qos):
     print("Subscribed to topic")
 
 def on_message(client_local, userdata, msg):
-    print(f"From topic: {msg.topic} | msg: {msg.payload}")  
+    msg_str = msg.payload.decode()
+    match msg.topic:
+        case "agents/discovery/start":
+            client_local.publish(f"agents/discovery/hello", f"{MY_NAME}", qos=2)
+
+        case "agents/discovery/hello":
+            handle_discovery(msg_str)
+
+        # Election
+        case "agents/election/start":
+            send_vote()
+
+        case "agents/election/vote":
+            agent, vote = msg_str.split(", ")
+            receive_vote(agent, int(vote))
+
+        case "agents/election/winner":
+            election_completed(msg_str)
+
+        case _:
+            print("Unknown topic")
+            print(f"From topic: {msg.topic} | msg: {msg.payload}")
 
 client_local = mqtt.Client()
 client_local.username_pw_set(username="agent", password="agent-pass")
@@ -38,16 +115,15 @@ client_cloud.on_message = on_message
 client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT)
 
 # Subscribe for related topics
-client_local.subscribe(f"{MY_NAME}/#", qos=1)
-client_cloud.subscribe(f"{MY_NAME}/#", qos=1)
+client_local.subscribe(f"{MY_NAME}/#", qos=2)
+client_local.subscribe(f"agents/#", qos=2)
+client_cloud.subscribe(f"{MY_NAME}/#", qos=2)
 
-# Send hello to all agents
-print(f"Sending hello to agents {my_mates}")
-for mate in my_mates:
-    client_local.publish(f"agent-{mate}/hello", f"Hello from agent-{my_number}!", qos=2)
+
+start_discovery()
 
 print(f"Sending hello to cloud-agent")
-client_cloud.publish(f"cloud-agent/hello", f"Hello from agent-{my_number}!", qos=2)
+client_cloud.publish(f"cloud-agent/hello", f"Hello from {MY_NAME}!", qos=2)
 
 while 1:
     client_local.loop(0.01)
