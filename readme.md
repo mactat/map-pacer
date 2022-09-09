@@ -25,9 +25,20 @@ tilt up
 
 This includes live cde changes and automatic deployment to local kubernetes cluster managed by `kind`.
 
-## Cloud deployment
+## General development
 ```bash
-to be finished
+For spinning dev-env, tilt, kind and ctlptl has to be configured.
+For cloud development add '.env' file with:
+AZURE_SUBSCRIPTION_ID, AZURE_GROUP_NAME, AZURE_CLUSTER_NAME, DOCKER_TOKEN, DOCKER_USERNAME
+
+Usage:
+	make dev                    run dev cluster and tilt
+	make clean                  stop local cluster and tilt
+	make cloud-login            login to azure and setup kubectl
+	make cloud-up               start kubernetes cluster in azure
+	make cloud-down             stop kubernetes cluster in azure
+	make cloud-deploy           deploy to kubernetes cluster in azure
+	make cloud-build			build and push docker images
 ```
 
 ## Algorithms
