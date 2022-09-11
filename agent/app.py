@@ -1,11 +1,12 @@
 
+import copy
 import os
 import socket
 import paho.mqtt.client as mqtt
 import sys
 import random
 import json
-
+from algo_lib import Grid_map, Obstacle, Cell
 
 #Get environment variables
 MY_NAME = socket.gethostname()
@@ -94,6 +95,42 @@ def send_info_backend():
     }
     client_cloud.publish("backend/agents-info", json.dumps(data), qos=2)
 
+def calculate_single():
+    global current_map
+    temp_map = copy.deepcopy(current_map)
+    start = None
+    end = None
+    # Sanitize map from other agents
+    for i, row in enumerate(temp_map):
+        for j, cell in enumerate(row):
+            if cell == f"{MY_NAME}-start": 
+                    start = (i,j)
+                    temp_map[i][j] = 0
+            elif cell == f"{MY_NAME}-end":
+                    end = (i,j)
+                    temp_map[i][j] = 0
+            elif cell == 0 or cell == 1:
+                    pass
+            else:
+                    temp_map[i][j] = 0
+    
+    if not start or not end:
+        print(f"Start or end not found") 
+        return
+
+    print(f"Agent: {MY_NAME} start: {start}, end: {end}")
+    # create grid map
+    grid_map = Grid_map(mode="no_diag")
+    grid_map.load_from_list(temp_map)
+    # get path
+    possible, path = grid_map.a_star(start, end)
+    if possible:
+        print(f"Path found: {path}")
+        grid_map.print_path(path)
+    else:
+        print(f"Path not found")
+
+
 def on_subscribe(client_local, userdata, mid, granted_qos):
     print("Subscribed to topic")
 
@@ -128,6 +165,9 @@ def on_message(client_local, userdata, msg):
         case "agents/info/all":
             if leader == MY_NAME: send_info_backend()
 
+        case "agents/calculate/single_mode":
+            print(f"Calculating single path...")
+            calculate_single()
         case _:
             print("Unknown topic")
             print(f"From topic: {msg.topic} | msg: {msg_str}")

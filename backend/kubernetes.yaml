@@ -21,9 +21,13 @@ spec:
         - containerPort: 8888
         env:
         - name: CLOUD_BROKER_HOSTNAME
-          value: "tcp-mo2.mogenius.io"
+          value: "cloud-broker-service"
         - name: CLOUD_BROKER_PORT
-          value: "10106"
+          value: "1883" 
+        # - name: CLOUD_BROKER_HOSTNAME
+        #   value: "tcp-mo2.mogenius.io"
+        # - name: CLOUD_BROKER_PORT
+        #   value: "10106"
 ---
 apiVersion: v1
 kind: Service

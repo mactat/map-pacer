@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-broker
+  labels:
+        app: cloud-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud-broker
+  template:
+    metadata:
+      labels:
+        app: cloud-broker
+    spec:
+      containers:
+      - name: cloud-broker-container
+        image: hivemq/hivemq-ce
+        resources:
+          limits:
+            memory: "0.6Gi"
+            cpu: "300m"  
+          requests:
+            memory: "0.2Gi"
+            cpu: "150m"  
+        ports:
+        - containerPort: 1883

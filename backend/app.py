@@ -67,5 +67,11 @@ def get_info():
     refresh_info()
     return info
 
+@app.route("/backend/single-agent-calculate")
+def single_calculate():
+    global info
+    mqtt.publish("agents/calculate/single_mode", "empty", qos=2)
+    return "Calculation requested!"
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8888, debug=True)

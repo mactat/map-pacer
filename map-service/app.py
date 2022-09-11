@@ -5,6 +5,7 @@ import paho.mqtt.client as mqtt
 import sys
 import random
 import json
+import numpy as np
 
 
 #Get environment variables
@@ -24,9 +25,7 @@ def generate_map(map_size):
     global current_map
     current_map.clear()
     for x in range(map_size):
-        current_map.append([])
-        for y in range(map_size):
-            current_map[x].append(random.randint(0, 1))
+        current_map.append(np.random.choice([0,1],map_size,p=[0.8,0.2]).tolist())
     # inject agents to a map
     for agent in agents:
         x_start = random.randint(0, map_size - 1)
