@@ -1,5 +1,5 @@
 
-import os
+import os, random
 import socket
 import paho.mqtt.client as mqtt
 import sys
@@ -28,16 +28,32 @@ def generate_map(map_size):
     current_map.clear()
     for x in range(map_size):
         current_map.append(np.random.choice([0,1],map_size,p=[0.8,0.2]).tolist())
+    put_agents_in_map()
+    logger.info("Random map generated")
+
+def get_map_from_file(map_file="random"):
+    global current_map
+    if map_file=="random": map_file = random.choice(os.listdir("./maps"))
+
+    # take map from text file a cast to int
+    with open(f"./maps/{map_file}") as f:
+        current_map = [[int(num) for num in line.split()] for line in f]
+    put_agents_in_map()
+    logger.info(f"Map from file: {map_file} generated")
+
+# Have to be smarter to avoid spawning in the wall
+def put_agents_in_map():
+    global current_map, agents
     # inject agents to a map
     for agent in agents:
-        x_start = random.randint(0, map_size - 1)
-        y_start = random.randint(0, map_size - 1)
-        x_end = random.randint(0, map_size - 1)
-        y_end = random.randint(0, map_size - 1)
+        x_start = random.randint(0, len(current_map) - 1)
+        y_start = random.randint(0, len(current_map) - 1)
+        x_end = random.randint(0, len(current_map) - 1)
+        y_end = random.randint(0, len(current_map) - 1)
 
         current_map[x_start][y_start] = f"{agent}-start"
         current_map[x_end][y_end] = f"{agent}-end"
-    logger.info(current_map)
+
 
 def announce_new_map():
     logger.info("Announcing new map")
@@ -57,9 +73,13 @@ def on_message(client_local, userdata, msg):
                 agents.append(msg_str)
                 logger.info(f"Agents: {agents}")
 
-        case "map-service/new-map":
+        case "map-service/random-map":
             logger.info("Generating new map")
             generate_map(int(msg_str))
+            announce_new_map()
+
+        case "map-service/map-from-file":
+            get_map_from_file(map_file=msg_str)
             announce_new_map()
 
         case _:

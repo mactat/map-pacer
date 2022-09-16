@@ -65,8 +65,17 @@ def trigger_discovery():
 @app.route("/backend/new-map")
 def generate_map():
     args = request.args
+    paths.clear()
     size = args.get("size", default="10")
-    mqtt.publish("map-service/new-map", size, qos=2)
+    mqtt.publish("map-service/random-map", size, qos=2)
+    return "New map requested!"
+
+@app.route("/backend/map-from-file")
+def get_map_from_file():
+    args = request.args
+    paths.clear()
+    map_file = args.get("map_file", default="random")
+    mqtt.publish("map-service/map-from-file", f"{map_file}.txt", qos=2)
     return "New map requested!"
 
 @app.route("/backend/refresh-info")
@@ -83,13 +92,15 @@ def get_info():
 @app.route("/backend/single-agent-calculate")
 def single_calculate():
     global info
-    mqtt.publish("agents/calculate/single_mode", "empty", qos=2)
-    return "Calculation requested!"
+    args = request.args
+    algo = args.get("algo", default="a_star")
+    mqtt.publish("agents/calculate/single_mode", algo, qos=2)
+    return f"Calculation requested with algorithm: {algo}!"
 
 @app.route("/backend/show_paths")
 def show_paths():
     global paths
-    paths_str = "\n\n".join([f"{agent}:\n {path}" for agent, path in paths.items()]).replace('\n', '<br>')
+    paths_str = "\n\n".join([f"<h1>{agent}:</h1>\n {path}" for agent, path in paths.items()]).replace('\n', '<br>')
     return paths_str
 
 

@@ -96,7 +96,15 @@ class Grid_map:
             final_str += "⬛\n"
         final_str += " ⬛ "*(self.y_limit+2)
         return final_str
-
+    def find_path(self, start, end, algo="a_star"):
+        if algo == "BFS":
+            return self.BFS(start, end)
+        elif algo == "dijkstra":
+            return self.dijkstra(start, end)
+        elif algo == "a_star":
+            return self.a_star(start, end)
+        else:
+            raise ValueError("Invalid algo")
     def BFS(self, start, end):
         frontier = []
         starting_cell = self.grid[start[0]][start[1]]

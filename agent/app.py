@@ -124,7 +124,7 @@ def send_info_backend():
     }
     client_cloud.publish("backend/agents-info", json.dumps(data), qos=2)
 
-def calculate_single():
+def calculate_single(algo="a_star"):
     global current_map
     temp_map = copy.deepcopy(current_map)
     start = None
@@ -152,7 +152,7 @@ def calculate_single():
     grid_map = Grid_map(mode="no_diag")
     grid_map.load_from_list(temp_map)
     # get path
-    possible, path = grid_map.a_star(start, end)
+    possible, path = grid_map.find_path(start, end, algo=algo)
     if possible:
         logger.info(f"Path found: {path}")
         path_on_map = grid_map.path_on_map(path)
@@ -195,7 +195,7 @@ def on_message(client_local, userdata, msg):
 
         case "agents/calculate/single_mode":
             logger.info(f"Calculating single path...")
-            calculate_single()
+            calculate_single(algo=msg_str)
         case _:
             logger.warning("Unknown topic")
             logger.warning(f"From topic: {msg.topic} | msg: {msg_str}")
