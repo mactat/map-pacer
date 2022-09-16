@@ -4,9 +4,10 @@ import os
 import socket
 import paho.mqtt.client as mqtt
 import sys
-import random
+import random, time
 import json
 from algo_lib import Grid_map, Obstacle, Cell
+from log_lib import get_default_logger
 
 #Get environment variables
 MY_NAME = socket.gethostname()
@@ -16,33 +17,61 @@ BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
 NUM_OF_AGENTS= int(os.environ.get('AGENTS_NUMBER'))
 
+# Set logging
+logger = get_default_logger(MY_NAME)
+
 # State, should be moved somewhere else
 my_mates = []
+my_mates_timers = {}
 leader = None
 current_election = {}
 election = False
 current_map = []
 
-print(f"My name is {MY_NAME}, Broker: {BROKER}")
+# Parameters
+POLL_INTERVAL = 1 # seconds
+AGENT_TTL = 3 # seconds
+CLOUD_MODE = False
+
+logger.info(f"My name is {MY_NAME}, Broker: {BROKER}")
 
 def start_discovery():
-    print(f"Starting local discovery")
-    my_mates.clear()
+    logger.debug(f"Starting local discovery")
     client_local.publish("agents/discovery/start", f"Initiate discovery!", qos=2)
+
+def send_hello():
+    client_local.publish(f"agents/discovery/hello", f"{MY_NAME}", qos=2)
+    client_local.publish(f"map-service/hello", f"{MY_NAME}", qos=2)
+    if CLOUD_MODE: client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
 
 def handle_discovery(candidate):
     if candidate != MY_NAME and candidate not in my_mates:
         my_mates.append(candidate)
-        print(f"My name: {MY_NAME}, My_mates: {my_mates}")
-    if len(my_mates) == NUM_OF_AGENTS - 1:
+        logger.info(f"New mate: {candidate}, My_mates: {my_mates}")
+        my_mates_timers[candidate] = AGENT_TTL
+
+    elif candidate != MY_NAME and candidate in my_mates:
+        my_mates_timers[candidate] = AGENT_TTL
+        logger.debug(f"Timer for {candidate} reset")
+
+    if len(my_mates) == NUM_OF_AGENTS - 1 and not election and not leader:
         # find better way to initiate election
-        print(f"Discovery completed")
+        logger.info(f"Discovery completed")
         start_election()
+
+def check_liveness(seconds):
+    for mate in my_mates:
+        my_mates_timers[mate] -= seconds
+        if my_mates_timers[mate] == 0:
+            logger.warning(f"Agent {mate} is dead")
+            my_mates.remove(mate)
+            del my_mates_timers[mate]
+            logger.info(f"Current mates: {my_mates}")
 
 def start_election():
     global election, leader
     if election: return
-    print(f"Starting election")
+    logger.info(f"Starting election")
     leader = None
     client_local.publish("agents/election/start", f"Starting election", qos=2)
     election = True
@@ -50,7 +79,7 @@ def start_election():
 def send_vote():
     global election, leader
     election = True
-    print(f"There is new election, preparing my vote")
+    logger.info(f"There is new election, preparing my vote")
     # get random number
     random.seed()
     vote = random.randint(0, 100)
@@ -58,7 +87,7 @@ def send_vote():
     client_local.publish("agents/election/vote", f"{MY_NAME}, {vote}", qos=2)
 
 def receive_vote(agent, vote):
-    print(f"Receiving vote")
+    logger.info(f"Receiving vote")
     current_election[agent] = vote
     if len(current_election) == len(my_mates):
         # find winner
@@ -68,26 +97,26 @@ def receive_vote(agent, vote):
 def election_completed(winner):
     global election, leader
     if not election: return
-    print(f"Election completed, winner is {winner}")
+    logger.info(f"Election completed, winner is {winner}")
     leader = winner
     if winner == MY_NAME:
-        print(f"I am the leader({MY_NAME})")
+        logger.info(f"I am the leader({MY_NAME})")
         client_local.publish("agents/election/winner", f"{MY_NAME}", qos=2)
-        print(f"I will generate new map")
+        logger.info(f"I will generate new map")
         client_local.publish("map-service/new-map", f"10", qos=2)
     else:
-        print(f"I am not the leader({MY_NAME})")
+        logger.info(f"I am not the leader({MY_NAME})")
     current_election.clear()
     election = False
 
 def adopt_new_map(new_map):
     global current_map
     current_map = new_map
-    print(f"New map adopted")
+    logger.info(f"New map adopted")
 
 def send_info_backend():
     global current_map, leader, my_mates
-    print(f"Sending info to backend")
+    logger.info(f"Sending info to backend")
     data = {
         "leader": MY_NAME,
         "agents": my_mates+ [MY_NAME],
@@ -115,33 +144,32 @@ def calculate_single():
                     temp_map[i][j] = 0
     
     if not start or not end:
-        print(f"Start or end not found") 
+        logger.info(f"Start or end not found") 
         return
 
-    print(f"Agent: {MY_NAME} start: {start}, end: {end}")
+    logger.info(f"Agent: {MY_NAME} start: {start}, end: {end}")
     # create grid map
     grid_map = Grid_map(mode="no_diag")
     grid_map.load_from_list(temp_map)
     # get path
     possible, path = grid_map.a_star(start, end)
     if possible:
-        print(f"Path found: {path}")
-        grid_map.print_path(path)
+        logger.info(f"Path found: {path}")
+        path_on_map = grid_map.path_on_map(path)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": path_on_map}), qos=2)
     else:
-        print(f"Path not found")
+        logger.info(f"Path not found")
 
 
 def on_subscribe(client_local, userdata, mid, granted_qos):
-    print("Subscribed to topic")
+    logger.info("Subscribed to topic")
 
 def on_message(client_local, userdata, msg):
     global election, leader
     msg_str = msg.payload.decode()
     match msg.topic:
         case "agents/discovery/start":
-            client_local.publish(f"agents/discovery/hello", f"{MY_NAME}", qos=2)
-            client_local.publish(f"map-service/hello", f"{MY_NAME}", qos=2)
-            client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
+            send_hello()
 
         case "agents/discovery/hello":
             handle_discovery(msg_str)
@@ -166,11 +194,11 @@ def on_message(client_local, userdata, msg):
             if leader == MY_NAME: send_info_backend()
 
         case "agents/calculate/single_mode":
-            print(f"Calculating single path...")
+            logger.info(f"Calculating single path...")
             calculate_single()
         case _:
-            print("Unknown topic")
-            print(f"From topic: {msg.topic} | msg: {msg_str}")
+            logger.warning("Unknown topic")
+            logger.warning(f"From topic: {msg.topic} | msg: {msg_str}")
 
 client_local = mqtt.Client()
 client_local.username_pw_set(username="agent", password="agent-pass")
@@ -191,8 +219,15 @@ client_cloud.subscribe(f"{MY_NAME}/#", qos=2)
 client_cloud.subscribe(f"agents/#", qos=2)
 
 
-start_discovery()
+
+client_local.loop_start()
+client_cloud.loop_start()
+
 
 while 1:
-    client_local.loop(0.01)
-    client_cloud.loop(0.01)
+    start_discovery()
+    check_liveness(POLL_INTERVAL)
+    time.sleep(POLL_INTERVAL)
+
+
+

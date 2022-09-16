@@ -8,6 +8,10 @@ import json
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
 MY_NAME = socket.gethostname()
+
+# This will be in DB
+paths = {}
+
 print(f"My name is {MY_NAME}, Broker: {BROKER_CLOUD}")
 
 app = Flask(__name__)
@@ -19,6 +23,11 @@ app.config['MQTT_KEEPALIVE'] = 5  # set the time interval for sending a ping to 
 app.config['MQTT_TLS_ENABLED'] = False  # set TLS to disabled for testing purposes
 info = {}
 mqtt = Mqtt(app)
+
+
+def save_path(agent, path):
+    paths[agent] = path
+
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
@@ -32,6 +41,10 @@ def handle_mqtt_message(client, userdata, message):
     match topic[0]:
         case "backend/agents-info":
             info = json.loads(payload)
+        case "backend/path":
+            print("Path received")
+            info = json.loads(payload)
+            save_path(info["agent"], info["path"])
         case _:
             print("Unknown topic", file=sys.stderr)
             print(f"From topic: {topic} | msg: {payload}", file=sys.stderr)
@@ -72,6 +85,13 @@ def single_calculate():
     global info
     mqtt.publish("agents/calculate/single_mode", "empty", qos=2)
     return "Calculation requested!"
+
+@app.route("/backend/show_paths")
+def show_paths():
+    global paths
+    paths_str = "\n\n".join([f"{agent}:\n {path}" for agent, path in paths.items()]).replace('\n', '<br>')
+    return paths_str
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8888, debug=True)

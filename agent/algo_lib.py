@@ -1,7 +1,7 @@
 import numpy as np
 
 class Obstacle:
-    def __init__(self, vis="#"):
+    def __init__(self, vis="⬛"):
         self.vis = vis
 
     def __repr__(self):
@@ -23,10 +23,10 @@ class Cell:
         self.neighbors = []
 
     def __repr__(self):
-        return " "
+        return "⬜"
 
     def __str__(self):
-        return " "
+        return "⬜"
 
 
 class Grid_map:
@@ -84,18 +84,18 @@ class Grid_map:
                     cell.visited = False
                     cell.g = float("inf")
 
-    def print_path(self, path):
-        final_str = " - "*(self.y_limit+1)+"\n"
+    def path_on_map(self, path):
+        final_str = " ⬛ "*(self.y_limit+2)+"\n"
         for i, row in enumerate(self.grid):
-            final_str += "|"
+            final_str += "⬛"
             for j, cell in enumerate(row):
                 if (i, j) in path:
-                    final_str += " * "
+                    final_str += " 🟦 "
                 else:
                     final_str += f" {str(cell)} "
-            final_str += "|\n"
-        final_str += " - "*(self.y_limit+1)
-        print(final_str)
+            final_str += "⬛\n"
+        final_str += " ⬛ "*(self.y_limit+2)
+        return final_str
 
     def BFS(self, start, end):
         frontier = []
@@ -207,12 +207,12 @@ if __name__ == "__main__":
 
     print("BFS")
     possible, path = grid_map.BFS(start, end)
-    grid_map.print_path(path)
+    grid_map.path_on_map(path)
 
     print("Dijkstra")
     possible, path = grid_map.dijkstra(start, end)
-    grid_map.print_path(path)
+    grid_map.path_on_map(path)
 
     print("A*")
     possible, path = grid_map.a_star(start, end)
-    grid_map.print_path(path)
+    grid_map.path_on_map(path)

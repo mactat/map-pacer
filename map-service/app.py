@@ -6,6 +6,7 @@ import sys
 import random
 import json
 import numpy as np
+from log_lib import get_default_logger
 
 
 #Get environment variables
@@ -19,7 +20,8 @@ agents = []
 map_id = 0
 current_map = []
 
-print(f"My name is {MY_NAME}, Broker: {BROKER}")
+logger = get_default_logger(MY_NAME)
+logger.info(f"My name is {MY_NAME}, Broker: {BROKER}")
 
 def generate_map(map_size):
     global current_map
@@ -35,34 +37,34 @@ def generate_map(map_size):
 
         current_map[x_start][y_start] = f"{agent}-start"
         current_map[x_end][y_end] = f"{agent}-end"
-    print(current_map)
+    logger.info(current_map)
 
 def announce_new_map():
-    print("Announcing new map")
+    logger.info("Announcing new map")
     # map to json
     map_json = json.dumps(current_map)
     client_local.publish("agents/map/new", map_json, qos=2)
 
 def on_subscribe(client_local, userdata, mid, granted_qos):
-    print("Subscribed to topic")
+    logger.info("Subscribed to topic")
 
 def on_message(client_local, userdata, msg):
     msg_str = msg.payload.decode()
     match msg.topic:
         case "map-service/hello":
-            print(f"Hello from {msg_str}")
+            logger.debug(f"Hello from {msg_str}")
             if msg_str not in agents:
                 agents.append(msg_str)
-                print(f"Agents: {agents}")
+                logger.info(f"Agents: {agents}")
 
         case "map-service/new-map":
-            print("Generating new map")
+            logger.info("Generating new map")
             generate_map(int(msg_str))
             announce_new_map()
 
         case _:
-            print("Unknown topic")
-            print(f"From topic: {msg.topic} | msg: {msg_str}")
+            logger.info("Unknown topic")
+            logger.info(f"From topic: {msg.topic} | msg: {msg_str}")
 
 client_local = mqtt.Client()
 client_local.username_pw_set(username="agent", password="agent-pass")
