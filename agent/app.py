@@ -11,6 +11,7 @@ from log_lib import get_default_logger
 
 #Get environment variables
 MY_NAME = socket.gethostname()
+MY_NUMBER = int(MY_NAME[-1])
 BROKER = os.environ.get('BROKER_HOSTNAME')
 BROKER_PORT = int(os.environ.get('BROKER_PORT'))
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
@@ -103,7 +104,7 @@ def election_completed(winner):
         logger.info(f"I am the leader({MY_NAME})")
         client_local.publish("agents/election/winner", f"{MY_NAME}", qos=2)
         logger.info(f"I will generate new map")
-        client_local.publish("map-service/new-map", f"10", qos=2)
+        client_local.publish("map-service/random-map", f"20", qos=2)
     else:
         logger.info(f"I am not the leader({MY_NAME})")
     current_election.clear()
@@ -149,7 +150,7 @@ def calculate_single(algo="a_star"):
 
     logger.info(f"Agent: {MY_NAME} start: {start}, end: {end}")
     # create grid map
-    grid_map = Grid_map(mode="no_diag")
+    grid_map = Grid_map(agent_num=MY_NUMBER, mode="no_diag")
     grid_map.load_from_list(temp_map)
     # get path
     possible, path = grid_map.find_path(start, end, algo=algo)

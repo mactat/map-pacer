@@ -1,5 +1,15 @@
 import numpy as np
 
+PATH_TILES_DICT = {
+    0: "🟥",
+    1: "🟦",
+    2: "🟩",
+    3: "🟨",
+    4: "🟧",
+    5: "🟪",
+    6: "🟫"
+}
+
 class Obstacle:
     def __init__(self, vis="⬛"):
         self.vis = vis
@@ -30,11 +40,15 @@ class Cell:
 
 
 class Grid_map:
-    def __init__(self, mode="no_diag"):
+    def __init__(self,agent_num=None, mode="no_diag"):
         self.grid = []
         self.frontier = []
         self.x_limit = 0
         self.y_limit = 0
+        # random till 6
+        if not agent_num: self.agent_num = np.random.randint(0, 6)
+        else: self.agent_num = agent_num
+        self.agent_color = PATH_TILES_DICT[self.agent_num]
         self.neighbors_coord = [(-1, 0), (0, -1), (0, 1), (1, 0)]
         if mode == "diag":
             self.neighbors_coord += [(-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -85,16 +99,16 @@ class Grid_map:
                     cell.g = float("inf")
 
     def path_on_map(self, path):
-        final_str = " ⬛ "*(self.y_limit+2)+"\n"
+        final_str = "⬛"*(self.y_limit+2)+"\n"
         for i, row in enumerate(self.grid):
             final_str += "⬛"
             for j, cell in enumerate(row):
                 if (i, j) in path:
-                    final_str += " 🟦 "
+                    final_str += self.agent_color
                 else:
-                    final_str += f" {str(cell)} "
+                    final_str += f"{str(cell)}"
             final_str += "⬛\n"
-        final_str += " ⬛ "*(self.y_limit+2)
+        final_str += "⬛"*(self.y_limit+2)
         return final_str
     def find_path(self, start, end, algo="a_star"):
         if algo == "BFS":
@@ -215,12 +229,12 @@ if __name__ == "__main__":
 
     print("BFS")
     possible, path = grid_map.BFS(start, end)
-    grid_map.path_on_map(path)
+    print(grid_map.path_on_map(path))
 
     print("Dijkstra")
     possible, path = grid_map.dijkstra(start, end)
-    grid_map.path_on_map(path)
+    print(grid_map.path_on_map(path))
 
     print("A*")
     possible, path = grid_map.a_star(start, end)
-    grid_map.path_on_map(path)
+    print(grid_map.path_on_map(path))

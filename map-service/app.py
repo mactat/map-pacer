@@ -33,7 +33,7 @@ def generate_map(map_size):
 
 def get_map_from_file(map_file="random"):
     global current_map
-    if map_file=="random": map_file = random.choice(os.listdir("./maps"))
+    if "random" in map_file: map_file = random.choice(os.listdir("./maps"))
 
     # take map from text file a cast to int
     with open(f"./maps/{map_file}") as f:
