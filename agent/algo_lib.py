@@ -46,7 +46,7 @@ class Grid_map:
         self.x_limit = 0
         self.y_limit = 0
         # random till 6
-        if not agent_num: self.agent_num = np.random.randint(0, 6)
+        if agent_num==None: self.agent_num = np.random.randint(0, 6)
         else: self.agent_num = agent_num
         self.agent_color = PATH_TILES_DICT[self.agent_num]
         self.neighbors_coord = [(-1, 0), (0, -1), (0, 1), (1, 0)]
