@@ -26,19 +26,26 @@ my_mates = []
 my_mates_timers = {}
 leader = None
 current_election = {}
-election = False
+CUR_HIGHEST_ELECTION = 0
 current_map = []
+election_started = False
 
 # Parameters
 POLL_INTERVAL = 1 # seconds
-AGENT_TTL = 3 # seconds
+AGENT_TTL = 4 # seconds
 CLOUD_MODE = False
+DEFAULT_MAP_SIZE = 30
 
 logger.info(f"My name is {MY_NAME}, Broker: {BROKER}")
 
 def start_discovery():
+    global leader
     logger.debug(f"Starting local discovery")
     client_local.publish("agents/discovery/start", f"Initiate discovery!", qos=2)
+    if leader == MY_NAME:
+        logger.debug(f"I am the leader, sending info to backend and agents")
+        client_local.publish("agents/discovery/leader", f"{MY_NAME}", qos=2)
+        send_info_backend()
 
 def send_hello():
     client_local.publish(f"agents/discovery/hello", f"{MY_NAME}", qos=2)
@@ -46,6 +53,7 @@ def send_hello():
     if CLOUD_MODE: client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
 
 def handle_discovery(candidate):
+    global election_started
     if candidate != MY_NAME and candidate not in my_mates:
         my_mates.append(candidate)
         logger.info(f"New mate: {candidate}, My_mates: {my_mates}")
@@ -55,60 +63,81 @@ def handle_discovery(candidate):
         my_mates_timers[candidate] = AGENT_TTL
         logger.debug(f"Timer for {candidate} reset")
 
-    if len(my_mates) == NUM_OF_AGENTS - 1 and not election and not leader:
+    if len(my_mates) > 0 and not leader and not election_started:
         # find better way to initiate election
-        logger.info(f"Discovery completed")
+        start_election()
+
+def receive_leader(new_leader):
+    global leader, election, current_election,CUR_HIGHEST_ELECTION, election_started
+    election_started = False
+    if new_leader == leader: return
+    elif not leader:
+        leader = new_leader
+        current_election.clear()
+        CUR_HIGHEST_ELECTION = 0
+        logger.info(f"Got leader info, leader is {leader}")
+    else:
+        logger.warning(f"Leader mismatch, old: {leader}, new: {new_leader}. Initiating election")
         start_election()
 
 def check_liveness(seconds):
+    global leader
     for mate in my_mates:
         my_mates_timers[mate] -= seconds
         if my_mates_timers[mate] == 0:
             logger.warning(f"Agent {mate} is dead")
             my_mates.remove(mate)
             del my_mates_timers[mate]
+            if mate == leader:
+                logger.warning(f"Leader {mate} is dead")
+                leader = None
+                start_election()
             logger.info(f"Current mates: {my_mates}")
 
 def start_election():
-    global election, leader
-    if election: return
-    logger.info(f"Starting election")
+    global leader, election_started
+    election_started = True
+    current_election.clear()
     leader = None
-    client_local.publish("agents/election/start", f"Starting election", qos=2)
-    election = True
+    # Generate random election number
+    random.seed()
+    election_number = random.randint(0, 100)
+    logger.info(f"Starting election #{election_number}")
+    client_local.publish("agents/election/start", f"{election_number}", qos=2)
 
-def send_vote():
-    global election, leader
-    election = True
-    logger.info(f"There is new election, preparing my vote")
+def send_vote(election_number):
+    global leader
     # get random number
     random.seed()
     vote = random.randint(0, 100)
     # send vote
-    client_local.publish("agents/election/vote", f"{MY_NAME}, {vote}", qos=2)
+    logger.debug(f"Sending vote: {vote} in election #{election_number}")
+    client_local.publish("agents/election/vote", f"{election_number}, {MY_NAME}, {vote}", qos=2)
 
-def receive_vote(agent, vote):
-    logger.info(f"Receiving vote")
-    current_election[agent] = vote
-    if len(current_election) == len(my_mates):
-        # find winner
-        winner = max(current_election, key=current_election.get)
-        election_completed(winner)
+def receive_vote(election_number, agent, vote):
+    global current_election, CUR_HIGHEST_ELECTION, leader
+    if election_number < CUR_HIGHEST_ELECTION: return
+    elif election_number == CUR_HIGHEST_ELECTION:
+        current_election[agent] = vote
+    elif election_number > CUR_HIGHEST_ELECTION:
+        CUR_HIGHEST_ELECTION = election_number
+        logger.info(f"More important election #{election_number} started")
+        current_election.clear()
+        current_election[agent] = vote
+    logger.debug(f"Receiving vote in election #{election_number}: {agent} - {vote}")
+    # current_election[agent] = vote
+    if len(current_election) != len(my_mates): return
+    # find winner
+    winner = max(current_election, key=current_election.get)
+    if winner != MY_NAME: return
+    leader = MY_NAME
+    logger.info(f"I am the leader({MY_NAME})")
 
-def election_completed(winner):
-    global election, leader
-    if not election: return
-    logger.info(f"Election completed, winner is {winner}")
-    leader = winner
-    if winner == MY_NAME:
-        logger.info(f"I am the leader({MY_NAME})")
-        client_local.publish("agents/election/winner", f"{MY_NAME}", qos=2)
-        logger.info(f"I will generate new map")
-        client_local.publish("map-service/random-map", f"20", qos=2)
-    else:
-        logger.info(f"I am not the leader({MY_NAME})")
-    current_election.clear()
-    election = False
+
+def check_map():
+    if leader != MY_NAME or current_map: return
+    logger.info(f"No map available. I will generate new map")
+    client_local.publish("map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=2)
 
 def adopt_new_map(new_map):
     global current_map
@@ -117,7 +146,7 @@ def adopt_new_map(new_map):
 
 def send_info_backend():
     global current_map, leader, my_mates
-    logger.info(f"Sending info to backend")
+    logger.debug(f"Sending info to backend")
     data = {
         "leader": MY_NAME,
         "agents": my_mates+ [MY_NAME],
@@ -166,7 +195,7 @@ def on_subscribe(client_local, userdata, mid, granted_qos):
     logger.info("Subscribed to topic")
 
 def on_message(client_local, userdata, msg):
-    global election, leader
+    global leader
     msg_str = msg.payload.decode()
     match msg.topic:
         case "agents/discovery/start":
@@ -175,16 +204,15 @@ def on_message(client_local, userdata, msg):
         case "agents/discovery/hello":
             handle_discovery(msg_str)
 
+        case "agents/discovery/leader":
+            receive_leader(msg_str)
         # Election
         case "agents/election/start":
-            send_vote()
+            send_vote(msg_str)
 
         case "agents/election/vote":
-            agent, vote = msg_str.split(", ")
-            receive_vote(agent, int(vote))
-
-        case "agents/election/winner":
-            election_completed(msg_str)
+            election_number, agent, vote = msg_str.split(", ")
+            receive_vote(int(election_number), agent, int(vote))
 
         case "agents/map/new":
             # map from json
@@ -228,6 +256,7 @@ client_cloud.loop_start()
 while 1:
     start_discovery()
     check_liveness(POLL_INTERVAL)
+    check_map()
     time.sleep(POLL_INTERVAL)
 
 

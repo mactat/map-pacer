@@ -23,7 +23,7 @@ mqtt.publish(f"agent-0/hello", f"Hello from cloud!", qos=2)
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe('cloud-agent/hello')
-    mqtt.publish(f"agent-0/hello", f"Hello from cloud!", qos=2)
+    #mqtt.publish(f"agent-0/hello", f"Hello from cloud!", qos=2)
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
