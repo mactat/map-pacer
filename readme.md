@@ -5,10 +5,10 @@
 Comparison of path planning algorithms for multiple robots based on edge-cloud collaborative computing, cloud computing, and local computing
 
 ## Initial idea
-![Initial idea](/docs/diagrams/initial.png)
+![Initial idea](./docs/pictures/initial.png)
 
 ## Services architecture
-![Services architecture](/docs/diagrams/services.png)
+![Services architecture](./docs/pictures/services.png)
 
 ## Local testing
 1) Install vagrant and virtualbox
@@ -43,5 +43,22 @@ Usage:
 
 ## Algorithms
 ```bash
-to be finished
+# Basic A*, Dijkstra, BFS
+# Advanced CA*
 ```
+
+## Map
+Maps are set to be grid based and are represented as 2D array of integers. Each integer represents a cell in the grid. Those grids are transformed into graphs and then used for path planning.
+
+Planning can be based on 2D maps(representing just space) or 3D maps(representing both time and space).
+
+### Principle of graph creation for 2D map:
+![2D map](./docs/pictures/map_2D_no_diag.png)
+![2D map](./docs/pictures/map_2D_diag.png)
+
+### Principle of graph creation for 3D map:
+![3D map](./docs/pictures/map_3D_no_diag.png)
+![3D map](./docs/pictures/map_3D_diag.png)
+
+### Example of solved map for single agent:
+![Solved map](./docs/pictures/single_path_maze.png)
