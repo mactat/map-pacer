@@ -51,6 +51,7 @@ class Grid_map:
         if agent_num==None: self.agent_num = np.random.randint(0, 6)
         else: self.agent_num = agent_num
         self.agent_color = PATH_TILES_DICT[self.agent_num]
+        self.longest_path = None
         self.neighbors_coord = [(-1, 0, 1), (0, -1, 1), (0, 1, 1), (1, 0, 1), (0, 0, 1)] # x,y,z
         if mode == "diag":
             self.neighbors_coord += [(-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -66,22 +67,7 @@ class Grid_map:
                     else:
                         self.grid[timeframe][row_num][column_num] = Cell(row_num, column_num, timeframe)
 
-        # find neighbours
-        for timeframe in self.grid:
-            for row in timeframe:
-                for cell in row:
-                    if isinstance(cell, Cell):
-                        cell.neighbors = self.get_neighbors(cell)
-
-    def __repr__(self):
-        final_str = " - "*(self.y_limit+1)+"\n"
-        for row in self.grid:
-            final_str += "|"
-            for cell in row:
-                final_str += f" {str(cell)} "
-            final_str += "|\n"
-        final_str += " - "*(self.y_limit+1)
-        return final_str
+        self.reset_state()
 
     def get_neighbors(self, cell):
         current_x = cell.x
@@ -100,102 +86,41 @@ class Grid_map:
         for timeframe in self.grid:
             for row in timeframe:
                 for cell in row:
-                    if isinstance(cell, Cell):
-                        cell.parents = []
-                        cell.visited = False
-                        cell.g = float("inf")
+                    if not isinstance(cell, Cell): continue
+                    cell.parents = []
+                    cell.visited = False
+                    cell.neighbors = self.get_neighbors(cell)
+                    cell.g = float("inf")
 
     def mark_path_as_obstacle(self, path):
-        for point in path: self.grid[point[2]][point[0]][point[1]] = Obstacle()
-        for timeframe in self.grid:
-            for row in timeframe:
-                for cell in row:
-                    if isinstance(cell, Cell):
-                        cell.neighbors = self.get_neighbors(cell)
-    
-    def path_on_map(self, path):
+        for point in path: self.grid[point[2]][point[0]][point[1]] = Obstacle(vis=self.agent_color)
+
+    def print_single_grid(self, grid):
         final_str = "⬛"*(self.y_limit+2)+"\n"
-        for i, row in enumerate(self.grid[0]):
+        for row in grid:
             final_str += "⬛"
-            for j, cell in enumerate(row):
-                if (i, j) in path:
-                    final_str += self.agent_color
-                else:
-                    final_str += f"{str(cell)}"
+            for cell in row:
+                final_str += f"{str(cell)}"
             final_str += "⬛\n"
         final_str += "⬛"*(self.y_limit+2)
         return final_str
 
-    def path_every_state_on_map(self, paths):
-        final_str=""
-        for (point1, point2) in zip(paths[0],paths[1]):
-            final_str += "\n" + "⬛"*(self.y_limit+2)+"\n"
-            for i, row in enumerate(self.grid[0]):
-                final_str += "⬛"
-                for j, cell in enumerate(row):
-                    if (i, j) == point1:
-                        final_str += PATH_TILES_DICT[1]
-                    elif (i, j) == point2:
-                        final_str += PATH_TILES_DICT[2]
-                    else:
-                        final_str += f"{str(cell)}"
-                final_str += "⬛\n"
-            final_str += "⬛"*(self.y_limit+2) +"\n"
-        return final_str
+    def print_timegrid(self):
+        if self.longest_path == None: return "No path found"
+        for i in range(self.longest_path):
+            print(f"Timeframe {i}")
+            print(self.print_single_grid(self.grid[i]))
+
+    def mark_goal_as_obstacle(self, goal, timeframe_num):
+        for time in range(timeframe_num, self.time_limit - timeframe_num):
+            self.grid[time][goal[0]][goal[1]] = Obstacle(vis=self.agent_color)
 
     def find_path(self, start, end, algo="a_star"):
-        if algo == "BFS":
-            return self.BFS(start, end)
-        elif algo == "dijkstra":
-            return self.dijkstra(start, end)
-        elif algo == "a_star":
+        if algo == "a_star":
             return self.a_star(start, end)
         else:
             raise ValueError("Invalid algo")
-    def BFS(self, start, end):
-        frontier = []
-        starting_cell = self.grid[start[0]][start[1]]
-        self.reset_state()
-        starting_cell.visited = True
-        frontier.append(starting_cell)
-        while frontier:
-            # Just pop from FIFO queue
-            current = frontier.pop(0)
-            for (x, y) in current.neighbors:
-                if self.grid[x][y].visited:
-                    continue
-                frontier.append(self.grid[x][y])
-                self.grid[x][y].visited = True
-                self.grid[x][y].parents.append((current.x, current.y))
-                self.grid[x][y].parents += current.parents
 
-                if (x, y) == end:
-                    return True, self.grid[x][y].parents + [(x, y)]
-        return False, None
-
-    def dijkstra(self, start, end):
-        frontier = []
-        starting_cell = self.grid[start[0]][start[1]]
-        self.reset_state()
-        starting_cell.visited = True
-        starting_cell.g = 0
-        frontier.append(starting_cell)
-        while frontier:
-            # priority queue based on g value
-            frontier.sort(key=lambda x: x.g)
-            current = frontier.pop(0)
-            for (x, y) in current.neighbors:
-                if self.grid[x][y].visited:
-                    continue
-                frontier.append(self.grid[x][y])
-                self.grid[x][y].visited = True
-                self.grid[x][y].parents.append((current.x, current.y))
-                self.grid[x][y].parents += current.parents
-                self.grid[x][y].g = current.g + 1
-
-                if (x, y) == end:
-                    return True, self.grid[x][y].parents + [(x, y)]
-        return False, None
 
     def get_heuristic(self, point, heuristic="manhattan"):
         if heuristic == "manhattan":
@@ -207,7 +132,6 @@ class Grid_map:
 
     def a_star(self, start, end):
         frontier = []
-        self.reset_state()
         starting_cell = self.grid[0][start[0]][start[1]]
         heuristic_func = self.get_heuristic((end[0], end[1]), heuristic="manhattan")
         starting_cell.visited = True
@@ -232,7 +156,13 @@ class Grid_map:
                 self.grid[z][x][y].f = self.grid[z][x][y].g + self.grid[z][x][y].h
 
                 if (x, y) == end:
-                    return True, [(x, y, z)] + self.grid[z][x][y].parents
+                    path = [(x, y, z)] + self.grid[z][x][y].parents
+                    self.mark_path_as_obstacle(path)
+                    self.mark_goal_as_obstacle(end, z)
+                    self.reset_state()
+                    if self.longest_path == None or len(path) > self.longest_path:
+                        self.longest_path = len(path)
+                    return True, path
         return False, None
 
 if __name__ == "__main__":
@@ -246,35 +176,23 @@ if __name__ == "__main__":
 
     grid_map = Grid_map(mode="no_diag")
     grid_map.load_from_list(simple_map)
-    # print(grid_map)
-    start = (2, 0) 
-    end = (2, 4) 
-
-    # print("BFS")
-    # possible, path = grid_map.BFS(start, end)
-    # print(grid_map.path_on_map(path))
-
-    # print("Dijkstra")
-    # possible, path = grid_map.dijkstra(start, end)
-    # print(grid_map.path_on_map(path))
 
     print("A* agent 1")
+    grid_map.agent_color = PATH_TILES_DICT[1]
+    start = (2, 0) 
+    end = (2, 4) 
     possible_1, path_1 = grid_map.a_star(start, end)
-    print(path_1)
-    path_2d_1 = list(reversed([(x, y) for (x, y, z) in path_1]))
-
-    start = (0, 2) 
-    end = (4, 2) 
 
     print("A* agent 2")
-    grid_map.mark_path_as_obstacle(path_1)
+    grid_map.agent_color = PATH_TILES_DICT[2]
+    start = (0, 2) 
+    end = (4, 2) 
     possible_2, path_2 = grid_map.a_star(start, end)
-    print(path_2)
-    path_2d_2 = list(reversed([(x, y) for (x, y, z) in path_2]))
-    diff = len(path_2) - len(path_1)
-    print(diff)
-    path_2d_1 += [path_2d_1[-1]]*diff
-    print(path_2d_1)
-    print(path_2d_2)
 
-    print(grid_map.path_every_state_on_map([path_2d_1, path_2d_2]))
+    print("A* agent 3")
+    grid_map.agent_color = PATH_TILES_DICT[3]
+    start = (0, 0) 
+    end = (4, 4) 
+    possible_3, path_3 = grid_map.a_star(start, end)
+
+    print(grid_map.print_timegrid())
