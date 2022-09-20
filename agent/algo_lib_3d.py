@@ -1,4 +1,5 @@
 import numpy as np
+import time,os
 
 PATH_TILES_DICT = {
     0: "🟥",
@@ -41,12 +42,13 @@ class Cell:
 
 
 class Grid_map:
-    def __init__(self,agent_num=None, mode="no_diag", time_limit=100):
+    def __init__(self,agent_num=None, mode="no_diag",head_collision_allowed=False, time_limit=100):
         self.grid = []
         self.frontier = []
         self.x_limit = 0
         self.y_limit = 0
         self.time_limit = time_limit
+        self.head_collision_allowed = head_collision_allowed
         # random till 6
         if agent_num==None: self.agent_num = np.random.randint(0, 6)
         else: self.agent_num = agent_num
@@ -91,7 +93,20 @@ class Grid_map:
                     cell.visited = False
                     cell.neighbors = self.get_neighbors(cell)
                     cell.g = float("inf")
+    def avoid_head_collision(self, path):
+        prev_point = None
+        for point in path:
+            if prev_point == None:
+                prev_point = point
+                continue
 
+            # Why is that needed??? Shouldn't the next point be an free cell anyway?
+            if isinstance(self.grid[prev_point[2]][point[0]][point[1]], Obstacle): continue
+            if (prev_point[0], prev_point[1], point[2]) not in self.grid[prev_point[2]][point[0]][point[1]].neighbors: continue
+            # Remove head path in opposite direction than move to avoid head collision
+            self.grid[prev_point[2]][point[0]][point[1]].neighbors.remove((prev_point[0], prev_point[1], point[2]))
+
+            prev_point = point
     def mark_path_as_obstacle(self, path):
         for point in path: self.grid[point[2]][point[0]][point[1]] = Obstacle(vis=self.agent_color)
 
@@ -105,11 +120,13 @@ class Grid_map:
         final_str += "⬛"*(self.y_limit+2)
         return final_str
 
-    def print_timegrid(self):
+    def print_timegrid(self, speed=1, clear=True):
         if self.longest_path == None: return "No path found"
         for i in range(self.longest_path):
+            if clear: os.system('cls' if os.name == 'nt' else 'clear')
             print(f"Timeframe {i}")
             print(self.print_single_grid(self.grid[i]))
+            time.sleep(1/speed)
 
     def mark_goal_as_obstacle(self, goal, timeframe_num):
         for time in range(timeframe_num, self.time_limit - timeframe_num):
@@ -157,12 +174,16 @@ class Grid_map:
 
                 if (x, y) == end:
                     path = [(x, y, z)] + self.grid[z][x][y].parents
+                    # reverse path
+                    path = path[::-1]
                     self.mark_path_as_obstacle(path)
                     self.mark_goal_as_obstacle(end, z)
                     self.reset_state()
+                    if not self.head_collision_allowed: self.avoid_head_collision(path)
                     if self.longest_path == None or len(path) > self.longest_path:
                         self.longest_path = len(path)
                     return True, path
+        self.reset_state()
         return False, None
 
 if __name__ == "__main__":
@@ -174,25 +195,63 @@ if __name__ == "__main__":
         [0, 0, 0, 0, 0]
     ])
 
-    grid_map = Grid_map(mode="no_diag")
+    grid_map = Grid_map(mode="no_diag", head_collision_allowed=False)
     grid_map.load_from_list(simple_map)
 
-    print("A* agent 1")
+    # A* agent 1
+    # grid_map.agent_color = PATH_TILES_DICT[1]
+    # start = (2, 0) 
+    # end = (2, 4) 
+    # possible_1, path_1 = grid_map.a_star(start, end)
+
+    # # A* agent 2
+    # grid_map.agent_color = PATH_TILES_DICT[2]
+    # start = (2, 4) 
+    # end = (2, 0) 
+    # possible_2, path_2 = grid_map.a_star(start, end)
+
+    # # A* agent 3
+    # grid_map.agent_color = PATH_TILES_DICT[3]
+    # start = (0, 0) 
+    # end = (4, 4) 
+    # possible_3, path_3 = grid_map.a_star(start, end)
+
+    # grid_map.print_timegrid(speed=2, clear=True)
+
+    # more complecated map
+    large_map = np.array([
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+        [0, 1, 1, 1, 0, 0, 0, 0, 1, 0],
+        [0, 1, 1, 1, 1, 0, 1, 0, 1, 0],
+        [0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ])
+
+    grid_map = Grid_map(mode="no_diag")
+    grid_map.load_from_list(large_map)
+
+    # A* agent 1
     grid_map.agent_color = PATH_TILES_DICT[1]
-    start = (2, 0) 
-    end = (2, 4) 
+    start = (0, 0) 
+    end = (5, 5) 
     possible_1, path_1 = grid_map.a_star(start, end)
 
-    print("A* agent 2")
+    # A* agent 2
     grid_map.agent_color = PATH_TILES_DICT[2]
-    start = (0, 2) 
-    end = (4, 2) 
+    start = (5, 9) 
+    end = (9, 9) 
     possible_2, path_2 = grid_map.a_star(start, end)
 
-    print("A* agent 3")
+    # # A* agent 3
     grid_map.agent_color = PATH_TILES_DICT[3]
-    start = (0, 0) 
-    end = (4, 4) 
+    start = (9, 9) 
+    end = (5, 9) 
     possible_3, path_3 = grid_map.a_star(start, end)
 
-    print(grid_map.print_timegrid())
+
+    grid_map.print_timegrid(speed=8)
