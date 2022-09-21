@@ -60,5 +60,8 @@ Planning can be based on 2D maps(representing just space) or 3D maps(representin
 ![3D map](./docs/pictures/map_3D_no_diag.png)
 ![3D map](./docs/pictures/map_3D_diag.png)
 
+### Head collision problem for CA* algorithm:
+![Head collision](./docs/pictures/head_collision_problem.png)
+
 ### Example of solved map for single agent:
 ![Solved map](./docs/pictures/single_path_maze.png)
