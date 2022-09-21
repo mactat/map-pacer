@@ -65,3 +65,6 @@ Planning can be based on 2D maps(representing just space) or 3D maps(representin
 
 ### Example of solved map for single agent:
 ![Solved map](./docs/pictures/single_path_maze.png)
+
+### Example of solved map for multiple agents(development vis):
+![Solved map](./docs/pictures/multi_agent_dev.gif)
