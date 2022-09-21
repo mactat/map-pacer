@@ -146,11 +146,11 @@ class Grid_map:
             time.sleep(1/speed)
 
     def mark_goal_as_obstacle(self, goal, timeframe_num):
-        for time in range(timeframe_num, self.time_limit - timeframe_num):
+        for time in range(timeframe_num, self.time_limit):
             self.grid[time][goal[0]][goal[1]] = Obstacle(vis=self.agent_color)
 
     def get_goal_as_path(self, goal, timeframe_num):
-        path = [(goal[0], goal[1], time) for time in range(timeframe_num, self.time_limit - timeframe_num)]
+        path = [(goal[0], goal[1], time) for time in range(timeframe_num, self.time_limit)]
         return path
 
     def find_path(self, start, end, algo="a_star"):
@@ -206,73 +206,3 @@ class Grid_map:
                     return True, path
         self.reset_state(reset_graph=False)
         return False, None
-
-if __name__ == "__main__":
-    simple_map = np.array([
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]
-    ])
-
-    grid_map = Grid_map(mode="no_diag", head_collision_allowed=False)
-    grid_map.load_from_list(simple_map)
-
-    # A* agent 1
-    # grid_map.agent_color = PATH_TILES_DICT[1]
-    # start = (2, 0) 
-    # end = (2, 4) 
-    # possible_1, path_1 = grid_map.a_star(start, end)
-
-    # # A* agent 2
-    # grid_map.agent_color = PATH_TILES_DICT[2]
-    # start = (2, 4) 
-    # end = (2, 0) 
-    # possible_2, path_2 = grid_map.a_star(start, end)
-
-    # # A* agent 3
-    # grid_map.agent_color = PATH_TILES_DICT[3]
-    # start = (0, 0) 
-    # end = (4, 4) 
-    # possible_3, path_3 = grid_map.a_star(start, end)
-
-    # grid_map.print_timegrid(speed=2, clear=True)
-
-    # more complecated map
-    large_map = np.array([
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-        [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
-        [0, 1, 1, 1, 0, 0, 0, 0, 1, 0],
-        [0, 1, 1, 1, 1, 0, 1, 0, 1, 0],
-        [0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ])
-
-    grid_map = Grid_map(mode="no_diag")
-    grid_map.load_from_list(large_map)
-
-    # A* agent 1
-    grid_map.agent_color = PATH_TILES_DICT[1]
-    start = (9, 8) 
-    end = (5, 5) 
-    possible_1, path_1 = grid_map.a_star(start, end)
-
-    # A* agent 2
-    grid_map.agent_color = PATH_TILES_DICT[2]
-    start = (5, 9) 
-    end = (9, 9) 
-    possible_2, path_2 = grid_map.a_star(start, end)
-
-    # # A* agent 3
-    grid_map.agent_color = PATH_TILES_DICT[3]
-    start = (9, 9) 
-    end = (5, 9) 
-    possible_3, path_3 = grid_map.a_star(start, end)
-
-
-    grid_map.print_timegrid(speed=4, clear=True)

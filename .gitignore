@@ -1,3 +1,4 @@
 **/**/.env
 docs/master-thesis-papers/
 /.vscode/
+*pyc
