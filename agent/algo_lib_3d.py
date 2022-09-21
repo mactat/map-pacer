@@ -69,7 +69,7 @@ class Grid_map:
                     else:
                         self.grid[timeframe][row_num][column_num] = Cell(row_num, column_num, timeframe)
 
-        self.reset_state()
+        self.reset_state(reset_graph=True)
 
     def get_neighbors(self, cell):
         current_x = cell.x
@@ -84,15 +84,28 @@ class Grid_map:
                 neighbors.append((x, y, z))
         return neighbors
 
-    def reset_state(self):
+    def reset_state(self,reset_graph=True):
         for timeframe in self.grid:
             for row in timeframe:
                 for cell in row:
                     if not isinstance(cell, Cell): continue
                     cell.parents = []
                     cell.visited = False
-                    cell.neighbors = self.get_neighbors(cell)
+                    if reset_graph: cell.neighbors = self.get_neighbors(cell)
                     cell.g = float("inf")
+
+    def remove_from_neighbors(self, points):
+        for timeframe in self.grid:
+            for row in timeframe:
+                for cell in row:
+                    if not isinstance(cell, Cell): continue
+                    cell.parents = []
+                    cell.visited = False
+                    for point in points:
+                        if point in cell.neighbors:
+                            cell.neighbors.remove(point)
+                    cell.g = float("inf")
+
     def avoid_head_collision(self, path):
         prev_point = None
         for point in path:
@@ -101,8 +114,12 @@ class Grid_map:
                 continue
 
             # Why is that needed??? Shouldn't the next point be an free cell anyway?
-            if isinstance(self.grid[prev_point[2]][point[0]][point[1]], Obstacle): continue
-            if (prev_point[0], prev_point[1], point[2]) not in self.grid[prev_point[2]][point[0]][point[1]].neighbors: continue
+            if isinstance(self.grid[prev_point[2]][point[0]][point[1]], Obstacle): 
+                prev_point = point
+                continue
+            if (prev_point[0], prev_point[1], point[2]) not in self.grid[prev_point[2]][point[0]][point[1]].neighbors: 
+                prev_point = point
+                continue
             # Remove head path in opposite direction than move to avoid head collision
             self.grid[prev_point[2]][point[0]][point[1]].neighbors.remove((prev_point[0], prev_point[1], point[2]))
 
@@ -131,6 +148,10 @@ class Grid_map:
     def mark_goal_as_obstacle(self, goal, timeframe_num):
         for time in range(timeframe_num, self.time_limit - timeframe_num):
             self.grid[time][goal[0]][goal[1]] = Obstacle(vis=self.agent_color)
+
+    def get_goal_as_path(self, goal, timeframe_num):
+        path = [(goal[0], goal[1], time) for time in range(timeframe_num, self.time_limit - timeframe_num)]
+        return path
 
     def find_path(self, start, end, algo="a_star"):
         if algo == "a_star":
@@ -176,14 +197,14 @@ class Grid_map:
                     path = [(x, y, z)] + self.grid[z][x][y].parents
                     # reverse path
                     path = path[::-1]
+                    if not self.head_collision_allowed: self.avoid_head_collision(path)
+                    self.remove_from_neighbors(path+self.get_goal_as_path(end, z))
                     self.mark_path_as_obstacle(path)
                     self.mark_goal_as_obstacle(end, z)
-                    self.reset_state()
-                    if not self.head_collision_allowed: self.avoid_head_collision(path)
                     if self.longest_path == None or len(path) > self.longest_path:
                         self.longest_path = len(path)
                     return True, path
-        self.reset_state()
+        self.reset_state(reset_graph=False)
         return False, None
 
 if __name__ == "__main__":
@@ -237,7 +258,7 @@ if __name__ == "__main__":
 
     # A* agent 1
     grid_map.agent_color = PATH_TILES_DICT[1]
-    start = (0, 0) 
+    start = (9, 8) 
     end = (5, 5) 
     possible_1, path_1 = grid_map.a_star(start, end)
 
@@ -254,4 +275,4 @@ if __name__ == "__main__":
     possible_3, path_3 = grid_map.a_star(start, end)
 
 
-    grid_map.print_timegrid(speed=8)
+    grid_map.print_timegrid(speed=4, clear=True)
