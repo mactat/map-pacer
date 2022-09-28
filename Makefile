@@ -30,6 +30,15 @@ dev:
 	kubectl config use-context kind-kind
 	tilt up
 
+.PHONY: local-observability
+local-observability:
+	kubectl config use-context kind-kind
+	kubectl create -f ./observability/kube-prometheus/manifests/setup
+	kubectl get ns monitoring
+	kubectl create -f ./observability/kube-prometheus/manifests/
+	kubectl get pods -n monitoring
+	kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090
+
 .PHONY: cloud-login
 cloud-login:
 	# Login to the cloud
@@ -67,6 +76,9 @@ cloud-deploy:
 	kubectl config use-context $(AZURE_CLUSTER_NAME)
 	kubectl config set-context --current --namespace=map-pacer
 	kubectl apply -f ./cloud-agent/kubernetes.yaml
+	# to be change in a real cluster
+	kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090 &
+	kubectl --namespace monitoring port-forward svc/grafana 3000 &
 
 .PHONY: cloud-deploy-broker
 cloud-deploy-broker:
@@ -92,3 +104,5 @@ cloud-build:
 clean:
 	kubectl config use-context kind-kind
 	tilt down
+	kubectl delete --ignore-not-found=true -f ./observability/kube-prometheus/manifests/
+	kubectl delete --ignore-not-found=true -f ./observability/kube-prometheus/manifests/setup

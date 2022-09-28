@@ -34,9 +34,8 @@ k8s_resource('broker')
 k8s_yaml('./broker/service.yaml')
 k8s_kind('broker-service')
 
-# Broker
+# Cloud-Broker
 k8s_yaml('./cloud-broker/kubernetes.yaml')
 k8s_resource('cloud-broker')
 k8s_yaml('./cloud-broker/service.yaml')
 k8s_kind('cloud-broker-service')
-

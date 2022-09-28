@@ -1,4 +1,3 @@
-
 import copy
 import os
 import socket
@@ -8,6 +7,7 @@ import random, time
 import json
 from algo_lib import Grid_map, Obstacle, Cell
 from log_lib import get_default_logger
+from prometheus_client import start_http_server, Summary, Enum
 
 #Get environment variables
 MY_NAME = socket.gethostname()
@@ -35,6 +35,13 @@ POLL_INTERVAL = 1 # seconds
 AGENT_TTL = 4 # seconds
 CLOUD_MODE = False
 DEFAULT_MAP_SIZE = 30
+
+# Monitoring
+monitoring_state = Enum(f"agent_state", 'State of the agents', states=['running', 'stopped'])
+monitoring_leader = Enum('leader', 'Leader of the swarm', states=["yes","no"]) 
+monitoring_single_path = Summary('single_path_compute', 'Time spent processing request')
+
+start_http_server(8080)
 
 logger.info(f"My name is {MY_NAME}, Broker: {BROKER}")
 
@@ -154,6 +161,7 @@ def send_info_backend():
     }
     client_cloud.publish("backend/agents-info", json.dumps(data), qos=2)
 
+@monitoring_single_path.time()
 def calculate_single(algo="a_star"):
     global current_map
     temp_map = copy.deepcopy(current_map)
@@ -229,6 +237,14 @@ def on_message(client_local, userdata, msg):
             logger.warning("Unknown topic")
             logger.warning(f"From topic: {msg.topic} | msg: {msg_str}")
 
+def monitor():
+    global leader
+    monitoring_state.state('running')
+    if MY_NAME==leader:
+        monitoring_leader.state('yes')
+    else:
+        monitoring_leader.state('no')
+
 client_local = mqtt.Client()
 client_local.username_pw_set(username="agent", password="agent-pass")
 client_local.on_subscribe = on_subscribe
@@ -257,6 +273,7 @@ while 1:
     start_discovery()
     check_liveness(POLL_INTERVAL)
     check_map()
+    monitor()
     time.sleep(POLL_INTERVAL)
 
 
