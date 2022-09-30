@@ -75,7 +75,8 @@ class Grid_map:
         end = path[-1]
         goal_timestamp = len(path)
         if not self.head_collision_allowed: self.avoid_head_collision(path)
-        self.remove_from_neighbors(path + self.get_goal_as_path(end, goal_timestamp))
+        full_path = path + self.get_goal_as_path(end, goal_timestamp)
+        self.remove_from_neighbors(full_path)
         self.mark_path_as_obstacle(path)
         self.mark_goal_as_obstacle(end, goal_timestamp)
 
@@ -104,15 +105,15 @@ class Grid_map:
                     cell.g = float("inf")
 
     def remove_from_neighbors(self, points):
-        for timeframe in self.grid:
-            for row in timeframe:
-                for cell in row:
+        for i,timeframe in enumerate(self.grid):
+            for j,row in enumerate(timeframe):
+                for k,cell in enumerate(row):
                     if not isinstance(cell, Cell): continue
                     cell.parents = []
                     cell.visited = False
                     for point in points:
-                        if point in cell.neighbors:
-                            cell.neighbors.remove(point)
+                        if tuple(point) in cell.neighbors:
+                            self.grid[i][j][k].neighbors.remove(tuple(point))
                     cell.g = float("inf")
 
     def avoid_head_collision(self, path):
@@ -192,9 +193,9 @@ class Grid_map:
             frontier.sort(key=lambda x: x.f)
             current = frontier.pop(0)
             for (x, y, z) in current.neighbors:
+                if (isinstance(self.grid[z][x][y], Obstacle)): raise ValueError(f"Obstacle in the neibours! current: {current.x} {current.y} {current.z} neibour: {x} {y} {z}")
                 if self.grid[z][x][y].visited:
                     continue
-                if (isinstance(self.grid[z][x][y], Obstacle)): raise ValueError(f"Obstacle in the neibours! current: {current.x} {current.y} {current.z} neibour: {x} {y} {z}")
                 frontier.append(self.grid[z][x][y])
                 self.grid[z][x][y].visited = True
                 self.grid[z][x][y].parents.append((current.x, current.y, current.z))
@@ -203,11 +204,12 @@ class Grid_map:
                 self.grid[z][x][y].h = heuristic_func(x, y)
                 self.grid[z][x][y].f = self.grid[z][x][y].g + self.grid[z][x][y].h
 
-                if (x, y) == end:
+                # BUG !!! Check if this cell is fre for the rest of sim
+                if (x, y) == end and z == self.time_limit-1:
                     path = [(x, y, z)] + self.grid[z][x][y].parents
                     # reverse path
                     path = path[::-1]
-                    self.mark_path_on_grid(path)
+                    #self.mark_path_on_grid(path)
                     if self.longest_path == None or len(path) > self.longest_path:
                         self.longest_path = len(path)
                     return True, path

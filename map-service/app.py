@@ -45,18 +45,23 @@ def get_map_from_file(map_file="random"):
 def get_new_position(agent_name):
     pass
 
+def get_random_free_position(my_map, num_of_agents):
+    positions = []
+    while len(positions) < num_of_agents:
+        x = random.randint(0, len(my_map) - 1)
+        y = random.randint(0, len(my_map) - 1)
+        if my_map[x][y] == 0:
+            positions.append([x, y])
+    return positions
+
 # Have to be smarter to avoid spawning in the wall
 def put_agents_in_map():
     global current_map, agents
     # inject agents to a map
-    for agent in agents:
-        x_start = random.randint(0, len(current_map) - 1)
-        y_start = random.randint(0, len(current_map) - 1)
-        x_end = random.randint(0, len(current_map) - 1)
-        y_end = random.randint(0, len(current_map) - 1)
-
-        current_map[x_start][y_start] = f"{agent}-start"
-        current_map[x_end][y_end] = f"{agent}-end"
+    for agent, position in zip(agents, get_random_free_position(current_map, len(agents))):
+        current_map[position[0]][position[1]] = f"{agent}-start"
+    for agent, position in zip(agents, get_random_free_position(current_map, len(agents))):
+        current_map[position[0]][position[1]] = f"{agent}-end"
 
 
 def announce_new_map():

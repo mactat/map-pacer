@@ -121,7 +121,7 @@ def visualize():
     global info, paths
     if not info:
         return "No info or paths"
-    return render_template("visualize.html", my_map=visualize_paths(info["map"], paths.values()))
+    return render_template("visualize.html", my_map=visualize_paths(info["map"], list(paths.values())))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8888, debug=True)

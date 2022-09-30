@@ -60,13 +60,20 @@ def medium_map_3d():
     possible_1, path_1 = grid_map.a_star(start, end)
 
     # A* agent 2
+    grid_map = Grid_map(mode="no_diag")
+    grid_map.load_from_list(large_map)
     grid_map.agent_color = PATH_TILES_DICT[2]
+    grid_map.mark_path_on_grid(path_1)
     start = (5, 9) 
     end = (9, 9) 
     possible_2, path_2 = grid_map.a_star(start, end)
 
     # # A* agent 3
+    grid_map = Grid_map(mode="no_diag")
+    grid_map.load_from_list(large_map)
     grid_map.agent_color = PATH_TILES_DICT[3]
+    grid_map.mark_path_on_grid(path_1)
+    grid_map.mark_path_on_grid(path_2)
     start = (9, 9) 
     end = (5, 9) 
     possible_3, path_3 = grid_map.a_star(start, end)
