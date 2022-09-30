@@ -103,6 +103,12 @@ def show_paths():
     paths_str = "\n\n".join([f"<h1>{agent}:</h1>\n {path}" for agent, path in paths.items()]).replace('\n', '<br>')
     return paths_str
 
+@app.route("/backend/sequence_calculate")
+def sequence_calculate():
+    global info
+    data = json.dumps({"paths": [], "sequence": [], "status": "start"})
+    mqtt.publish("agents/calculate/sequence_mode", data, qos=2)
+    return f"Calculation requested!"
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8888, debug=True)

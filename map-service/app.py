@@ -41,6 +41,10 @@ def get_map_from_file(map_file="random"):
     put_agents_in_map()
     logger.info(f"Map from file: {map_file} generated")
 
+# Reschedule position of the agent
+def get_new_position(agent_name):
+    pass
+
 # Have to be smarter to avoid spawning in the wall
 def put_agents_in_map():
     global current_map, agents

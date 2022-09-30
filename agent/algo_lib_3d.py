@@ -71,6 +71,15 @@ class Grid_map:
 
         self.reset_state(reset_graph=True)
 
+    def mark_path_on_grid(self, path):
+        end = path[-1]
+        goal_timestamp = len(path)
+        if not self.head_collision_allowed: self.avoid_head_collision(path)
+        self.remove_from_neighbors(path + self.get_goal_as_path(end, goal_timestamp))
+        self.mark_path_as_obstacle(path)
+        self.mark_goal_as_obstacle(end, goal_timestamp)
+
+
     def get_neighbors(self, cell):
         current_x = cell.x
         current_y = cell.y
@@ -197,10 +206,7 @@ class Grid_map:
                     path = [(x, y, z)] + self.grid[z][x][y].parents
                     # reverse path
                     path = path[::-1]
-                    if not self.head_collision_allowed: self.avoid_head_collision(path)
-                    self.remove_from_neighbors(path+self.get_goal_as_path(end, z))
-                    self.mark_path_as_obstacle(path)
-                    self.mark_goal_as_obstacle(end, z)
+                    self.mark_path_on_grid(path)
                     if self.longest_path == None or len(path) > self.longest_path:
                         self.longest_path = len(path)
                     return True, path

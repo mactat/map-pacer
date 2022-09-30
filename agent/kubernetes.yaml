@@ -20,11 +20,11 @@ spec:
         image: mactat/map-pacer-agent:latest
         resources:
           limits:
-            memory: "0.6Gi"
-            cpu: "300m"  
+            memory: "0.8Gi"
+            cpu: "400m"  
           requests:
-            memory: "0.2Gi"
-            cpu: "150m"  
+            memory: "0.4Gi"
+            cpu: "200m"  
         ports:
         - name: metrics
           containerPort: 8080
