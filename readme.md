@@ -68,3 +68,16 @@ Planning can be based on 2D maps(representing just space) or 3D maps(representin
 
 ### Example of solved map for multiple agents(development vis):
 ![Solved map](./docs/pictures/multi_agent_dev.gif)
+
+## Observability
+Observability in this project is based on prometheus and grafana. Grafana is used for visualizing metrics and prometheus is used for collecting them.
+To deply grafana and prometheus locally use:
+```bash
+make local-observability
+```
+
+It can be used in multiple setups:
+![Observability](./docs/pictures/observability.png)
+
+Example of grafana dashboard:
+![Grafana dashboard](./docs/pictures/grafana.png)
