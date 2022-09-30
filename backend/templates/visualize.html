@@ -199,12 +199,16 @@ p, li
 
 <script>
     const map = {{ my_map|tojson }}
+    var slider = document.getElementById("timerange");
+    var output = document.getElementById("timeframe");
     window.setTimeout(f => { document.getElementById("map").innerHTML = map[0]
                                 document.getElementById("map").style.fontSize = String((60/Math.sqrt(map[0].length)))+"vmin" }, 10);
     //Should use For loop variable to fetch and print specific element's Id
     function press(j) {
         if(map.length ===1){ alert("No paths found/calculated!!"); }
         document.getElementById("map").innerHTML = map[j];
+        slider.value = j;
+        output.innerHTML = j;
         if (++j < map.length) window.setTimeout(press, 300, j);
     }
     function calculate_multiple() {
@@ -229,8 +233,6 @@ p, li
             location.reload()
         })
     }
-    var slider = document.getElementById("timerange");
-    var output = document.getElementById("timeframe");
     output.innerHTML = slider.value; // Display the default slider value
 
     // Update the current slider value (each time you drag the slider handle)
@@ -241,6 +243,7 @@ p, li
         } else {
             alert("This timeframe does't exist")
             output.innerHTML = 0;
+            slider.value=0
         }
     }
 </script>
