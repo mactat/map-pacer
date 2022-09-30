@@ -51,6 +51,7 @@ def mark_paths(normal_map, paths):
             # mark begining and end of path
             if(marked_map_times[timestamp][start_tile[0]][start_tile[1]] == EMPTY):
                 marked_map_times[timestamp][start_tile[0]][start_tile[1]] = INITIAL_TILES_DICT[agent_num + 2]
+            if(marked_map_times[timestamp][end_tile[0]][end_tile[1]] == EMPTY):
                 marked_map_times[timestamp][end_tile[0]][end_tile[1]] = INITIAL_TILES_DICT[agent_num + 2]
 
             marked_map_times[timestamp][tile[0]][tile[1]] = PATH_TILES_DICT[agent_num + 2]

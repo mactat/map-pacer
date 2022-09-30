@@ -30,7 +30,7 @@ election_started = False
 
 # Parameters
 POLL_INTERVAL = 1 # seconds
-AGENT_TTL = 15 # seconds
+AGENT_TTL = 40 # seconds
 CLOUD_MODE = False
 DEFAULT_MAP_SIZE = 20
 

@@ -1,157 +1,41 @@
-<script>
-    const map = {{ my_map|tojson }}
-    window.setTimeout(f => { document.getElementById("map").innerHTML = map[0] }, 300);
-    //Should use For loop variable to fetch and print specific element's Id
-    function press(j) {
-        if(map.length ===1){ alert("No paths found/calculated!!"); }
-        document.getElementById("map").innerHTML = map[j];
-        if (++j < map.length) window.setTimeout(press, 300, j);
-    }
-    function calculate_multiple() {
-        console.log("Calculating multiple paths");
-        fetch("http://localhost:8022/backend/sequence_calculate").then(res => {
-            return res.text()
-        }).then(text => {
-            alert(text)
-        })
-    }
-    function change_map(name) {
-        console.log("Change map");
-        if(!name){
-            path = "new-map?size=25"
-        } else {
-            path = "map-from-file?map_file=" + name
-        }
-        fetch("http://localhost:8022/backend/" + path).then(res => {
-            return res.text()
-        }).then(text => {
-            alert(text)
-            location.reload()
-        })
-    }
-</script>
 <style>
-
+html {
+    font-family: Eina01,sans-serif;
+    font-weight: 100;
+    font-size: 14;
+    color: white;
+}
 
 .button-78 {
-  align-items: center;
-  appearance: none;
-  background-clip: padding-box;
-  background-color: initial;
-  background-image: none;
-  border-style: none;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  flex-direction: row;
-  flex-shrink: 0;
-  font-family: Eina01,sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  justify-content: center;
-  line-height: 24px;
-  margin: 0;
-  min-height: 64px;
-  outline: none;
-  overflow: visible;
-  padding: 19px 26px;
-  pointer-events: auto;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  text-transform: none;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: middle;
-  width: 15%;
-  word-break: keep-all;
-  z-index: 0;
+    background: linear-gradient(#541a0f 0, #0c0d0d 100%);
+    padding: 16px;
+    color: inherit;
+    position: relative;
+    display: inline-block;
+    width: 15%;
+    min-height: 64px;
+    min-width: 160px;
+    cursor: pointer;
+    border-radius: 80px;
+    border-color: rgb(255, 116, 38);
+    border-width: thick;
 }
 
-@media (min-width: 768px) {
-  .button-78 {
-    padding: 19px 32px;
-  }
+.button-78:hover {
+    background: linear-gradient(92.83deg, rgb(255, 116, 38) 0%, rgb(249, 58, 19) 100%);
+    transition: all 100ms ease-out;
+    border-width: thick;
+    border-color: rgb(255, 116, 38);
 }
-
-.button-78:before,
-.button-78:after {
-  border-radius: 80px;
-}
-
-.button-78:before {
-  background-image: linear-gradient(92.83deg, #ff7426 0, #f93a13 100%);
-  content: "";
-  display: block;
-  height: 100%;
-  left: 0;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: -2;
-}
-
-.button-78:after {
-  background-color: initial;
-  background-image: linear-gradient(#541a0f 0, #0c0d0d 100%);
-  bottom: 4px;
-  content: "";
-  display: block;
-  left: 4px;
-  overflow: hidden;
-  position: absolute;
-  right: 4px;
-  top: 4px;
-  transition: all 100ms ease-out;
-  z-index: -1;
-}
-
-.button-78:hover:not(:disabled):before {
-  background: linear-gradient(92.83deg, rgb(255, 116, 38) 0%, rgb(249, 58, 19) 100%);
-}
-
-.button-78:hover:not(:disabled):after {
-  bottom: 0;
-  left: 0;
-  right: 0;
-  top: 0;
-  transition-timing-function: ease-in;
-  opacity: 0;
-}
-
-.button-78:active:not(:disabled) {
-  color: #ccc;
-}
-
-.button-78:active:not(:disabled):before {
-  background-image: linear-gradient(0deg, rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)), linear-gradient(92.83deg, #ff7426 0, #f93a13 100%);
-}
-
-.button-78:active:not(:disabled):after {
-  background-image: linear-gradient(#541a0f 0, #0c0d0d 100%);
-  bottom: 4px;
-  left: 4px;
-  right: 4px;
-  top: 4px;
-}
-
-.button-78:disabled {
-  cursor: default;
-  opacity: .24;
-}
-
 
 .board {
-position: absolute;
-left: 50%;
-top: 50%;
-transform: translate(-50%, -50%);
-border: 10px solid #000000;
-padding: 10px;
-background-color: rgb(230, 255, 246);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 10px solid #000000;
+    background-color: rgb(230, 255, 246);
+    font-size: medium;
 }
 
 
@@ -160,7 +44,6 @@ background-color: rgb(230, 255, 246);
     background: linear-gradient(#541a0f 0, #0c0d0d 100%);
     color: white;
     padding: 16px;
-    font-size: 16px;
     min-height: 64px;
     cursor: pointer;
     border-radius: 80px;
@@ -226,21 +109,138 @@ background-color: rgb(230, 255, 246);
 .text-btn:hover {
   background-color: #ddd;
 }
+
+
+.slidercontainer{
+  width: 20%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 60%;
+  align-self: right;
+  height: 25px;
+  border-radius: 5px;  
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  display: inline-block;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: rgb(255, 116, 38);
+  border-radius: 5px;  
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: rgb(255, 116, 38);
+  border-radius: 5px;  
+  cursor: pointer;
+}
+.text-container{
+    justify-content: center;
+    height: 80%;
+    width: 30%;
+    background-color: rgb(255, 116, 38);
+    border-radius: 80px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    margin-left: 30px;
+}
+p, li
+{
+  font-size: 1.2vmin;
+}
 </style>
 
-<button class="button-78" role="button" onclick="press(0)">Visualize agents path</button>
-<button class="button-78" role="button" onclick="calculate_multiple()">Calculate paths</button>
-<button class="button-78" role="button" onclick="location.reload()">Refresh</button>
-<button class="button-78" role="button" onclick="change_map()">Random map</button>
-<div class="dropdown">
-    <button class="dropbtn">Pre-defined maps</button>
-    <div class="dropdown-content">
-        <button class=text-btn onclick="change_map('collision_10')">Collision</a>
-        <button class=text-btn onclick="change_map('maze_39')">Maze</a>
-        <button class=text-btn onclick="change_map('corridor_20')">Corridor</a>
+<div style="display:flex; width:100%; align-items: center;">
+    <button class="button-78" role="button" onclick="press(0)">Visualize agents path</button>
+    <button class="button-78" role="button" onclick="calculate_multiple()">Calculate paths</button>
+    <button class="button-78" role="button" onclick="location.reload()">Refresh</button>
+    <button class="button-78" role="button" onclick="change_map()">Random map</button>
+    <div class="dropdown">
+        <button class="dropbtn">Pre-defined maps</button>
+        <div class="dropdown-content">
+            <button class=text-btn onclick="change_map('collision_10')">Collision</a>
+            <button class=text-btn onclick="change_map('maze_39')">Maze</a>
+            <button class=text-btn onclick="change_map('corridor_20')">Corridor</a>
+            <button class=text-btn onclick="change_map('narrow_30')">Narrow</a>
+        </div>
     </div>
-</div>
+    
+    <div class="slidercontainer">
+        <div class="text-container">
+            <p>TF: <span id="timeframe"></span></p>
+        </div>
+        <input type="range" min="0" max="100" value="0" class="slider" id="timerange">
+    </div>
 
-<div id="map" class="board" style="font-size: x-large;">No Map</div>
+<div id="map" class="board">No Map</div>
 
 
+
+<script>
+    const map = {{ my_map|tojson }}
+    window.setTimeout(f => { document.getElementById("map").innerHTML = map[0]
+                                document.getElementById("map").style.fontSize = String((60/Math.sqrt(map[0].length)))+"vmin" }, 10);
+    //Should use For loop variable to fetch and print specific element's Id
+    function press(j) {
+        if(map.length ===1){ alert("No paths found/calculated!!"); }
+        document.getElementById("map").innerHTML = map[j];
+        if (++j < map.length) window.setTimeout(press, 300, j);
+    }
+    function calculate_multiple() {
+        console.log("Calculating multiple paths");
+        fetch("http://localhost:8022/backend/sequence_calculate").then(res => {
+            return res.text()
+        }).then(text => {
+            alert(text)
+        })
+    }
+    function change_map(name) {
+        console.log("Change map");
+        if(!name){
+            path = "new-map?size=25"
+        } else {
+            path = "map-from-file?map_file=" + name
+        }
+        fetch("http://localhost:8022/backend/" + path).then(res => {
+            return res.text()
+        }).then(text => {
+            alert(text)
+            location.reload()
+        })
+    }
+    var slider = document.getElementById("timerange");
+    var output = document.getElementById("timeframe");
+    output.innerHTML = slider.value; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+        if(this.value < map.length) {
+            document.getElementById("map").innerHTML = map[this.value];
+        } else {
+            alert("This timeframe does't exist")
+            output.innerHTML = 0;
+        }
+    }
+</script>
