@@ -194,6 +194,7 @@ class Grid_map:
             for (x, y, z) in current.neighbors:
                 if self.grid[z][x][y].visited:
                     continue
+                if (isinstance(self.grid[z][x][y], Obstacle)): raise ValueError(f"Obstacle in the neibours! current: {current.x} {current.y} {current.z} neibour: {x} {y} {z}")
                 frontier.append(self.grid[z][x][y])
                 self.grid[z][x][y].visited = True
                 self.grid[z][x][y].parents.append((current.x, current.y, current.z))

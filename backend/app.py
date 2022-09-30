@@ -1,3 +1,5 @@
+from cgitb import html
+from visualizer import visualize_paths
 from flask import Flask, render_template, request
 from flask_mqtt import Mqtt
 import socket
@@ -21,7 +23,7 @@ app.config['MQTT_USERNAME'] = "agent"
 app.config['MQTT_PASSWORD'] = "agent-pass"
 app.config['MQTT_KEEPALIVE'] = 5  # set the time interval for sending a ping to the broker to 5 seconds
 app.config['MQTT_TLS_ENABLED'] = False  # set TLS to disabled for testing purposes
-info = {}
+info = {"agents":"", "leader":"", "map": []}
 mqtt = Mqtt(app)
 
 
@@ -35,16 +37,19 @@ def handle_connect(client, userdata, flags, rc):
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
-    global info
+    global info, paths
     topic=message.topic,
     payload=message.payload.decode()
     match topic[0]:
         case "backend/agents-info":
-            info = json.loads(payload)
+            temp_info = json.loads(payload)
+            if not info["map"] or temp_info["map"] != info["map"]:
+                paths.clear()
+            info = temp_info
         case "backend/path":
             print("Path received")
-            info = json.loads(payload)
-            save_path(info["agent"], info["path"])
+            data = json.loads(payload)
+            save_path(data["agent"], data["path"])
         case _:
             print("Unknown topic", file=sys.stderr)
             print(f"From topic: {topic} | msg: {payload}", file=sys.stderr)
@@ -109,6 +114,14 @@ def sequence_calculate():
     data = json.dumps({"paths": [], "sequence": [], "status": "start"})
     mqtt.publish("agents/calculate/sequence_mode", data, qos=2)
     return f"Calculation requested!"
+
+
+@app.route("/backend/visualize")
+def visualize():
+    global info, paths
+    if not info:
+        return "No info or paths"
+    return render_template("visualize.html", my_map=visualize_paths(info["map"], paths.values()))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8888, debug=True)

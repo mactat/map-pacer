@@ -238,8 +238,6 @@ def calculate_sequence(paths, sequence, status, algo="CA_star"):
     else:
         logger.info(f"Path not found")
         client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found"}), qos=2)
-    # FEATURE! new endpoint
-
     # Last to calculate
     status = "continue"
     if len(sequence) == 1:
