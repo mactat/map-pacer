@@ -220,11 +220,12 @@ p, li
 </div>
 <script>
     // vars
-    const map = {{ my_map|tojson }}
+    var map = {{ my_map|tojson }}
     var slider = document.getElementById("timerange");
     var timeframeGauge = document.getElementById("timeframe");
     var curMap = document.getElementById("map");
     var agentsText = document.getElementById("agentinfo");
+    var visualization = null;
 
     // initial settings
     timeframeGauge.innerHTML = slider.value;
@@ -233,13 +234,13 @@ p, li
 
     // Fetch info every second
     agentsInfo()
-    var info = setInterval(agentsInfo,1000);
+    var ainfo = setInterval(agentsInfo,1000);
+    var minfo = setInterval(refreshMap,1000);
 
     function agentsInfo() {
         fetch("http://localhost:8022/backend/get-info").then(res => {
             return res.json()
         }).then(info => {
-            console.log(info)
             final_str = "Agents:<br>"
             for(num in info.agents) {
                 final_str += "<br>🟢 "+ info.agents[num]
@@ -252,12 +253,34 @@ p, li
             }
         })
     }
+
+    function refreshMap(){
+        fetch("http://localhost:8022/backend/get_prerendered_map").then(res => {
+            return res.json()
+        }).then(renderedMap => {
+            if(map[0] !== renderedMap[0]){
+                map = renderedMap
+                timeframeGauge.innerHTML = 0;
+                slider.value=0
+                curMap.innerHTML = map[0]
+                curMap.style.fontSize = String((60/Math.sqrt(map[0].length)))+"vmin"
+            }
+        })
+    }
     function visualizePath(j) {
         if(map.length ===1){ alert("No paths found/calculated!!"); }
+        if( j === 0 && visualization != null) {
+            window.clearTimeout(visualization);
+            visualization = null;
+        }
         curMap.innerHTML = map[j];
         slider.value = j;
         timeframeGauge.innerHTML = j;
-        if (++j < map.length) window.setTimeout(visualizePath, 300, j);
+        if (++j < map.length){
+            visualization = window.setTimeout(visualizePath, 300, j);
+        } else {
+            visualization = null;
+        }
     }
 
     function calculate_multiple() {
@@ -279,13 +302,16 @@ p, li
         fetch("http://localhost:8022/backend/" + path).then(res => {
             return res.text()
         }).then(text => {
-            alert(text)
-            location.reload()
+            console.log(text)
         })
     }
 
     // Update the current slider value (each time you drag the slider handle)
     slider.oninput = function() {
+        if(visualization){
+            window.clearTimeout(visualization);
+            visualization = null;
+        }
         timeframeGauge.innerHTML = this.value;
         if(this.value < map.length) {
             curMap.innerHTML = map[this.value];

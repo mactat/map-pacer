@@ -114,12 +114,19 @@ def sequence_calculate():
     mqtt.publish("agents/calculate/sequence_mode", data, qos=2)
     return f"Calculation requested!"
 
+# TODO: frontend shoud use this function rather than refreshing the page
+@app.route("/backend/get_prerendered_map")
+def get_prerendered_map():
+    global info, paths
+    if not info:
+        return ["No info or paths"]
+    return json.dumps(visualize_paths(info["map"], list(paths.values())))
 
 @app.route("/backend/visualize")
 def visualize():
     global info, paths
     if not info:
-        return "No info or paths"
+        return ["No info or paths"]
     return render_template("visualize.html", my_map=visualize_paths(info["map"], list(paths.values())))
 
 if __name__ == "__main__":
