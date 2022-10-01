@@ -229,8 +229,14 @@ def calculate_sequence(paths, sequence, status, algo="CA_star"):
     elif status != "continue" or sequence[0] != MY_NAME:
         return
     logger.info("It's my turn to calculate")
-    grid_map = setup_map(current_map, paths)
-    possible, path = calculate_a_star(grid_map, start, end)
+
+    if not start or not end:
+        logger.warning(f"Start or end not found")
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found"}), qos=2)
+        possible = False
+    else:
+        grid_map = setup_map(current_map, paths)
+        possible, path = calculate_a_star(grid_map, start, end)
     if possible:
         logger.info(f"Path found: {path}")
         paths.append(path)

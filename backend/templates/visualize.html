@@ -269,7 +269,13 @@ p, li
     }
     function visualizePath(j) {
         if(map.length ===1){ alert("No paths found/calculated!!"); }
-        if( j === 0 && visualization != null) {
+        // stop visualization if  state is not changing
+        if(j > 1 && map[j] == map[j-1]) {
+            visualization = null;
+            return;
+        }
+        // stop visualization if new one is started or
+        if(j === 0 && visualization != null) {
             window.clearTimeout(visualization);
             visualization = null;
         }
