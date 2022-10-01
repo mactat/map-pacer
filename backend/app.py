@@ -6,6 +6,8 @@ import socket
 import os
 import sys
 import json
+from flask_cors import CORS
+
 
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
@@ -17,6 +19,7 @@ paths = {}
 print(f"My name is {MY_NAME}, Broker: {BROKER_CLOUD}")
 
 app = Flask(__name__)
+CORS(app)
 app.config['MQTT_BROKER_URL'] = BROKER_CLOUD
 app.config['MQTT_BROKER_PORT'] = BROKER_CLOUD_PORT
 app.config['MQTT_USERNAME'] = "agent"
@@ -121,13 +124,6 @@ def get_prerendered_map():
     if not info:
         return ["No info or paths"]
     return json.dumps(visualize_paths(info["map"], list(paths.values())))
-
-@app.route("/backend/visualize")
-def visualize():
-    global info, paths
-    if not info:
-        return ["No info or paths"]
-    return render_template("visualize.html", my_map=visualize_paths(info["map"], list(paths.values())))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8888, debug=True)

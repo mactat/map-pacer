@@ -220,7 +220,7 @@ p, li
 </div>
 <script>
     // vars
-    var map = {{ my_map|tojson }}
+    var map = ["None"];
     var slider = document.getElementById("timerange");
     var timeframeGauge = document.getElementById("timeframe");
     var curMap = document.getElementById("map");
@@ -234,6 +234,7 @@ p, li
 
     // Fetch info every second
     agentsInfo()
+    refreshMap()
     var ainfo = setInterval(agentsInfo,1000);
     var minfo = setInterval(refreshMap,1000);
 
