@@ -91,7 +91,6 @@ def refresh_info():
 @app.route("/backend/get-info")
 def get_info():
     global info
-    refresh_info()
     return info
 
 @app.route("/backend/single-agent-calculate")

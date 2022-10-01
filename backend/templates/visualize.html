@@ -28,17 +28,6 @@ html {
     border-color: rgb(255, 116, 38);
 }
 
-.board {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    border: 10px solid #000000;
-    background-color: rgb(230, 255, 246);
-    font-size: medium;
-}
-
-
 /* Style The Dropdown Button */
 .dropbtn {
     background: linear-gradient(#541a0f 0, #0c0d0d 100%);
@@ -169,10 +158,41 @@ p, li
 {
   font-size: 1.2vmin;
 }
+.maincontainer{
+    display: flex;
+    align-items: center;
+    height: 80vh;
+    width: 100%;
+    background-color: rgba(255, 116, 38, 0.2);
+    border-radius: 30px;
+    margin-top: 30px;
+    margin-bottom:30px;
+    margin-right: 30px;
+    margin-left: 30px;
+    justify-content: space-between;
+    flex-wrap: nowrap
+}
+.board {
+    display: flex;
+    border-width: thick;
+    border-color: black;
+    background-color: white;
+    font-size: medium;
+    margin: 60px;
+    border-style: solid;
+}
+.agentinfo {
+    display: flex;
+    width: 30%;
+    border: #0c0d0d;
+    border-width: 5px;
+    background-color: none;
+    font-size: xx-large;
+}
 </style>
-
+<div style="display:flex; width:100%; align-items: center; flex-direction: column;">
 <div style="display:flex; width:100%; align-items: center;">
-    <button class="button-78" role="button" onclick="press(0)">Visualize agents path</button>
+    <button class="button-78" role="button" onclick="visualizePath(0)">Visualize agents path</button>
     <button class="button-78" role="button" onclick="calculate_multiple()">Calculate paths</button>
     <button class="button-78" role="button" onclick="location.reload()">Refresh</button>
     <button class="button-78" role="button" onclick="change_map()">Random map</button>
@@ -192,25 +212,54 @@ p, li
         </div>
         <input type="range" min="0" max="100" value="0" class="slider" id="timerange">
     </div>
-
-<div id="map" class="board">No Map</div>
-
-
-
+</div>
+<div class="maincontainer">
+    <div id="map" class="board">No Map</div>
+    <div class="agentinfo" id="agentinfo">Agents:<br><br>None</div>
+</div>
+</div>
 <script>
+    // vars
     const map = {{ my_map|tojson }}
     var slider = document.getElementById("timerange");
-    var output = document.getElementById("timeframe");
-    window.setTimeout(f => { document.getElementById("map").innerHTML = map[0]
-                                document.getElementById("map").style.fontSize = String((60/Math.sqrt(map[0].length)))+"vmin" }, 10);
-    //Should use For loop variable to fetch and print specific element's Id
-    function press(j) {
-        if(map.length ===1){ alert("No paths found/calculated!!"); }
-        document.getElementById("map").innerHTML = map[j];
-        slider.value = j;
-        output.innerHTML = j;
-        if (++j < map.length) window.setTimeout(press, 300, j);
+    var timeframeGauge = document.getElementById("timeframe");
+    var curMap = document.getElementById("map");
+    var agentsText = document.getElementById("agentinfo");
+
+    // initial settings
+    timeframeGauge.innerHTML = slider.value;
+    curMap.innerHTML = map[0]
+    curMap.style.fontSize = String((60/Math.sqrt(map[0].length)))+"vmin"
+
+    // Fetch info every second
+    agentsInfo()
+    var info = setInterval(agentsInfo,1000);
+
+    function agentsInfo() {
+        fetch("http://localhost:8022/backend/get-info").then(res => {
+            return res.json()
+        }).then(info => {
+            console.log(info)
+            final_str = "Agents:<br>"
+            for(num in info.agents) {
+                final_str += "<br>🟢 "+ info.agents[num]
+                if(info.agents[num] == info.leader){
+                    final_str += " 👑"
+                }
+            }
+            if(agentsText.innerHTML != final_str){
+                agentsText.innerHTML = final_str
+            }
+        })
     }
+    function visualizePath(j) {
+        if(map.length ===1){ alert("No paths found/calculated!!"); }
+        curMap.innerHTML = map[j];
+        slider.value = j;
+        timeframeGauge.innerHTML = j;
+        if (++j < map.length) window.setTimeout(visualizePath, 300, j);
+    }
+
     function calculate_multiple() {
         console.log("Calculating multiple paths");
         fetch("http://localhost:8022/backend/sequence_calculate").then(res => {
@@ -219,6 +268,7 @@ p, li
             alert(text)
         })
     }
+
     function change_map(name) {
         console.log("Change map");
         if(!name){
@@ -233,16 +283,15 @@ p, li
             location.reload()
         })
     }
-    output.innerHTML = slider.value; // Display the default slider value
 
     // Update the current slider value (each time you drag the slider handle)
     slider.oninput = function() {
-        output.innerHTML = this.value;
+        timeframeGauge.innerHTML = this.value;
         if(this.value < map.length) {
-            document.getElementById("map").innerHTML = map[this.value];
+            curMap.innerHTML = map[this.value];
         } else {
             alert("This timeframe does't exist")
-            output.innerHTML = 0;
+            timeframeGauge.innerHTML = 0;
             slider.value=0
         }
     }
