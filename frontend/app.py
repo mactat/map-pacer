@@ -15,23 +15,6 @@ def serve():
 # - map service stores agent start and end positions
 # - map service can spawn agent on EXISTING map
 # - droping agents start end on the map
-# - fix single agent calculate to return real paths, map them to time
-# - algorithm selection -> tab should look like this:
-#   | Select algorithm |
-#   --------------------
-#   | Single agent     |
-#   |******************|
-#   | A*               |
-#   | Dijkstra         |
-#   | BFS              |
-#   | Multi agent      |
-#   |******************|
-#   | Sequence agent   |
-#   |------------------|
-#   | CA*              |
-#   | Cloud guided     |
-#   |------------------|
-#   | CA*              |
 
 
 if __name__ == "__main__":

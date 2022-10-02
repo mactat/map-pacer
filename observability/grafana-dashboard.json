@@ -83,6 +83,7 @@
           },
           "mappings": [],
           "min": 0,
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -126,7 +127,7 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "builder",
-          "expr": "agent_state{agent_state=\"running\"}",
+          "expr": "sum by(pod) (last_over_time(agent_state{agent_state=\"running\"}[1m]))",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
@@ -143,6 +144,7 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -189,7 +191,7 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod) (leader{leader=\"yes\"})",
+          "expr": "sum by(pod) (last_over_time(leader{leader=\"yes\"}[1m]))",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
@@ -272,6 +274,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -425,14 +428,14 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 25,
+            "fillOpacity": 36,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -442,7 +445,7 @@
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "normal"
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -472,7 +475,7 @@
         "x": 0,
         "y": 11
       },
-      "id": 18,
+      "id": 24,
       "options": {
         "legend": {
           "calcs": [],
@@ -485,6 +488,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "9.1.6",
       "targets": [
         {
           "datasource": {
@@ -492,13 +496,13 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod) (rate(single_path_compute_sum[$__rate_interval]))",
+          "expr": "sum by(pod) (idelta(calculate_path_time_sum[5m]))",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Time of single path calculation",
+      "title": "Path calculation time",
       "type": "timeseries"
     },
     {
@@ -559,7 +563,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "single_path_compute_sum",
+          "expr": "sum by(pod) (calculate_path_time_sum)",
           "instant": true,
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -567,7 +571,7 @@
           "refId": "A"
         }
       ],
-      "title": "Total time of single path calculation",
+      "title": "Total time of path calculation",
       "type": "bargauge"
     },
     {
@@ -578,6 +582,7 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -596,7 +601,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 15,
         "w": 4,
         "x": 20,
         "y": 11
@@ -609,7 +614,7 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
@@ -625,7 +630,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "sum by(pod) (single_path_compute_count)",
+          "expr": "sum by(pod) (last_over_time(calculate_path_time_count[10m]))",
           "instant": false,
           "legendFormat": "{{pod}}",
           "range": true,
@@ -634,9 +639,167 @@
       ],
       "title": "Path calculated",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 36,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "id": 28,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.1.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "builder",
+          "expr": "sum by(pod) (idelta(setup_map_time_sum[5m]))",
+          "legendFormat": "{{pod}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Setup time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 12,
+        "y": 19
+      },
+      "id": 26,
+      "options": {
+        "displayMode": "lcd",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "9.1.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "builder",
+          "expr": "sum by(pod) (setup_map_time_sum)",
+          "legendFormat": "{{pod}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Map setup time total",
+      "type": "bargauge"
     }
   ],
-  "refresh": "5s",
+  "refresh": "10s",
   "schemaVersion": 37,
   "style": "dark",
   "tags": [],
@@ -651,6 +814,6 @@
   "timezone": "",
   "title": "Core dashboard",
   "uid": "fuidVnV4z",
-  "version": 15,
+  "version": 19,
   "weekStart": ""
 }
