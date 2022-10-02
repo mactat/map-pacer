@@ -96,7 +96,7 @@ def get_info():
     global info
     return info
 
-@app.route("/backend/single-agent-calculate")
+@app.route("/backend/single_calculate")
 def single_calculate():
     global info
     args = request.args

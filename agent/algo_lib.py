@@ -199,7 +199,9 @@ class Grid_map:
                 self.grid[x][y].f = self.grid[x][y].g + self.grid[x][y].h
 
                 if (x, y) == end:
-                    return True, self.grid[x][y].parents + [(x, y)]
+                    path = [(x, y)] + self.grid[x][y].parents
+                    path = path[::-1]
+                    return True, path
         return False, None
 
 if __name__ == "__main__":

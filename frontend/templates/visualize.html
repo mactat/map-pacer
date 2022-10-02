@@ -63,7 +63,7 @@ html {
 
 /* Links inside the dropdown */
 .dropdown-content a {
-    color: black;
+    color: grey;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
@@ -84,6 +84,15 @@ html {
     transition: all 100ms ease-out;
     border-width: thick;
     border-color: rgb(255, 116, 38);
+}
+.dropdown-text {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    width:100%;
+    font-size: 20px;
+    font-weight: thick;
 }
 .text-btn {
   border: none;
@@ -194,7 +203,16 @@ p, li
 <div style="display:flex; width:100%; align-items: center;">
     <button class="button-78" role="button" onclick="visualizePath(0)">Visualize agents path</button>
     <button class="button-78" role="button" onclick="calculate_multiple()">Calculate paths</button>
-    <button class="button-78" role="button" onclick="location.reload()">Refresh</button>
+    <div class="dropdown">
+        <button class="dropbtn">Algorithms</button>
+        <div class="dropdown-content">
+            <p class="dropdown-text">Single Agent</p>
+            <button class=text-btn onclick="set_algo('single_calculate')">A*</button>
+            <p class="dropdown-text">Multiple Agents</p>
+            <button class=text-btn onclick="set_algo('sequence_calculate')">Sequence mode</button>
+            <p class="dropdown-text">Cloud enhanced</p>
+        </div>
+    </div>
     <button class="button-78" role="button" onclick="change_map()">Random map</button>
     <div class="dropdown">
         <button class="dropbtn">Pre-defined maps</button>
@@ -226,6 +244,7 @@ p, li
     var curMap = document.getElementById("map");
     var agentsText = document.getElementById("agentinfo");
     var visualization = null;
+    var algo = "sequence_calculate";
 
     // initial settings
     timeframeGauge.innerHTML = slider.value;
@@ -292,7 +311,7 @@ p, li
 
     function calculate_multiple() {
         console.log("Calculating multiple paths");
-        fetch("http://localhost:8022/backend/sequence_calculate").then(res => {
+        fetch("http://localhost:8022/backend/" + algo).then(res => {
             return res.text()
         }).then(text => {
             alert(text)
@@ -311,6 +330,10 @@ p, li
         }).then(text => {
             console.log(text)
         })
+    }
+
+    function set_algo(name) {
+        algo = name
     }
 
     // Update the current slider value (each time you drag the slider handle)

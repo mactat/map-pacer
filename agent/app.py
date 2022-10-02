@@ -198,9 +198,10 @@ def calculate_single(algo="a_star"):
     # get path
     possible, path = grid_map.find_path(start, end, algo=algo)
     if possible:
+        # to be changed to dynamic
+        full_path = path + [path[-1]*(100-len(path))]
         logger.info(f"Path found: {path}")
-        path_on_map = grid_map.path_on_map(path)
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": path_on_map}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": full_path}), qos=2)
     else:
         logger.info(f"Path not found")
         client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found"}), qos=2)
