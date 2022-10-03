@@ -191,8 +191,8 @@ p, li
     border-style: solid;
 }
 .agentinfo {
+    color: black;
     display: flex;
-    width: 30%;
     border: #0c0d0d;
     border-width: 5px;
     background-color: none;
@@ -205,7 +205,7 @@ p, li
     <button class="button-78" role="button" onclick="calculate_multiple()">Calculate paths</button>
     <div class="dropdown">
         <button class="dropbtn">Algorithms</button>
-        <div class="dropdown-content">
+        <div class="dropdown-content"id="algorithms_panel">
             <p class="dropdown-text">Single Agent</p>
             <button class=text-btn onclick="set_algo('single_calculate')">A*</button>
             <p class="dropdown-text">Multiple Agents</p>
@@ -216,7 +216,7 @@ p, li
     <button class="button-78" role="button" onclick="change_map()">Random map</button>
     <div class="dropdown">
         <button class="dropbtn">Pre-defined maps</button>
-        <div class="dropdown-content">
+        <div class="dropdown-content" id="map_panel">
             <button class=text-btn onclick="change_map('collision_10')">Collision</a>
             <button class=text-btn onclick="change_map('maze_39')">Maze</a>
             <button class=text-btn onclick="change_map('corridor_20')">Corridor</a>
@@ -233,7 +233,10 @@ p, li
 </div>
 <div class="maincontainer">
     <div id="map" class="board">No Map</div>
-    <div class="agentinfo" id="agentinfo">Agents:<br><br>None</div>
+    <div style="display: flex; flex-direction: column; width: 50%;">
+        <div class="agentinfo" id="agentinfo">Agents:<br><br>None</div>
+        <div class="agentinfo" id="algo"><br><br>Algorithm: CA*</div>
+    </div>
 </div>
 </div>
 <script>
@@ -243,6 +246,7 @@ p, li
     var timeframeGauge = document.getElementById("timeframe");
     var curMap = document.getElementById("map");
     var agentsText = document.getElementById("agentinfo");
+    var algoText = document.getElementById("algo")
     var visualization = null;
     var algo = "sequence_calculate";
 
@@ -331,9 +335,13 @@ p, li
             console.log(text)
         })
     }
-
+    algo_map = {
+        "single_calculate":"A*",
+        "sequence_calculate":"CA*"
+    }
     function set_algo(name) {
         algo = name
+        algoText.innerHTML = "<br><br>Algorithm: " + algo_map[algo]
     }
 
     // Update the current slider value (each time you drag the slider handle)
