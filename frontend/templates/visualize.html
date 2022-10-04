@@ -207,9 +207,11 @@ p, li
         <button class="dropbtn">Algorithms</button>
         <div class="dropdown-content"id="algorithms_panel">
             <p class="dropdown-text">Single Agent</p>
-            <button class=text-btn onclick="set_algo('single_calculate')">A*</button>
+            <button class=text-btn onclick="set_algo('single_calculate', 'A*')">A*</button>
+            <button class=text-btn onclick="set_algo('single_calculate', 'Dijkstra')">Dijkstra</button>
+            <button class=text-btn onclick="set_algo('single_calculate', 'BFS')">BFS</button>
             <p class="dropdown-text">Multiple Agents</p>
-            <button class=text-btn onclick="set_algo('sequence_calculate')">Sequence mode</button>
+            <button class=text-btn onclick="set_algo('sequence_calculate', 'CA*')">CA*</button>
             <p class="dropdown-text">Cloud enhanced</p>
         </div>
     </div>
@@ -248,7 +250,8 @@ p, li
     var agentsText = document.getElementById("agentinfo");
     var algoText = document.getElementById("algo")
     var visualization = null;
-    var algo = "sequence_calculate";
+    var mode = "sequence_calculate";
+    var algo = "CA*";
 
     // initial settings
     timeframeGauge.innerHTML = slider.value;
@@ -315,7 +318,7 @@ p, li
 
     function calculate_multiple() {
         console.log("Calculating multiple paths");
-        fetch("http://localhost:8022/backend/" + algo).then(res => {
+        fetch("http://localhost:8022/backend/" + mode + '?algo=' + algo).then(res => {
             return res.text()
         }).then(text => {
             alert(text)
@@ -335,13 +338,11 @@ p, li
             console.log(text)
         })
     }
-    algo_map = {
-        "single_calculate":"A*",
-        "sequence_calculate":"CA*"
-    }
-    function set_algo(name) {
-        algo = name
-        algoText.innerHTML = "<br><br>Algorithm: " + algo_map[algo]
+
+    function set_algo(cur_mode, cur_algo) {
+        algo = cur_algo
+        mode = cur_mode
+        algoText.innerHTML = "<br><br>Algorithm: " + algo
     }
 
     // Update the current slider value (each time you drag the slider handle)

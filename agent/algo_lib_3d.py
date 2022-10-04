@@ -163,8 +163,8 @@ class Grid_map:
         path = [(goal[0], goal[1], time) for time in range(timeframe_num, self.time_limit)]
         return path
 
-    def find_path(self, start, end, algo="a_star"):
-        if algo == "a_star":
+    def find_path(self, start, end, algo="A*"):
+        if algo == "A*":
             return self.a_star(start, end)
         else:
             raise ValueError("Invalid algo")

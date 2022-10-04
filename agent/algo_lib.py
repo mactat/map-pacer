@@ -110,12 +110,12 @@ class Grid_map:
             final_str += "⬛\n"
         final_str += "⬛"*(self.y_limit+2)
         return final_str
-    def find_path(self, start, end, algo="a_star"):
+    def find_path(self, start, end, algo="A*"):
         if algo == "BFS":
             return self.BFS(start, end)
-        elif algo == "dijkstra":
+        elif algo == "Dijkstra":
             return self.dijkstra(start, end)
-        elif algo == "a_star":
+        elif algo == "A*":
             return self.a_star(start, end)
         else:
             raise ValueError("Invalid algo")
@@ -137,7 +137,9 @@ class Grid_map:
                 self.grid[x][y].parents += current.parents
 
                 if (x, y) == end:
-                    return True, self.grid[x][y].parents + [(x, y)]
+                    path = [(x, y)] + self.grid[x][y].parents
+                    path = path[::-1]
+                    return True, path
         return False, None
 
     def dijkstra(self, start, end):
@@ -161,7 +163,9 @@ class Grid_map:
                 self.grid[x][y].g = current.g + 1
 
                 if (x, y) == end:
-                    return True, self.grid[x][y].parents + [(x, y)]
+                    path = [(x, y)] + self.grid[x][y].parents
+                    path = path[::-1]
+                    return True, path
         return False, None
 
     def get_heuristic(self, point, heuristic="manhattan"):

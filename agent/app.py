@@ -184,7 +184,7 @@ def send_info_backend():
     client_cloud.publish("backend/agents-info", json.dumps(data), qos=2)
 
 @monitoring_calculate_path_time.time()
-def calculate_single(algo="a_star"):
+def calculate_single(algo="A*"):
     global current_map, start, end
     temp_map = copy.deepcopy(current_map)
     if not start or not end:

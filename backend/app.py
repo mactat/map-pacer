@@ -100,7 +100,7 @@ def get_info():
 def single_calculate():
     global info
     args = request.args
-    algo = args.get("algo", default="a_star")
+    algo = args.get("algo", default="A*")
     mqtt.publish("agents/calculate/single_mode", algo, qos=2)
     return f"Calculation requested with algorithm: {algo}!"
 
