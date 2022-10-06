@@ -46,6 +46,8 @@ Usage:
 # Basic A*, Dijkstra, BFS
 # Advanced CA*
 ```
+### CA* sequence diagram
+![CA* sequence diagram](./docs/pictures/ca_start_sequence.png)
 
 ## Map
 Maps are set to be grid based and are represented as 2D array of integers. Each integer represents a cell in the grid. Those grids are transformed into graphs and then used for path planning.
