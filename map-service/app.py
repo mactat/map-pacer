@@ -23,6 +23,12 @@ current_map = []
 logger = get_default_logger(MY_NAME)
 logger.info(f"My name is {MY_NAME}, Broker: {BROKER}")
 
+
+def adopt_new_map(new_map):
+    global current_map
+    current_map = new_map
+    logger.info("Map adopted")
+
 def generate_map(map_size):
     global current_map
     current_map.clear()
@@ -89,6 +95,10 @@ def on_message(client_local, userdata, msg):
 
         case "map-service/map-from-file":
             get_map_from_file(map_file=msg_str)
+            announce_new_map()
+        case "map-service/adopt-map":
+            new_map = json.loads(msg_str)
+            adopt_new_map(new_map)
             announce_new_map()
 
         case _:

@@ -215,10 +215,11 @@ p, li
             <p class="dropdown-text">Cloud enhanced</p>
         </div>
     </div>
-    <button class="button-78" role="button" onclick="change_map()">Random map</button>
+    <button class="button-78" role="button" onclick="redirect_to_map_creator()">Map creator</button>
     <div class="dropdown">
         <button class="dropbtn">Pre-defined maps</button>
         <div class="dropdown-content" id="map_panel">
+            <button class=text-btn onclick="change_map()">Random</a>
             <button class=text-btn onclick="change_map('collision_10')">Collision</a>
             <button class=text-btn onclick="change_map('maze_39')">Maze</a>
             <button class=text-btn onclick="change_map('corridor_20')">Corridor</a>
@@ -253,6 +254,7 @@ p, li
     var visualization = null;
     var mode = "sequence_calculate";
     var algo = "CA*";
+    var num_of_agents = 0;
 
     // initial settings
     timeframeGauge.innerHTML = slider.value;
@@ -265,11 +267,15 @@ p, li
     var ainfo = setInterval(agentsInfo,1000);
     var minfo = setInterval(refreshMap,1000);
 
+    function redirect_to_map_creator() {
+        location.href = "http://localhost:8023/map-creator?num_of_agents=" + num_of_agents;
+    }
     function agentsInfo() {
         fetch("http://localhost:8022/backend/get-info").then(res => {
             return res.json()
         }).then(info => {
             final_str = "Agents:<br>"
+            num_of_agents = info.agents.length
             for(num in info.agents) {
                 final_str += "<br>🟢 "+ info.agents[num]
                 if(info.agents[num] == info.leader){

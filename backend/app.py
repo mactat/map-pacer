@@ -1,4 +1,3 @@
-from cgitb import html
 from visualizer import visualize_paths
 from flask import Flask, render_template, request
 from flask_mqtt import Mqtt
@@ -124,6 +123,18 @@ def get_prerendered_map():
     if not info:
         return ["No info or paths"]
     return json.dumps(visualize_paths(info["map"], list(paths.values())))
+
+@app.route("/backend/save_map", methods=['GET', 'POST'])
+def save_map():
+    new_map = json.dumps(request.json)
+    mqtt.publish("map-service/save-map", new_map, qos=2)
+    return "ok"
+
+@app.route("/backend/adopt_map", methods=['GET', 'POST'])
+def adopt_new_map():
+    new_map = json.dumps(request.json)
+    mqtt.publish("map-service/adopt-map", new_map, qos=2)
+    return "ok"
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8888, debug=True)
