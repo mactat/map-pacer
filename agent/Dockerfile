@@ -6,11 +6,12 @@ ENV PYTHONIOENCODING=UTF-8
 
 WORKDIR /app
 
-ADD requirements.txt .
+ADD ./agent/requirements.txt .
 
 RUN apk --no-cache --update-cache add  python3 py3-pip py3-arrow  py3-numpy
 RUN pip install --no-cache-dir -r requirements.txt
 
-ADD . .
+COPY ./libs/ /app/libs/
+ADD ./agent .
 
 ENTRYPOINT ["python3", "/app/app.py"]

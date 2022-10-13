@@ -6,7 +6,7 @@ import sys
 import random
 import json
 import numpy as np
-from log_lib import get_default_logger
+from libs.log_lib import get_default_logger
 
 
 #Get environment variables

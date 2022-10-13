@@ -1,45 +1,57 @@
-from flask import Flask, render_template
-from flask_mqtt import Mqtt
-import socket
-import os
-import sys
 
+import os, random
+import socket
+import paho.mqtt.client as mqtt
+import sys
+import random
+import json
+import numpy as np
+from libs.log_lib import get_default_logger
+from prometheus_client import start_http_server, Summary, Enum
+
+#Get environment variables
+MY_NAME = socket.gethostname()
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
-MY_NAME = socket.gethostname()
-print(f"My name is {MY_NAME}, Broker: {BROKER_CLOUD}")
+agents = []
+map_id = 0
+current_map = []
 
-app = Flask(__name__)
-app.config['MQTT_BROKER_URL'] = BROKER_CLOUD
-app.config['MQTT_BROKER_PORT'] = BROKER_CLOUD_PORT
-app.config['MQTT_USERNAME'] = "agent"
-app.config['MQTT_PASSWORD'] = "agent-pass"
-app.config['MQTT_KEEPALIVE'] = 5  # set the time interval for sending a ping to the broker to 5 seconds
-app.config['MQTT_TLS_ENABLED'] = False  # set TLS to disabled for testing purposes
+logger = get_default_logger(MY_NAME)
+logger.info(f"My name is {MY_NAME}, Broker: {BROKER_CLOUD}")
 
-mqtt = Mqtt(app)
-mqtt.publish(f"agent-0/hello", f"Hello from cloud!", qos=2)
+# Metrics
+monitoring_setup_map_time = Summary('setup_map_time', 'Time spent for map setup')
+monitoring_calculate_path_time = Summary('calculate_path_time', 'Time spent for path calculation')
 
-@mqtt.on_connect()
-def handle_connect(client, userdata, flags, rc):
-    mqtt.subscribe('cloud-agent/hello')
-    #mqtt.publish(f"agent-0/hello", f"Hello from cloud!", qos=2)
+def on_subscribe(client_local, userdata, mid, granted_qos):
+    logger.info("Subscribed to topic")
 
-@mqtt.on_message()
-def handle_mqtt_message(client, userdata, message):
-    data = dict(
-        topic=message.topic,
-        payload=message.payload.decode()
-    )
-    print(data, file=sys.stderr)
+def on_message(client_local, userdata, msg):
+    msg_str = msg.payload.decode()
+    match msg.topic:
+        case "cloud-agent/hello":
+            logger.debug(f"Hello from {msg_str}")
+            if msg_str not in agents:
+                agents.append(msg_str)
+                logger.info(f"Agents: {agents}")
 
-@mqtt.on_log()
-def handle_logging(client, userdata, level, buf):
-    print(level, buf)
+        case _:
+            logger.info("Unknown topic")
+            logger.info(f"From topic: {msg.topic} | msg: {msg_str}")
 
-@app.route("/cloud-agent")
-def serve():
-    return "Hi there, I am a cloud-agent"
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8888, debug=True)
+client_cloud = mqtt.Client()
+client_cloud.username_pw_set(username="agent", password="agent-pass")
+client_cloud.on_subscribe = on_subscribe
+client_cloud.on_message = on_message
+client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT)
+
+# Subscribe for related topics
+client_cloud.subscribe(f"cloud-agent/#", qos=2)
+
+# Restart discovery of agents
+client_cloud.publish("agents/discovery/start","It's cloud-agent looking for ya" , qos=2)
+
+while 1:
+    client_cloud.loop(0.01)

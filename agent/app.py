@@ -1,10 +1,10 @@
 import copy, os, socket
-import paho.mqtt.client as mqtt
 import random, time, json
-from algo_lib import Grid_map
-from log_lib import get_default_logger
+from libs.algo_lib import Grid_map
+from libs.log_lib import get_default_logger
+from libs.algo_lib_3d import Grid_map as Grid_map_3d
+import paho.mqtt.client as mqtt
 from prometheus_client import start_http_server, Summary, Enum
-from algo_lib_3d import Grid_map as Grid_map_3d
 
 #Get environment variables
 MY_NAME = socket.gethostname()
@@ -56,6 +56,7 @@ def start_discovery():
 def send_hello():
     client_local.publish(f"agents/discovery/hello", f"{MY_NAME}", qos=2)
     client_local.publish(f"map-service/hello", f"{MY_NAME}", qos=2)
+    client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
     if CLOUD_MODE: client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
 
 def handle_discovery(candidate):

@@ -1,7 +1,7 @@
 # Agent
 k8s_yaml('./agent/kubernetes.yaml')
 k8s_resource('agent')
-docker_build('mactat/map-pacer-agent', './agent')
+docker_build('mactat/map-pacer-agent', './', dockerfile='./agent/Dockerfile')
 
 # Backend
 k8s_yaml('./backend/kubernetes.yaml')
@@ -16,12 +16,12 @@ docker_build('mactat/map-pacer-frontend', './frontend')
 # Map-service
 k8s_yaml('./map-service/kubernetes.yaml')
 k8s_resource('map-service', port_forwards=8024)
-docker_build('mactat/map-pacer-map-service', './map-service')
+docker_build('mactat/map-pacer-map-service', './', dockerfile='./map-service/Dockerfile')
 
 # Cloud-agent
 k8s_yaml('./cloud-agent/kubernetes.yaml')
 k8s_resource('cloud-agent', port_forwards=8025)
-docker_build('mactat/map-pacer-cloud-agent', './cloud-agent')
+docker_build('mactat/map-pacer-cloud-agent', './', dockerfile='./cloud-agent/Dockerfile')
 
 # Redis
 # load('ext://helm_resource', 'helm_resource', 'helm_repo')
