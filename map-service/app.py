@@ -75,6 +75,7 @@ def announce_new_map():
     # map to json
     map_json = json.dumps(current_map)
     client_local.publish("agents/map/new", map_json, qos=2)
+    client_cloud.publish("cloud-agent/map/new", map_json, qos=2)
 
 def on_subscribe(client_local, userdata, mid, granted_qos):
     logger.info("Subscribed to topic")
@@ -93,6 +94,9 @@ def on_message(client_local, userdata, msg):
             generate_map(int(msg_str))
             announce_new_map()
 
+        case "map-service/re-announce-map":
+            logger.info("Re-announcing map")
+            announce_new_map()
         case "map-service/map-from-file":
             get_map_from_file(map_file=msg_str)
             announce_new_map()

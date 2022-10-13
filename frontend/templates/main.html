@@ -213,6 +213,7 @@ p, li
             <p class="dropdown-text">Multiple Agents</p>
             <button class=text-btn onclick="set_algo('sequence_calculate', 'CA*')">CA*</button>
             <p class="dropdown-text">Cloud enhanced</p>
+            <button class=text-btn onclick="set_algo('sequence_calculate_cloud', 'CA*')">CA*</button>
         </div>
     </div>
     <button class="button-78" role="button" onclick="redirect_to_map_creator()">Map creator</button>
@@ -349,7 +350,7 @@ p, li
     function set_algo(cur_mode, cur_algo) {
         algo = cur_algo
         mode = cur_mode
-        algoText.innerHTML = "<br><br>Algorithm: " + algo
+        algoText.innerHTML = "<br><br>Algorithm: " + algo + "-" + mode
     }
 
     // Update the current slider value (each time you drag the slider handle)

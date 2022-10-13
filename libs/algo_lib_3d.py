@@ -42,11 +42,12 @@ class Cell:
 
 
 class Grid_map:
-    def __init__(self,agent_num=None, mode="no_diag",head_collision_allowed=False, time_limit=100):
+    def __init__(self,agent_num=None, mode="no_diag",head_collision_allowed=False, time_limit=100, mark_path=False):
         self.grid = []
         self.frontier = []
         self.x_limit = 0
         self.y_limit = 0
+        self.mark_path = mark_path
         self.time_limit = time_limit
         self.head_collision_allowed = head_collision_allowed
         # random till 6
@@ -209,7 +210,9 @@ class Grid_map:
                     path = [(x, y, z)] + self.grid[z][x][y].parents
                     # reverse path
                     path = path[::-1]
-                    #self.mark_path_on_grid(path)
+
+                    # Think about it v
+                    if self.mark_path == True: self.mark_path_on_grid(path)
                     if self.longest_path == None or len(path) > self.longest_path:
                         self.longest_path = len(path)
                     return True, path

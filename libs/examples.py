@@ -11,7 +11,7 @@ def simple_map_3d():
         [0, 0, 0, 0, 0]
     ])
 
-    grid_map = Grid_map(mode="no_diag", head_collision_allowed=False)
+    grid_map = Grid_map(mode="no_diag", head_collision_allowed=False, mark_path=True)
     grid_map.load_from_list(simple_map)
 
     #A* agent 1
@@ -60,7 +60,7 @@ def medium_map_3d():
     possible_1, path_1 = grid_map.a_star(start, end)
 
     # A* agent 2
-    grid_map = Grid_map(mode="no_diag")
+    grid_map = Grid_map(mode="no_diag"
     grid_map.load_from_list(large_map)
     grid_map.agent_color = PATH_TILES_DICT[2]
     grid_map.mark_path_on_grid(path_1)
@@ -83,7 +83,7 @@ def medium_map_3d():
 
 def random_map_3d(map_size, num_of_agent):
     # Random huge map
-    grid_map = Grid_map(mode="no_diag", head_collision_allowed=False)
+    grid_map = Grid_map(mode="no_diag", head_collision_allowed=False, mark_path=True)
     huge_map = []
     for x in range(map_size):
         huge_map.append(np.random.choice([0,1],map_size,p=[0.7,0.3]).tolist())

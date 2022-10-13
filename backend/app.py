@@ -116,6 +116,12 @@ def sequence_calculate():
     mqtt.publish("agents/calculate/sequence_mode", data, qos=2)
     return f"Calculation requested!"
 
+@app.route("/backend/sequence_calculate_cloud")
+def sequence_calculate_cloud():
+    data = json.dumps({"algo":"CA*"})
+    mqtt.publish("cloud-agent/calculate/sequence_mode", data, qos=2)
+    return f"Calculation requested!"
+
 # TODO: frontend shoud use this function rather than refreshing the page
 @app.route("/backend/get_prerendered_map")
 def get_prerendered_map():
