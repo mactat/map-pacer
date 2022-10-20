@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: "Build & test"
         run: |
+          touch .env #Should be filled with secret creds
           make pdf
 
       - uses: "marvinpinto/action-automatic-releases@latest"
