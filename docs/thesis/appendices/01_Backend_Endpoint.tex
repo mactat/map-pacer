@@ -1,0 +1,22 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{lscape}
+\begin{landscape}
+\begin{table}[]
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{endpoint}               & \textbf{params}    & \textbf{returns}                  & \textbf{action}                              & \textbf{method}                         \\ \hline
+/backend/test                   & none               & test string                       & none                                         & GET                                     \\ \hline
+/backend/discovery              & none               & status string                     & triggers agents discovery                    & GET                                     \\ \hline
+/backend/new-map                & size::int          & status string                     & triggers new map generation                  & GET                                     \\ \hline
+/backend/map-from-file          & map_file::string   & map_file::random                  & status_string                                & triggers new map generation             \\ \hline
+/backend/refresh-info           & none               & status string                     & fetches info from leader                     & GET                                     \\ \hline
+/backend/get-info               & none               & {"agents": [],"leader": ,"map": } & none                                         & GET                                     \\ \hline
+/backend/single_agent_calculate & algo::<a_star      & dijkstra                          & BFS>                                         & status_string                           \\ \hline
+/backend/sequence_calculate     & none               & status_string                     & triggers calculation for multiagent scenario & GET                                     \\ \hline
+/backend/show_paths             & none               & {”agent”:, “map”: }               & none                                         & GET                                     \\ \hline
+/backend/get_prerendered_map    & none               & map string                        & renders map string                           & GET                                     \\ \hline
+/backend/save_map               & map without agents & ok                                & error                                        & saves created map                       \\ \hline
+/backend/adopt_new_map          & map with agents    & ok                                & error                                        & adopt created map with agents psoitions \\ \hline
+\end{tabular}
+\end{table}
+\end{landscape}
