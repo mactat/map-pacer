@@ -100,6 +100,10 @@ cloud-build:
 	docker push $(DOCKER_USERNAME)/map-pacer-frontend:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-backend:latest
 
+.PHONY: pdf
+pdf:
+	sudo docker run --rm -v $(pwd)/docs/thesis:/data mactat/latex:latest  make pdf
+
 .PHONY: clean
 clean:
 	kubectl config use-context kind-kind

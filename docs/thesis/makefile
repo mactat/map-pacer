@@ -4,6 +4,12 @@ XELATEX=xelatex -file-line-error -interaction=nonstopmode
 all: Thesis.tex
 	latexmk -pdf -pdflatex="$(XELATEX)" -use-make Thesis.tex
 
+.PHONY: pdf
+pdf:
+	latexmk -pdf -pdflatex="$(XELATEX)" -use-make Thesis.tex
+	rm -f .aux *.bbl *bcf *.blg *.log *.out *.tdo *.toc *.xdv *.synctex.gz *.fdb_latexmk *.fls *.run.xml; \
+	rm -f **/*.aux
+
 .PHONY: auto
 auto: Thesis.tex
 	latexmk -pdf -pdflatex="$(XELATEX)" -use-make -pvc Thesis.tex
