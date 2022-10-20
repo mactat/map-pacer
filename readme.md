@@ -5,10 +5,10 @@
 Comparison of path planning algorithms for multiple robots based on edge-cloud collaborative computing, cloud computing, and local computing
 
 ## Initial idea
-![Initial idea](./docs/pictures/initial.png)
+![Initial idea](./docs/thesis/pictures/initial.png)
 
 ## Services architecture
-![Services architecture](./docs/pictures/services.png)
+![Services architecture](./docs/thesis/pictures/services.png)
 
 ## Local testing
 1) Install vagrant and virtualbox
@@ -47,7 +47,7 @@ Usage:
 # Advanced CA*
 ```
 ### CA* sequence diagram
-![CA* sequence diagram](./docs/pictures/ca_start_sequence.png)
+![CA* sequence diagram](./docs/thesis/pictures/ca_start_sequence.png)
 
 ## Map
 Maps are set to be grid based and are represented as 2D array of integers. Each integer represents a cell in the grid. Those grids are transformed into graphs and then used for path planning.
@@ -55,21 +55,21 @@ Maps are set to be grid based and are represented as 2D array of integers. Each 
 Planning can be based on 2D maps(representing just space) or 3D maps(representing both time and space).
 
 ### Principle of graph creation for 2D map:
-![2D map](./docs/pictures/map_2D_no_diag.png)
-![2D map](./docs/pictures/map_2D_diag.png)
+![2D map](./docs/thesis/pictures/map_2D_no_diag.png)
+![2D map](./docs/thesis/pictures/map_2D_diag.png)
 
 ### Principle of graph creation for 3D map:
-![3D map](./docs/pictures/map_3D_no_diag.png)
-![3D map](./docs/pictures/map_3D_diag.png)
+![3D map](./docs/thesis/pictures/map_3D_no_diag.png)
+![3D map](./docs/thesis/pictures/map_3D_diag.png)
 
 ### Head collision problem for CA* algorithm:
-![Head collision](./docs/pictures/head_collision_problem.png)
+![Head collision](./docs/thesis/pictures/head_collision_problem.png)
 
 ### Example of solved map for single agent:
-![Solved map](./docs/pictures/single_path_maze.png)
+![Solved map](./docs/thesis/pictures/single_path_maze.png)
 
 ### Example of solved map for multiple agents(development vis):
-![Solved map](./docs/pictures/multi_agent_dev.gif)
+![Solved map](./docs/thesis/pictures/multi_agent_dev.gif)
 
 ## Observability
 Observability in this project is based on prometheus and grafana. Grafana is used for visualizing metrics and prometheus is used for collecting them.
@@ -79,7 +79,7 @@ make local-observability
 ```
 
 It can be used in multiple setups:
-![Observability](./docs/pictures/observability.png)
+![Observability](./docs/thesis/pictures/observability.png)
 
 Example of grafana dashboard:
-![Grafana dashboard](./docs/pictures/grafana.png)
+![Grafana dashboard](./docs/thesis/pictures/grafana.png)
