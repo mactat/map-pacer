@@ -1,5 +1,6 @@
 # Define required macros here
 SHELL = /bin/bash
+CUR_DIR="$(shell pwd)"
 include .env
 export
 
@@ -102,7 +103,7 @@ cloud-build:
 
 .PHONY: pdf
 pdf:
-	sudo docker run --rm -v $(pwd)/docs/thesis:/data mactat/latex:latest  make pdf
+	sudo docker run --rm -v $(CUR_DIR)/docs/thesis:/data mactat/latex:latest  make pdf
 
 .PHONY: clean
 clean:
