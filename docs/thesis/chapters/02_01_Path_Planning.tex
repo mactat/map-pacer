@@ -1,1 +1,8 @@
 %!TEX root = ../Thesis.tex
+Path planning is a problem focused on finding a correct path from source to destination with focus on avoiding obstacles, for example navigating a mobile robot in a factory setup from one place in a factory to another\cite{path_planning}. Map geometry can be represented either in 3D or in 2D, for simplicity this report will focus on 2D path planning, moreover it will put emphasis on grid-search algorithms as opposed to different solutions.
+
+Grid-based algorithms assume that world can be represented as a grid and every position of an agent can be described as a grid point. Robot is only allowed to move to adjacent grid points, so the available state space is discretized and simplify the computation. The drawback is that solutions may be sub-optimal in relation to real-world scenario as only limited number of point is being considered\cite{SARANYA2014766}.
+
+\subsection{KEPP vs UEPP}
+Path planning problems can be divided into two categories: known-environment path planing
+(KEPP) and unknown-environment path planning (UEPP). Former assumes that there is a complete knowledge of the environment before execution of the algorithm, and there is no exploration phase, nor sensing. Latter incorporates sensing information into planning process, therefore complete, absolute information is not required during execution of the algorithms. KEPP is simpler in execution but UEPP seems to be closer to the real-world scenario. In this study only KEPP solutions will be discusses as the main objective is to tackle multi-agent system path planning effectively so information gathering and environment sensing is not crucial for this process\cite{path_planning_protocols}.

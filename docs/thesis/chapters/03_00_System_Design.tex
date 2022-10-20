@@ -1,6 +1,7 @@
 %!TEX root = ../Thesis.tex
 \chapter{System Design}
-
+The development of multi-agent systems requires spinning multiple instances of identical entities. In a real-world scenario, those entities would be real robots with their own computing unit connected to each other with some kind of networking. To simulate this scenario microservices approach will be used, as it allows to easily separate agents even on a single computer setup as well as put constrain on computing power and memory usage.
+Cloud computing will also be used in this study and the micro-service approach is a native one for the cloud. Therefore all services around the agents will also be implemented as microservices.
 \section{Microservices}
 \input{chapters/03_01_Microservices}
 

@@ -1,7 +1,17 @@
 %!TEX root = ../Thesis.tex
 
-\subsection{BFS}
+\section{Basic algorithms}
 
-\subsection{Dijkstra}
+This section will focus on basic grid-based path planning algorithms used mostly in a single-agent scenarios. Those algorithms are usually graph based and represents a map as an set of vertices and edges. Graph can be either undirected or directed, depends on whenever agent can move in both or in just one direction between vertices\cite{basic_algorithms}. Only three algorithms will be discussed in this section: Dijkstra's Algorithm, A* Algorithm, D* Algorithm, as they are useful for further understanding of more complex algorithms.
 
-\subsection{A*}
+\subsection{Dijkstra's Algorithm}
+Dijkstra's Algorithm assigns a minimal length(edge value - g(n)) from a starting point for every vertex in a graph, initially starting point has length 0 assigned and other have infinity. For each step of the algorithm, new vertices are expanded(the one which are neighbours of the one with the lowest length from start) and marked as visited. If all vertices are visited or goal is reached then algorithm terminates, otherwise continue expansion\cite{basic_algorithms}. Algorithm is guaranteed to find a shortest path from the starting point to the goal, as long as none of the edges have a negative cost\cite{basic_2}.
+
+\subsection{Greedy Best-First-Search}
+This algorithm takes opposite approach to the previous one. Instead of exploring nodes with the shortest distance from start it tries to explore the ones closest to the goal, using heuristic function - h(n).
+As what we said earlier, the greedy best-first search algorithm tries to explore the node that is closest to the goal. This is what makes the search algorithm 'greedy' as it wants to reach the goal as quickly as possible, not considering obstacles in a way. It is a fast algorithm, but routes found are often un-optimal.
+
+\subsection{A* Algorithm}
+A* is the most popular choice for path finding, because of it's simplicity and robustness. It has also many advanced extensions used in multi-agent systems approach. It works very similar to Dijkstra's algorithm, except it is using heuristic to guide itself. It combines the information about the distance from the start - g(n) and heuristic function which is usually a distance to a goal - h(n). Each iteration it examines the node that has the lowest sum of g(n) + h(n)\cite{basic_2}.
+
+Behaviour of A* algorithm will vary, depends of a heuristic function that is being used. It is usually faster than Dijkstra when finding a solution, but a result can be sub-optimal so it is a challenge to balance those two.
