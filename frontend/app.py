@@ -1,9 +1,16 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from flask_cors import CORS
 import os
 app = Flask(__name__)
 CORS(app)
 BACKEND_URL = os.environ.get('BACKEND_URL')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                          'favicon.ico',mimetype='image/vnd.microsoft.icon')
+
 
 @app.route("/")
 def serve():

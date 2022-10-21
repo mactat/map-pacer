@@ -199,6 +199,12 @@ p, li
     font-size: xx-large;
 }
 </style>
+<html>
+<head>
+    <title>Map-pacer</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+
 <div style="display:flex; width:100%; align-items: center; flex-direction: column;">
 <div style="display:flex; width:100%; align-items: center;">
     <button class="button-78" role="button" onclick="visualizePath(0)">Visualize agents path</button>
@@ -244,6 +250,7 @@ p, li
     </div>
 </div>
 </div>
+</html>
 <script>
     // vars
     var map = ["None"];

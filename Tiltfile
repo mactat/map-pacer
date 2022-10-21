@@ -1,14 +1,10 @@
 # Broker
 k8s_yaml('./broker/kubernetes.yaml')
 k8s_resource('broker', labels=["core-module"])
-k8s_yaml('./broker/service.yaml')
-k8s_kind('broker-service')
 
 # Cloud-Broker
 k8s_yaml('./cloud-broker/kubernetes.yaml')
 k8s_resource('cloud-broker', labels=["core-module"])
-k8s_yaml('./cloud-broker/service.yaml')
-k8s_kind('cloud-broker-service')
 
 # Agent
 k8s_yaml('./agent/kubernetes.yaml')
