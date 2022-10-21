@@ -8,7 +8,7 @@ define PROJECT_HELP_MSG
 Makefile for map-pacer project
 For spinning dev-env, tilt, kind and ctlptl has to be configured.
 For cloud development add '.env' file with:
-AZURE_SUBSCRIPTION_ID, AZURE_GROUP_NAME, AZURE_CLUSTER_NAME, DOCKER_TOKEN, DOCKER_USERNAME
+AZURE_SUBSCRIPTION_ID, AZURE_GROUP_NAME, CLUSTER_NAME, DOCKER_TOKEN, DOCKER_USERNAME
 
 Usage:
 	make dev                    run dev cluster and tilt
@@ -47,45 +47,49 @@ cloud-login:
 
 	# Set connection details
 	az account set --subscription $(AZURE_SUBSCRIPTION_ID)
-	az aks get-credentials --resource-group $(AZURE_GROUP_NAME) --name $(AZURE_CLUSTER_NAME)
+	az aks get-credentials --resource-group $(AZURE_GROUP_NAME) --name $(CLUSTER_NAME)
 
 	# Check the context
 	echo "Current context:"
 	kubectl config current-context
-	kubectl config set-context --current --namespace=map-pacer
+	kubectl config set-context --current --namespace=$(K8S_NAMESPACE)
 
 # Cloud create
 # az login --use-device-code
 # az account set --subscription $(AZURE_SUBSCRIPTION_ID)
 # az group create --name $(AZURE_GROUP_NAME) --location northeurope
-# az aks create -g $(AZURE_GROUP_NAME) -n $(AZURE_CLUSTER_NAME) --node-count 4 --node-vm-size Standard_A8_v2
+# az aks create -g $(AZURE_GROUP_NAME) -n $(CLUSTER_NAME) --node-count 4 --node-vm-size Standard_A8_v2
 # deploy application gateway
 
 .PHONY: cloud-up
 cloud-up:
 	# Start the cluster
-	az aks start --name $(AZURE_CLUSTER_NAME) --resource-group $(AZURE_GROUP_NAME)
+	az aks start --name $(CLUSTER_NAME) --resource-group $(AZURE_GROUP_NAME)
 
 .PHONY: cloud-down
 cloud-down:
 	# Stop the cluster
-	az aks stop --name $(AZURE_CLUSTER_NAME) --resource-group $(AZURE_GROUP_NAME)
+	az aks stop --name $(CLUSTER_NAME) --resource-group $(AZURE_GROUP_NAME)
 
+CLOUD_SERVICES= cloud-agent cloud-broker backend frontend
 .PHONY: cloud-deploy
 cloud-deploy:
 	echo "deploying to cluster"
-	kubectl config use-context $(AZURE_CLUSTER_NAME)
-	kubectl config set-context --current --namespace=map-pacer
-	kubectl apply -f ./cloud-agent/kubernetes.yaml
+	kubectl config use-context $(CLUSTER_NAME)
+	kubectl config set-context --current --namespace=$(K8S_NAMESPACE)
+	@for service in $(CLOUD_SERVICES); do \
+        kubectl apply -f "$$service/kubernetes.yaml"; \
+    done
+
 	# to be change in a real cluster
-	kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090 &
-	kubectl --namespace monitoring port-forward svc/grafana 3000 &
+	# kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090 &
+	# kubectl --namespace monitoring port-forward svc/grafana 3000 &
 
 .PHONY: cloud-deploy-broker
 cloud-deploy-broker:
 	echo "deploying broker to cluster"
-	kubectl config use-context $(AZURE_CLUSTER_NAME)
-	kubectl config set-context --current --namespace=map-pacer
+	kubectl config use-context $(CLUSTER_NAME)
+	kubectl config set-context --current --namespace=$(K8S_NAMESPACE)
 	helm repo add hivemq https://hivemq.github.io/helm-charts
 	helm upgrade --install -f ./cloud-broker/kubernetes.yaml cloud-broker hivemq/hivemq-operator
 
