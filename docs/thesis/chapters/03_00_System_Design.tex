@@ -1,7 +1,12 @@
 %!TEX root = ../Thesis.tex
 \chapter{System Design}
 The development of multi-agent systems requires spinning multiple instances of identical entities. In a real-world scenario, those entities would be real robots with their own computing unit connected to each other with some kind of networking. To simulate this scenario microservices approach will be used, as it allows to easily separate agents even on a single computer setup as well as put constrain on computing power and memory usage.
-Cloud computing will also be used in this study and the micro-service approach is a native one for the cloud. Therefore all services around the agents will also be implemented as microservices.
+
+Cloud and edge computing are widely used in this project, cloud for up-streaming the computation, gathering and visualizing the data, edge to model agents behaviour.
+
+Multiple agents will communicate together to agree on certain actions, therefore mechanisms such as leader election an liveness check and local discovery were implemented and will be described in this section.
+
+This section will also explain how data gathering and visualization will be implemented in this project and how it is connected to the whole system.
 \section{Microservices}
 \input{chapters/03_01_Microservices}
 
@@ -24,4 +29,5 @@ Cloud computing will also be used in this study and the micro-service approach i
 \input{chapters/03_07_Liveness_algorithm}
 
 \section{Visualization}
+\label{sec:0308}
 \input{chapters/03_08_Visualization}
