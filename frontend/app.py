@@ -1,18 +1,20 @@
 from flask import Flask, render_template, request
 from flask_cors import CORS
+import os
 app = Flask(__name__)
 CORS(app)
+BACKEND_URL = os.environ.get('BACKEND_URL')
 
 @app.route("/")
 def serve():
-    return render_template("main.html")
+    return render_template("main.html", backend_url=BACKEND_URL)
 
 @app.route("/map-creator")
 def map_creator():
     args = request.args
     agents_color = ["red", "blue", "green", "yellow"]
     num_of_agents = int(args.get("num_of_agents", default=1))
-    return render_template("map_creator.html", num_of_agents=num_of_agents, agents_color=agents_color[:num_of_agents])
+    return render_template("map_creator.html", num_of_agents=num_of_agents, agents_color=agents_color[:num_of_agents], backend_url=BACKEND_URL)
 # TODO:
 # - dynamic map-names fetching from backend
 # - start and stop for each agent stored in backend

@@ -165,6 +165,7 @@ label[for=black],
 <script>
 var board = document.querySelector('.game-board')
 const num_of_agents = {{num_of_agents}}
+const backend_url = "{{backend_url}}"
 console.log(num_of_agents)
 classToMap = {
     "card red": "agent-0",
@@ -175,7 +176,7 @@ classToMap = {
     "card": 0
 }
 function save_map() {
-  fetch("http://localhost:8022/backend/save_map", { 
+  fetch(`${backend_url}/save_map`, { 
       method: 'POST', 
       mode: 'cors', 
       body: JSON.stringify(boardToList(true)),
@@ -188,7 +189,7 @@ function save_map() {
 }
 
 function adopt_map() {
-  fetch("http://localhost:8022/backend/adopt_map", { 
+  fetch(`${backend_url}/adopt_map`, { 
       method: 'POST', 
       mode: 'cors', 
       body: JSON.stringify(boardToList(false)),
@@ -200,7 +201,7 @@ function adopt_map() {
 }
 
 function go_back() {
-  location.href = "http://localhost:8023/"
+  location.href = `https://${window.location.host}`
 }
 function setSize() {
     size = prompt("Please enter size of the board", 5);

@@ -256,6 +256,7 @@ p, li
     var mode = "sequence_calculate";
     var algo = "CA*";
     var num_of_agents = 0;
+    const backend_url = "{{backend_url}}"
 
     // initial settings
     timeframeGauge.innerHTML = slider.value;
@@ -269,10 +270,10 @@ p, li
     var minfo = setInterval(refreshMap,1000);
 
     function redirect_to_map_creator() {
-        location.href = "http://localhost:8023/map-creator?num_of_agents=" + num_of_agents;
+        location.href = `https://${window.location.host}/map-creator?num_of_agents=${num_of_agents}`;
     }
     function agentsInfo() {
-        fetch("http://localhost:8022/backend/get-info").then(res => {
+        fetch(`${backend_url}/get-info`).then(res => {
             return res.json()
         }).then(info => {
             final_str = "Agents:<br>"
@@ -290,7 +291,7 @@ p, li
     }
 
     function refreshMap(){
-        fetch("http://localhost:8022/backend/get_prerendered_map").then(res => {
+        fetch(`${backend_url}/get_prerendered_map`).then(res => {
             return res.json()
         }).then(renderedMap => {
             if(map[0] !== renderedMap[0]){
@@ -326,7 +327,7 @@ p, li
 
     function calculate_multiple() {
         console.log("Calculating multiple paths");
-        fetch("http://localhost:8022/backend/" + mode + '?algo=' + algo).then(res => {
+        fetch(`${backend_url}/${mode}?algo=${algo}`).then(res => {
             return res.text()
         }).then(text => {
             alert(text)
@@ -340,7 +341,7 @@ p, li
         } else {
             path = "map-from-file?map_file=" + name
         }
-        fetch("http://localhost:8022/backend/" + path).then(res => {
+        fetch(`${backend_url}/${path}`).then(res => {
             return res.text()
         }).then(text => {
             console.log(text)

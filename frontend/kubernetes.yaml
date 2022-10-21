@@ -19,3 +19,35 @@ spec:
         image: mactat/map-pacer-frontend:latest
         ports:
         - containerPort: 8888
+        env:
+        - name: BACKEND_URL
+          value: "https://backend-mactat.cloud.okteto.net/backend"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 8888
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend
+  annotations:
+    dev.okteto.com/generate-host: "true"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80

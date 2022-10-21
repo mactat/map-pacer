@@ -93,13 +93,17 @@ cloud-deploy-broker:
 cloud-build:
 	docker login -u $(DOCKER_USERNAME) -p $(DOCKER_TOKEN)
 	echo "Building images"
-	docker build -t $(DOCKER_USERNAME)/map-pacer-cloud-agent:latest -f ./cloud-agent/Dockerfile ./cloud-agent
+	docker build -t $(DOCKER_USERNAME)/map-pacer-cloud-agent:latest -f ./cloud-agent/Dockerfile .
 	docker build -t $(DOCKER_USERNAME)/map-pacer-frontend:latest -f ./frontend/Dockerfile ./frontend
 	docker build -t $(DOCKER_USERNAME)/map-pacer-backend:latest -f ./backend/Dockerfile ./backend
+	docker build -t $(DOCKER_USERNAME)/map-pacer-agent:latest -f ./agent/Dockerfile .
+	docker build -t $(DOCKER_USERNAME)/map-pacer-map-service -f ./map-service/Dockerfile .
 	echo "Pushing images"
 	docker push $(DOCKER_USERNAME)/map-pacer-cloud-agent:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-frontend:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-backend:latest
+	docker push $(DOCKER_USERNAME)/map-pacer-agent:latest
+	docker push $(DOCKER_USERNAME)/map-pacer-map-service:latest
 
 .PHONY: pdf
 pdf:
