@@ -45,7 +45,7 @@ kind: Ingress
 metadata:
   name: backend
   annotations:
-    kubernetes.io/ingress.class: azure/application-gateway
+    dev.okteto.com/generate-host: "true"
 spec:
   rules:
   - http:
