@@ -1,4 +1,4 @@
-# Brokercore-module
+# Broker
 k8s_yaml('./broker/kubernetes.yaml')
 k8s_resource('broker', labels=["core-module"])
 k8s_yaml('./broker/service.yaml')
