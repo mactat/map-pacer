@@ -1,4 +1,5 @@
 ![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)
+[![CI/CD](https://github.com/mactat/map-pacer/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/mactat/map-pacer/actions/workflows/ci_cd.yml)
 [![thesis-release](https://github.com/mactat/map-pacer/actions/workflows/thesis-release.yml/badge.svg)](https://github.com/mactat/map-pacer/actions/workflows/thesis-release.yml)
 
 # MAP-PACER - multiple agents path planing algorithms using cloud and edge resources
