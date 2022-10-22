@@ -7,6 +7,7 @@ k8s_yaml('./cloud-broker/kubernetes.yaml')
 k8s_resource('cloud-broker', labels=["core-module"])
 
 # Agent
+# Add observability if needed
 k8s_yaml('./agent/kubernetes.yaml')
 k8s_resource('agent',  labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-agent', './', dockerfile='./agent/Dockerfile')
