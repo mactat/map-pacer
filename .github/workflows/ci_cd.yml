@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    environment: dockerhub
     steps:
     - uses: actions/checkout@v3
     - name: Make envfile
@@ -23,6 +23,7 @@ jobs:
       run: make cloud-build
   deploy:
     runs-on: ubuntu-latest
+    environment: okteto-cloud
     steps:
     - uses: actions/checkout@v3
     - name: Deploy resources
