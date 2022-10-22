@@ -1,0 +1,29 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envkey_DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        envkey_DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        file_name: .env
+        fail_on_empty: true
+    - name: Build and Push Docker image
+      run: make cloud-build
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Deploy resources
+      run: echo "hehe"
