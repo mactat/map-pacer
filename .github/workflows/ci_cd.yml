@@ -34,7 +34,7 @@ jobs:
          namespace: mactat
     - name: Deploy
       run: |
-        CLOUD_SERVICES="cloud-agent cloud-broker backend frontend"
+        CLOUD_SERVICES="cloud-agent backend frontend" #cloud broker is not changing for now
         for service in $CLOUD_SERVICES
         do
           echo "Deploying ${service}"
