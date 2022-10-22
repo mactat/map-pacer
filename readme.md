@@ -2,6 +2,7 @@
 [![CI/CD](https://github.com/mactat/map-pacer/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/mactat/map-pacer/actions/workflows/ci_cd.yml)
 [![thesis-release](https://github.com/mactat/map-pacer/actions/workflows/thesis-release.yml/badge.svg)](https://github.com/mactat/map-pacer/actions/workflows/thesis-release.yml)
 
+![Initial idea](./frontend/static/favicon.ico)
 # MAP-PACER - multiple agents path planing algorithms using cloud and edge resources
 
 ## Description
