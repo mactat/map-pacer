@@ -24,7 +24,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: okteto-cloud
+    needs: build
     steps:
     - uses: actions/checkout@v3
-    - name: Deploy resources
-      run: echo "hehe"
+    - uses: azure/k8s-set-context@v2
+      with:
+         method: kubeconfig
+         kubeconfig: ${{ secrets.KUBECONFIG_OKTETO }}
+         namespace: mactat
+    - name: Deploy
+      run: |
+        CLOUD_SERVICES="cloud-agent cloud-broker backend frontend"
+        for service in $CLOUD_SERVICES
+        do
+          echo "Deploying ${service}"
+          kubectl apply -f ./$service/kubernetes.yaml
+          kubectl rollout restart deployment $service
+        done
