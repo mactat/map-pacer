@@ -3,8 +3,9 @@ name: "thesis-release"
 
 on:
   push:
-    tags:
-      - "vt*"
+    branches: [master]
+    paths:
+      - 'docs/thesis/**'
 
 jobs:
   tagged-release:
@@ -25,6 +26,6 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           title: Thesis release version ${{ env.RELEASE_VERSION }}
-          automatic_release_tag: ${{ env.RELEASE_VERSION }}
+          automatic_release_tag: "thesis-latest"
           files: |
             ./docs/thesis/Thesis.pdf
