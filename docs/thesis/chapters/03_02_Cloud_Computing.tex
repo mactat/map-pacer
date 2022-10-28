@@ -15,3 +15,5 @@ Overall design of the cloud services can be seen on figure \ref{fig:cloud_servic
 
 Three endpoints are exposed to externally traffic(from outside of the cluster): two HTTP endpoints for Backend and Frontend and one MQTT enpoint for cloud-broker.
 HTTP traffic is being served via ingress resources in the cluster it is forwarded via reverse proxy to kubernetes service which distributes the request among the pods. Default ingress resource is designed to only serve HTTP/HTTPS request and do not allow any other protocol. For MQTT protocol which is transported over TCP NodePort is used to expose service to outside world and map pod ports to ports of the node in a cluster.
+
+Test
