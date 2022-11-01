@@ -8,12 +8,10 @@ from prometheus_client import start_http_server, Summary, Enum
 
 #Get environment variables
 MY_NAME = socket.gethostname()
-MY_NUMBER = int(MY_NAME[-1])
 BROKER = os.environ.get('BROKER_HOSTNAME')
 BROKER_PORT = int(os.environ.get('BROKER_PORT'))
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
-NUM_OF_AGENTS= int(os.environ.get('AGENTS_NUMBER'))
 
 # Set logging
 logger = get_default_logger(MY_NAME)
