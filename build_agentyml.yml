@@ -21,4 +21,5 @@ stages:
         repository: 'map-pacer-agent'
         command: 'buildAndPush'
         Dockerfile: 'agent/Dockerfile'
+        buildContext: '/'
         tags: 'arm-latest'
