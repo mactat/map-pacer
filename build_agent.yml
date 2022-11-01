@@ -23,3 +23,11 @@ stages:
         Dockerfile: 'agent/Dockerfile'
         buildContext: '.'
         tags: 'arm-latest'
+     - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerhub_mactat'
+        repository: 'mactat/map-pacer-map-service'
+        command: 'buildAndPush'
+        Dockerfile: 'map-service/Dockerfile'
+        buildContext: '.'
+        tags: 'arm-latest'
