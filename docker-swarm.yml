@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  agent:
+    image: mactat/map-pacer-agent:arm-latest
+    networks:
+      - map-pacer-net
+    deploy:
+      mode: global
+    environment:
+      AGENTS_NUMBER: "3"
+      BROKER_HOSTNAME: "192.168.1.19"
+      BROKER_PORT: "1883"
+      CLOUD_BROKER_HOSTNAME: "192.168.1.19"
+      CLOUD_BROKER_PORT: "1883" 
+  
+  map-service:
+    image: mactat/map-pacer-map-service:arm-latest
+    networks:
+      - map-pacer-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    environment:
+      AGENTS_NUMBER: "3"
+      BROKER_HOSTNAME: "192.168.1.19"
+      BROKER_PORT: "1883"
+      CLOUD_BROKER_HOSTNAME: "192.168.1.19"
+      CLOUD_BROKER_PORT: "1883" 
+
+  broker:
+    image: eclipse-mosquitto
+    networks:
+      - map-pacer-net
+    ports:
+      - target: 1883
+        published: 1883
+        mode: host
+      - target: 8883
+        published: 8883
+        mode: host
+    volumes:
+      - /home/pi/mosquitto/config:/mosquitto/config/mosquitto.conf
+      - /home/pi/mosquitto/data:/mosquitto/data
+      - /home/pi/mosquitto/log:/mosquitto/log
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+
+networks:
+  map-pacer-net:
