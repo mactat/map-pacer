@@ -1,5 +1,6 @@
 ![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)
 [![CI/CD](https://github.com/mactat/map-pacer/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/mactat/map-pacer/actions/workflows/ci_cd.yml)
+[![Build Status](https://dev.azure.com/s202609/Hello-world/_apis/build/status/Build%20and%20Push%20agent%20image?branchName=master)](https://dev.azure.com/s202609/Hello-world/_build/latest?definitionId=10&branchName=master)
 [![thesis-release](https://github.com/mactat/map-pacer/actions/workflows/thesis-release.yml/badge.svg)](https://github.com/mactat/map-pacer/actions/workflows/thesis-release.yml)
 
 ![Initial idea](./frontend/static/favicon.ico)
