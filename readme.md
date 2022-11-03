@@ -61,12 +61,10 @@ Maps are set to be grid based and are represented as 2D array of integers. Each 
 Planning can be based on 2D maps(representing just space) or 3D maps(representing both time and space).
 
 ### Principle of graph creation for 2D map:
-![2D map](./docs/thesis/pictures/map_2D_no_diag.png)
-![2D map](./docs/thesis/pictures/map_2D_diag.png)
+![2D map](./docs/thesis/pictures/map_2d.png)
 
 ### Principle of graph creation for 3D map:
-![3D map](./docs/thesis/pictures/map_3D_no_diag.png)
-![3D map](./docs/thesis/pictures/map_3D_diag.png)
+![3D map](./docs/thesis/pictures/map_3d.png)
 
 ### Head collision problem for CA* algorithm:
 ![Head collision](./docs/thesis/pictures/head_collision_problem.png)
@@ -75,7 +73,9 @@ Planning can be based on 2D maps(representing just space) or 3D maps(representin
 ![Solved map](./docs/thesis/pictures/single_path_maze.png)
 
 ### Example of solved map for multiple agents(development vis):
-![Solved map](./docs/thesis/pictures/multi_agent_dev.gif)
+![Solved map](./docs/thesis/pictures/example_planning.gif)
+
+![Solved map](./docs/thesis/pictures/multi_agent_dev_1.gif)
 
 ## Observability
 Observability in this project is based on prometheus and grafana. Grafana is used for visualizing metrics and prometheus is used for collecting them.
