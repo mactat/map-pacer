@@ -247,6 +247,11 @@ p, li
     <div style="display: flex; flex-direction: column; width: 50%;">
         <div class="agentinfo" id="agentinfo">Agents:<br><br>None</div>
         <div class="agentinfo" id="algo"><br><br>Algorithm: CA*</div>
+        <div class="dropdown">
+            <button class="dropbtn">Systems</button>
+            <div class="dropdown-content"id="system_panel">
+            </div>
+        </div>
     </div>
 </div>
 </div>
@@ -265,11 +270,13 @@ p, li
     var num_of_agents = 0;
     var main_view = document.getElementById("maincontainer");
     const backend_url = "{{backend_url}}"
+    var system_id = null
 
     // initial settings
     timeframeGauge.innerHTML = slider.value;
     curMap.innerHTML = map[0]
     curMap.style.fontSize = String((60/Math.sqrt(map[0].length)))+"vmin"
+    get_systems()
 
     // Fetch info every second
     agentsInfo()
@@ -277,15 +284,30 @@ p, li
     var ainfo = setInterval(agentsInfo,1000);
     var minfo = setInterval(refreshMap,1000);
 
+    function get_systems() {
+        fetch(`${backend_url}/get_systems`).then(res => {
+            return res.json()
+        }).then(systems => {
+            // Update system list
+            var system_panel = document.getElementById("system_panel");
+            system_panel.innerHTML = ''
+            for (var i = 0; i < systems.length; i++) {
+                button_str=`<button class=text-btn onclick="set_system('${systems[i]}')">${systems[i]}</button>`
+                system_panel.innerHTML+=button_str;
+            }
+        })
+    }
+
     function redirect_to_map_creator() {
         location.href = `http://${window.location.host}/map-creator?num_of_agents=${num_of_agents}`;
     }
     function agentsInfo() {
-        fetch(`${backend_url}/get-info`).then(res => {
+        fetch(`${backend_url}/get-info?system_id=${system_id}`).then(res => {
             return res.json()
         }).then(info => {
             final_str = "Agents:<br>"
             num_of_agents = info.agents.length
+            system_ids = info.systems
             for(num in info.agents) {
                 final_str += "<br>🟢 "+ info.agents[num]
                 if(info.agents[num] == info.leader){
@@ -301,6 +323,7 @@ p, li
             if(agentsText.innerHTML != final_str){
                 agentsText.innerHTML = final_str
             }
+
         }).catch((error) => {
             agentsText.style.display = "none"
             console.log(error)
@@ -308,7 +331,7 @@ p, li
     }
 
     function refreshMap(){
-        fetch(`${backend_url}/get_prerendered_map`).then(res => {
+        fetch(`${backend_url}/get_prerendered_map?system_id=${system_id}`).then(res => {
             return res.json()
         }).then(renderedMap => {
             // show main container
@@ -381,6 +404,9 @@ p, li
         algo = cur_algo
         mode = cur_mode
         algoText.innerHTML = "<br><br>Algorithm: " + algo + "-" + mode
+    }
+    function set_system(new_system_id) {
+        system_id = new_system_id
     }
 
     // Update the current slider value (each time you drag the slider handle)

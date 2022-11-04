@@ -15,6 +15,7 @@ from prometheus_client import start_http_server, Summary, Enum
 MY_NAME = socket.gethostname()
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
+SYSTEM_ID = os.environ.get('SYSTEM_ID')
 agents = []
 coords = []
 map_id = 0
@@ -47,16 +48,16 @@ def calculate_sequence(algo="CA_star"):
     for agent, (start, end) in zip(agents, coords):
         if not start or not end:
             logger.warning(f"Start or end not found")
-            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found"}), qos=2)
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
             possible = False
         else:
             possible, path = calculate_a_star(grid_map, start, end)
         if possible:
             logger.info(f"Path found: {path}")
-            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": [(x, y) for x,y,_ in path]}), qos=2)
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": [(x, y) for x,y,_ in path], "system_id": SYSTEM_ID}), qos=2)
         else:
             logger.info(f"Path not found")
-            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found"}), qos=2)
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
 
 def extract_coords(new_map):
     coords = []

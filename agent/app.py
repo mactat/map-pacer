@@ -13,6 +13,7 @@ BROKER = os.environ.get('BROKER_HOSTNAME')
 BROKER_PORT = int(os.environ.get('BROKER_PORT'))
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
+SYSTEM_ID = os.environ.get('SYSTEM_ID')
 
 # Set logging
 logger = get_default_logger(MY_NAME)
@@ -179,7 +180,8 @@ def send_info_backend():
     data = {
         "leader": MY_NAME,
         "agents": my_mates+ [MY_NAME],
-        "map": current_map
+        "map": current_map,
+        "system_id": SYSTEM_ID
     }
     client_cloud.publish("backend/agents-info", json.dumps(data), qos=2)
 
@@ -201,10 +203,10 @@ def calculate_single(algo="A*"):
         # to be changed to dynamic
         full_path = path + [path[-1]*(100-len(path))]
         logger.info(f"Path found: {path}")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": full_path}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": full_path, "system_id": SYSTEM_ID}), qos=2)
     else:
         logger.info(f"Path not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found"}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
 
 @monitoring_calculate_path_time.time()
 def calculate_a_star(grid_map, start, end):
@@ -233,7 +235,7 @@ def calculate_sequence(paths, sequence, status, algo="CA_star"):
 
     if not start or not end:
         logger.warning(f"Start or end not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found"}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
         possible = False
     else:
         grid_map = setup_map(current_map, paths)
@@ -241,10 +243,10 @@ def calculate_sequence(paths, sequence, status, algo="CA_star"):
     if possible:
         logger.info(f"Path found: {path}")
         paths.append(path)
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": [(x, y) for x,y,_ in path]}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": [(x, y) for x,y,_ in path], "system_id": SYSTEM_ID}), qos=2)
     else:
         logger.info(f"Path not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found"}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
     # Last to calculate
     status = "continue"
     if len(sequence) == 1:

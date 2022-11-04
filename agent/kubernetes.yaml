@@ -38,7 +38,10 @@ spec:
         - name: CLOUD_BROKER_HOSTNAME
           value: "cloud-broker-mactat.cloud.okteto.net"
         - name: CLOUD_BROKER_PORT
-          value: "443" 
+          value: "443"
+        - name: SYSTEM_ID
+          value: "CI_CD" 
+
 ---
 kind: Service
 apiVersion: v1

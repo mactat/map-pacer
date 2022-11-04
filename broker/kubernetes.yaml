@@ -17,13 +17,6 @@ spec:
       containers:
       - name: broker-container
         image: hivemq/hivemq-ce
-        resources:
-          limits:
-            memory: "0.6Gi"
-            cpu: "300m"  
-          requests:
-            memory: "0.2Gi"
-            cpu: "150m"  
         ports:
         - containerPort: 1883
 

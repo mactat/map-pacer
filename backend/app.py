@@ -8,6 +8,7 @@ import sys
 import json
 from flask_cors import CORS
 from waitress import serve
+from db_lib import Database
 
 
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
@@ -31,32 +32,44 @@ app.config['MQTT_TLS_ENABLED'] = False  # set TLS to disabled for testing purpos
 info = {"agents":"", "leader":"", "map": []}
 mqtt = Mqtt(app)
 
+# Handle DB
+DB_USERNAME = os.environ.get('DB_USERNAME')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_HOSTNAME = os.environ.get('DB_HOSTNAME')
+DB_PORT= int(os.environ.get('DB_PORT'))
 
-def save_path(agent, path):
+database = Database(DB_USERNAME, DB_PASSWORD, DB_HOSTNAME, DB_PORT)
+database.create_table("systems")
+
+def save_path(system_id, agent, path):
+    agents, leader, cur_map, paths = database.get_data(system_id)
+    if not paths: paths = {}
     paths[agent] = path
+    full_data = {"agents": agents, "leader": leader, "map": cur_map, "paths": paths}
+    database.update_data(system_id=system_id, data=full_data)
 
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
-    mqtt.subscribe('backend/#')
+    mqtt.subscribe('backend/#', 2)
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
-    global info, paths
     topic=message.topic,
     payload=message.payload.decode()
     match topic[0]:
         case "backend/agents-info":
             temp_info = json.loads(payload)
-            if not info["map"] or temp_info["map"] != info["map"]:
-                logger.info("Detected map change")
+            agents, leader, cur_map, paths = database.get_data(temp_info['system_id'])
+            if not cur_map or temp_info["map"] != cur_map:
+                print("Detected map change")
                 paths = {}
-            logger.info("Info received")
-            info = temp_info
+            full_data = {"agents": temp_info['agents'], "leader": temp_info['leader'], "map": temp_info["map"] , "paths": paths}
+            database.update_data(system_id=temp_info['system_id'], data=full_data)
         case "backend/path":
             logger.info("Path received")
             data = json.loads(payload)
-            save_path(data["agent"], data["path"])
+            save_path(data['system_id'], data["agent"], data["path"])
         case _:
             print("Unknown topic", file=sys.stderr)
             print(f"From topic: {topic} | msg: {payload}", file=sys.stderr)
@@ -100,12 +113,14 @@ def refresh_info():
 
 @app.route("/backend/get-info")
 def get_info():
-    global info
-    return info
+    args = request.args
+    system_id = args.get("system_id", default="test")
+    agents, leader, cur_map, paths = database.get_data(system_id)
+    info = {"agents": agents, "leader": leader, "map": cur_map, "paths": paths}
+    return json.dumps(info)
 
 @app.route("/backend/single_calculate")
 def single_calculate():
-    global info
     args = request.args
     algo = args.get("algo", default="A*")
     mqtt.publish("agents/calculate/single_mode", algo, qos=2)
@@ -130,7 +145,6 @@ def clear_paths():
 
 @app.route("/backend/sequence_calculate")
 def sequence_calculate():
-    global info
     data = json.dumps({"paths": [], "sequence": [], "status": "start"})
     mqtt.publish("agents/calculate/sequence_mode", data, qos=2)
     return f"Calculation requested!"
@@ -144,10 +158,12 @@ def sequence_calculate_cloud():
 # TODO: frontend shoud use this function rather than refreshing the page
 @app.route("/backend/get_prerendered_map")
 def get_prerendered_map():
-    global info, paths
-    if not info:
-        return ["No info or paths"]
-    return json.dumps(visualize_paths(info["map"], list(paths.values())))
+    args = request.args
+    system_id = args.get("system_id", default="test")
+    _, _, cur_map, paths = database.get_data(system_id)
+    if not cur_map:
+        return [False]
+    return json.dumps(visualize_paths(cur_map, list(paths.values())))
 
 @app.route("/backend/save_map", methods=['GET', 'POST'])
 def save_map():
@@ -161,6 +177,11 @@ def adopt_new_map():
     mqtt.publish("map-service/adopt-map", new_map, qos=2)
     return "ok"
 
+@app.route("/backend/get_systems")
+def get_systems():
+    return json.dumps(database.get_systems())
+
+database.get_systems()
 if __name__ == "__main__":
     serve(app, port='8888')
     #app.run(host='0.0.0.0', port=8888, debug=True)
