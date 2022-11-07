@@ -335,12 +335,12 @@ p, li
         fetch(`${backend_url}/get_prerendered_map?system_id=${system_id}`).then(res => {
             return res.json()
         }).then(renderedMap => {
-            // show main container
-            main_view.style.display = "flex"
             // hide map if empty
             if (map == "false" || renderedMap.map.length == 0) {
                 curMap.style.display = "none"
             } else {
+                // show main container
+                maincontainer.style.display = "flex"
                 curMap.style.display = "block"
             }
             if(map[0] !== renderedMap[0]){
@@ -353,7 +353,7 @@ p, li
         }).catch((error) => {
             console.log(error)
             //hide main container
-            main_view.style.display = "none"
+            maincontainer.style.display = "none"
         });
     }
     function visualizePath(j) {

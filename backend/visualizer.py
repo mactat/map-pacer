@@ -33,7 +33,7 @@ def map_to_string(my_map):
     return "<br>".join(["".join(row) for row in my_map])
 
 def mark_paths(normal_map, paths):
-    if len(paths) == 0:
+    if not paths:
         return [normal_map]
     paths = [path for path in paths if path != "not found"]
 
