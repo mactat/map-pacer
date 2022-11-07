@@ -168,7 +168,7 @@ p, li
   font-size: 1.2vmin;
 }
 .maincontainer{
-    display: flex;
+    display: none;
     align-items: center;
     height: 80vh;
     width: 100%;
@@ -234,6 +234,11 @@ p, li
             <button class=text-btn onclick="change_map('cross_10')">Cross</a>
         </div>
     </div>
+    <div class="dropdown">
+        <button class="dropbtn">Systems</button>
+        <div class="dropdown-content"id="system_panel">
+        </div>
+    </div>
     
     <div class="slidercontainer">
         <div class="text-container">
@@ -247,11 +252,6 @@ p, li
     <div style="display: flex; flex-direction: column; width: 50%;">
         <div class="agentinfo" id="agentinfo">Agents:<br><br>None</div>
         <div class="agentinfo" id="algo"><br><br>Algorithm: CA*</div>
-        <div class="dropdown">
-            <button class="dropbtn">Systems</button>
-            <div class="dropdown-content"id="system_panel">
-            </div>
-        </div>
     </div>
 </div>
 </div>
@@ -317,16 +317,16 @@ p, li
             }
             // Hide agents info if no agents
             if (info.agents.length == 0) {
-                agentsText.style.display = "none"
+                maincontainer.style.display = "none"
             } else {
-                agentsText.style.display = "block"
+                maincontainer.style.display = "flex"
             }
             if(agentsText.innerHTML != final_str){
                 agentsText.innerHTML = final_str
             }
 
         }).catch((error) => {
-            agentsText.style.display = "none"
+            maincontainer.style.display = "none"
             console.log(error)
         });
     }

@@ -39,6 +39,7 @@ class Database:
         cursor.execute(query)
         if return_value: record=cursor.fetchall()
         cursor.close()
+        self.connection.commit()
         return record
 
     def create_table(self, table_name):
@@ -98,5 +99,5 @@ class Database:
         '''
         raw_data=self.execute_query(query, return_value=True)
         print(raw_data)
-        if not raw_data: return None
-        return raw_data[0]
+        if not raw_data: return []
+        return raw_data

@@ -191,7 +191,8 @@ def adopt_new_map():
 
 @app.route("/backend/get_systems")
 def get_systems():
-    return json.dumps(database.get_systems())
+    systems_raw = json.dumps(database.get_systems())
+    return systems_raw
 
 database.get_systems()
 if __name__ == "__main__":
