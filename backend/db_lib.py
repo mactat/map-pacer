@@ -96,6 +96,7 @@ class Database:
         query = f'''
         SELECT SYSTEM_ID FROM {self.table_name}
         '''
-        raw_data=self.execute_query(query, return_value=True)    
+        raw_data=self.execute_query(query, return_value=True)
+        print(raw_data)
         if not raw_data: return None
         return raw_data[0]

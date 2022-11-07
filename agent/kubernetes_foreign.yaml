@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: agent-foreign
+  labels:
+    app: agent-foreign
+spec:
+  replicas: 3
+  serviceName: agent-foreign
+  selector:
+    matchLabels:
+      app: agent-foreign
+  template:
+    metadata:
+      labels:
+        app: agent-foreign
+    spec:
+      containers:
+      - name: agent-foreign
+        image: mactat/map-pacer-agent:latest
+        resources:
+          limits:
+            memory: "0.8Gi"
+            cpu: "400m"  
+          requests:
+            memory: "0.4Gi"
+            cpu: "200m"  
+        ports:
+        - name: metrics
+          containerPort: 8080
+        env:
+        - name: AGENTS_NUMBER
+          value: "3"
+        - name: BROKER_HOSTNAME
+          value: "broker-service"
+        - name: BROKER_PORT
+          value: "1883"
+        - name: CLOUD_BROKER_HOSTNAME
+          value: "cloud-broker-service"
+        - name: CLOUD_BROKER_PORT
+          value: "1883"
+        - name: SYSTEM_ID
+          value: "foreign_system"
+        # - name: CLOUD_BROKER_HOSTNAME
+        #   value: "tcp-mo2.mogenius.io"
+        # - name: CLOUD_BROKER_PORT
+        #   value: "10106"
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: agent-foreign
+  labels:
+    app: agent-foreign
+spec:
+  selector:
+    app: agent-foreign
+  ports:
+  - name: metrics
+    port: 8080

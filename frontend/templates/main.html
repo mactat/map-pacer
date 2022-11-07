@@ -295,6 +295,7 @@ p, li
                 button_str=`<button class=text-btn onclick="set_system('${systems[i]}')">${systems[i]}</button>`
                 system_panel.innerHTML+=button_str;
             }
+            return systems
         })
     }
 
@@ -337,7 +338,7 @@ p, li
             // show main container
             main_view.style.display = "flex"
             // hide map if empty
-            if (renderedMap.map.length == 0) {
+            if (map == "false" || renderedMap.map.length == 0) {
                 curMap.style.display = "none"
             } else {
                 curMap.style.display = "block"
@@ -379,7 +380,7 @@ p, li
 
     function calculate_multiple() {
         console.log("Calculating multiple paths");
-        fetch(`${backend_url}/${mode}?algo=${algo}`).then(res => {
+        fetch(`${backend_url}/${mode}?algo=${algo}&system_id=${system_id}`).then(res => {
             return res.text()
         }).then(text => {
             alert(text)
@@ -393,7 +394,7 @@ p, li
         } else {
             path = "map-from-file?map_file=" + name
         }
-        fetch(`${backend_url}/${path}`).then(res => {
+        fetch(`${backend_url}/${path}&system_id=${system_id}`).then(res => {
             return res.text()
         }).then(text => {
             console.log(text)

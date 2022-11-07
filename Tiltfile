@@ -71,3 +71,13 @@ docker_build('mactat/map-pacer-map-service', './', dockerfile='./map-service/Doc
 k8s_yaml('./cloud-agent/kubernetes.yaml')
 k8s_resource('cloud-agent', labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-cloud-agent', './', dockerfile='./cloud-agent/Dockerfile')
+# System-2(foreign)
+k8s_yaml('./agent/kubernetes_foreign.yaml')
+k8s_resource('agent-foreign',  labels=["foreign-system"], resource_deps=['broker', 'cloud-broker'])
+
+# Map-service
+k8s_yaml('./map-service/kubernetes _foreign.yaml')
+k8s_resource('map-service-foreign',  labels=["foreign-system"], resource_deps=['broker', 'cloud-broker'])
+# load('ext://helm_resource', 'helm_resource', 'helm_repo')
+# helm_repo('bitnami', 'https://charts.bitnami.com/bitnami')
+# helm_resource('redis', 'bitnami/redis')

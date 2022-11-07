@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: map-service
+  name: map-service-foreign
   labels:
-    app: map-service
+    app: map-service-foreign
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: map-service
+      app: map-service-foreign
   template:
     metadata:
       labels:
-        app: map-service
+        app: map-service-foreign
     spec:
       containers:
-      - name: map-service
+      - name: map-service-foreign
         image: mactat/map-pacer-map-service:latest
         ports:
         - containerPort: 8888
@@ -27,8 +27,12 @@ spec:
         - name: BROKER_PORT
           value: "1883"
         - name: CLOUD_BROKER_HOSTNAME
-          value: "cloud-broker-mactat.cloud.okteto.net"
+          value: "cloud-broker-service"
         - name: CLOUD_BROKER_PORT
-          value: "443" 
+          value: "1883" 
         - name: SYSTEM_ID
-          value: "home_system"
+          value: "foreign_system"
+        # - name: CLOUD_BROKER_HOSTNAME
+        #   value: "tcp-mo2.mogenius.io"
+        # - name: CLOUD_BROKER_PORT
+        #   value: "10106"

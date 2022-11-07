@@ -84,8 +84,9 @@ def test():
 
 @app.route("/backend/discovery")
 def trigger_discovery():
-    mqtt.publish("agents/discovery/start", "Backend service is here!", qos=2)
-    logger.info("Published: agents/discovery/start")
+    args = request.args
+    system_id = args.get("system_id", default="test")
+    mqtt.publish(f"{system_id}/agents/discovery/start", "Backend service is here!", qos=2)
     return "Discovery triggered!"
 
 @app.route("/backend/new-map")
@@ -93,8 +94,8 @@ def generate_map():
     args = request.args
     paths.clear()
     size = args.get("size", default="10")
-    mqtt.publish("map-service/random-map", size, qos=2)
-    logger.info("Published: map-service/random-map")
+    system_id = args.get("system_id", default="test")
+    mqtt.publish(f"{system_id}/map-service/random-map", size, qos=2)
     return "New map requested!"
 
 @app.route("/backend/map-from-file")
@@ -102,13 +103,15 @@ def get_map_from_file():
     args = request.args
     paths.clear()
     map_file = args.get("map_file", default="random")
-    mqtt.publish("map-service/map-from-file", f"{map_file}.txt", qos=2)
-    logger.info("Published: map-service/map-from-file")
+    system_id = args.get("system_id", default="test")
+    mqtt.publish(f"{system_id}/map-service/map-from-file", f"{map_file}.txt", qos=2)
     return "New map requested!"
 
 @app.route("/backend/refresh-info")
 def refresh_info():
-    mqtt.publish("agents/info/all", "empty", qos=2)
+    args = request.args
+    system_id = args.get("system_id", default="test")
+    mqtt.publish(f"{system_id}/agents/info/all", "empty", qos=2)
     return "Info requested!"
 
 @app.route("/backend/get-info")
@@ -123,7 +126,8 @@ def get_info():
 def single_calculate():
     args = request.args
     algo = args.get("algo", default="A*")
-    mqtt.publish("agents/calculate/single_mode", algo, qos=2)
+    system_id = args.get("system_id", default="test")
+    mqtt.publish(f"{system_id}/agents/calculate/single_mode", algo, qos=2)
     return f"Calculation requested with algorithm: {algo}!"
 
 @app.route("/backend/show_paths")
@@ -145,17 +149,21 @@ def clear_paths():
 
 @app.route("/backend/sequence_calculate")
 def sequence_calculate():
+    args = request.args
+    system_id = args.get("system_id", default="test")
     data = json.dumps({"paths": [], "sequence": [], "status": "start"})
-    mqtt.publish("agents/calculate/sequence_mode", data, qos=2)
+    mqtt.publish(f"{system_id}/agents/calculate/sequence_mode", data, qos=2)
     return f"Calculation requested!"
 
 @app.route("/backend/sequence_calculate_cloud")
 def sequence_calculate_cloud():
+#TODO: Change cloud agent to be multi tenant
+    args = request.args
+    system_id = args.get("system_id", default="test")
     data = json.dumps({"algo":"CA*"})
     mqtt.publish("cloud-agent/calculate/sequence_mode", data, qos=2)
     return f"Calculation requested!"
 
-# TODO: frontend shoud use this function rather than refreshing the page
 @app.route("/backend/get_prerendered_map")
 def get_prerendered_map():
     args = request.args
@@ -167,14 +175,18 @@ def get_prerendered_map():
 
 @app.route("/backend/save_map", methods=['GET', 'POST'])
 def save_map():
+    args = request.args
+    system_id = args.get("system_id", default="test")
     new_map = json.dumps(request.json)
-    mqtt.publish("map-service/save-map", new_map, qos=2)
+    mqtt.publish(f"{system_id}/map-service/save-map", new_map, qos=2)
     return "ok"
 
 @app.route("/backend/adopt_map", methods=['GET', 'POST'])
 def adopt_new_map():
+    args = request.args
+    system_id = args.get("system_id", default="test")
     new_map = json.dumps(request.json)
-    mqtt.publish("map-service/adopt-map", new_map, qos=2)
+    mqtt.publish(f"{system_id}/map-service/adopt-map", new_map, qos=2)
     return "ok"
 
 @app.route("/backend/get_systems")
