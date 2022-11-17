@@ -1,3 +1,4 @@
+from log_lib import get_default_logger
 from visualizer import visualize_paths
 from libs.log_lib import get_default_logger
 from flask import Flask, render_template, request
@@ -19,6 +20,7 @@ MY_NAME = socket.gethostname()
 paths = {}
 
 print(f"My name is {MY_NAME}, Broker: {BROKER_CLOUD}")
+# Set logging
 logger = get_default_logger(MY_NAME)
 
 app = Flask(__name__)
@@ -60,9 +62,10 @@ def handle_mqtt_message(client, userdata, message):
     match topic[0]:
         case "backend/agents-info":
             temp_info = json.loads(payload)
+            logger.info("got agent info")
             agents, leader, cur_map, paths = database.get_data(temp_info['system_id'])
             if not cur_map or temp_info["map"] != cur_map:
-                print("Detected map change")
+                logger.info("Detected map change")
                 paths = {}
             full_data = {"agents": temp_info['agents'], "leader": temp_info['leader'], "map": temp_info["map"] , "paths": paths}
             database.update_data(system_id=temp_info['system_id'], data=full_data)
