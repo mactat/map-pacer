@@ -23,11 +23,22 @@ docker_build('mactat/map-pacer-backend', './backend')
 objects = read_yaml_stream('./frontend/kubernetes.yaml')
 objects[0]['spec']['template']['spec']['containers'][0]['env'][0]['value'] = 'http://localhost:8022/backend'
 k8s_yaml(encode_yaml_stream(objects))
-
-
-# k8s_yaml('./frontend/kubernetes.yaml')
 k8s_resource('frontend', port_forwards=8023, labels=["visualization-module"], resource_deps=['backend'])
 docker_build('mactat/map-pacer-frontend', './frontend')
+
+# performance-test
+k8s_yaml('./performance-test/kubernetes.yaml')
+k8s_resource('performance-test' , labels=["test-module"], resource_deps=['backend'])
+docker_build('mactat/map-pacer-performance-test', './performance-test')
+
+# button
+load('ext://uibutton', 'cmd_button')
+cmd_button('performance-test:start test',
+        argv=['make', 'performance'],
+        resource='performance-test',
+        icon_name='rocket_launch',
+        text='start test',
+)
 
 # Map-service
 k8s_yaml('./map-service/kubernetes.yaml')

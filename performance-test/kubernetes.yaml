@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: performance-test
+  labels:
+    app: performance-test
+spec:
+  replicas: 1
+  serviceName: performance-test
+  selector:
+    matchLabels:
+      app: performance-test
+  template:
+    metadata:
+      labels:
+        app: performance-test
+    spec:
+      containers:
+      - name: performance-test
+        image: mactat/map-pacer-performance-test:latest
+        ports:
+        - name: metrics
+          containerPort: 8080
+        env:
+        - name: BACKEND_URL
+          value: "backend"
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: performance-test
+  labels:
+    app: performance-test
+spec:
+  selector:
+    app: performance-test
+  ports:
+  - name: metrics
+    port: 8080

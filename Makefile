@@ -1,6 +1,7 @@
 # Define required macros here
 SHELL = /bin/bash
 CUR_DIR="$(shell pwd)"
+PERFORMANCE_POD="$(shell kubectl get pod -l app=performance-test -o jsonpath='{.items[0].metadata.name}')"
 include .env
 export
 
@@ -30,6 +31,9 @@ help:
 dev:
 	kubectl config use-context kind-kind
 	tilt up
+.PHONY: performance
+performance:
+	kubectl exec $(PERFORMANCE_POD) -- python3 /app/test.py
 
 .PHONY: local-observability
 local-observability:

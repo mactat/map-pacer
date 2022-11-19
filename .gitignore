@@ -2,3 +2,4 @@
 docs/master-thesis-papers/
 /.vscode/
 *pyc
+*.config

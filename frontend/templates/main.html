@@ -278,7 +278,7 @@ p, li
     var minfo = setInterval(refreshMap,1000);
 
     function redirect_to_map_creator() {
-        location.href = `https://${window.location.host}/map-creator?num_of_agents=${num_of_agents}`;
+        location.href = `http://${window.location.host}/map-creator?num_of_agents=${num_of_agents}`;
     }
     function agentsInfo() {
         fetch(`${backend_url}/get-info`).then(res => {

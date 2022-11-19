@@ -109,6 +109,17 @@ def show_paths():
     paths_str = "\n\n".join([f"<h1>{agent}:</h1>\n {path}" for agent, path in paths.items()]).replace('\n', '<br>')
     return paths_str
 
+@app.route("/backend/get_paths")
+def get_paths():
+    global paths
+    return json.dumps(paths)
+
+@app.route("/backend/clear_paths")
+def clear_paths():
+    global paths
+    paths = {}
+    return "ok"
+
 @app.route("/backend/sequence_calculate")
 def sequence_calculate():
     global info
