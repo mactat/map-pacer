@@ -1,4 +1,5 @@
 from visualizer import visualize_paths
+from log_lib import get_default_logger
 from flask import Flask, render_template, request
 from flask_mqtt import Mqtt
 import socket
@@ -16,6 +17,7 @@ MY_NAME = socket.gethostname()
 paths = {}
 
 print(f"My name is {MY_NAME}, Broker: {BROKER_CLOUD}")
+logger = get_default_logger(MY_NAME)
 
 app = Flask(__name__)
 CORS(app)
@@ -46,10 +48,12 @@ def handle_mqtt_message(client, userdata, message):
         case "backend/agents-info":
             temp_info = json.loads(payload)
             if not info["map"] or temp_info["map"] != info["map"]:
-                paths.clear()
+                logger.info("Detected map change")
+                paths = {}
+            logger.info("Info received")
             info = temp_info
         case "backend/path":
-            print("Path received")
+            logger.info("Path received")
             data = json.loads(payload)
             save_path(data["agent"], data["path"])
         case _:

@@ -17,7 +17,7 @@ docker_build('mactat/map-pacer-agent', './', dockerfile='./agent/Dockerfile')
 # Backend
 k8s_yaml('./backend/kubernetes.yaml')
 k8s_resource('backend', port_forwards=8022, labels=["visualization-module"], resource_deps=['broker', 'cloud-broker'])
-docker_build('mactat/map-pacer-backend', './backend')
+docker_build('mactat/map-pacer-backend', './', dockerfile='./backend/Dockerfile')
 
 # Frontend
 
