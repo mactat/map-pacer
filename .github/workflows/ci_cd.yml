@@ -52,7 +52,7 @@ jobs:
       with:
          method: kubeconfig
          kubeconfig: ${{ secrets.KUBECONFIG_OKTETO }}
-         namespace: mactat
+         namespace: local-mactat
     - name: Deploy Local Services
       run: |
         LOCAL_SERVICES="broker agent map-service"
