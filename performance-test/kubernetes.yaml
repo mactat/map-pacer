@@ -6,7 +6,6 @@ metadata:
     app: performance-test
 spec:
   replicas: 1
-  serviceName: performance-test
   selector:
     matchLabels:
       app: performance-test
