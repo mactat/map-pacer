@@ -32,7 +32,7 @@ spec:
         - name: AGENTS_NUMBER
           value: "3"
         - name: BROKER_HOSTNAME
-          value: "broker"
+          value: "broker-service"
         - name: BROKER_PORT
           value: "1883"
         - name: CLOUD_BROKER_HOSTNAME
