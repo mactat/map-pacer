@@ -7,7 +7,7 @@ ENV FLASK_ENV $flask_env
 
 WORKDIR /app
 
-ADD requirements.txt .
+ADD ./backend/requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY ./libs/ /app/libs/
