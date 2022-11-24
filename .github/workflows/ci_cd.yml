@@ -41,7 +41,7 @@ jobs:
     - name: Deploy Cloud Services
       run: |
         kubectl config set-context --current --namespace=mactat
-        helm install cloud-broker ./cloud-broker
+        helm upgrade -i cloud-broker ./cloud-broker
         CLOUD_SERVICES="cloud-agent backend frontend"
         for service in $CLOUD_SERVICES
         do
