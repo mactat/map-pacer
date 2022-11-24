@@ -40,6 +40,7 @@ jobs:
         version: v3.10.0
     - name: Deploy Cloud Services
       run: |
+        kubectl config set-context --current --namespace=mactat
         helm install cloud-broker ./cloud-broker
         CLOUD_SERVICES="cloud-agent backend frontend"
         for service in $CLOUD_SERVICES
@@ -48,17 +49,15 @@ jobs:
           kubectl apply -f ./$service/kubernetes.yaml
           kubectl rollout restart deployment $service
         done
-    - uses: azure/k8s-set-context@v2
-      with:
-         method: kubeconfig
-         kubeconfig: ${{ secrets.KUBECONFIG_OKTETO }}
-         namespace: local-mactat
     - name: Deploy Local Services
       run: |
-        LOCAL_SERVICES="broker agent map-service"
+        kubectl config set-context --current --namespace=mactat-local
+        LOCAL_SERVICES="broker map-service"
         for service in $LOCAL_SERVICES
         do
           echo "Deploying ${service}"
           kubectl apply -f ./$service/kubernetes.yaml
           kubectl rollout restart deployment $service
         done
+        kubectl apply -f ./agent/kubernetes.yaml
+        kubectl rollout restart statefulset agent
