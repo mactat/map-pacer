@@ -10,9 +10,9 @@ def timeit(my_func):
         tstart = time.time()
         output = my_func(*args, **kw)
         tend = time.time()
-        
-        print('"{}" took {:.3f} ms to execute'.format(my_func.__name__, (tend - tstart) * 1000))
-        return output
+        diff = (tend - tstart)* 1000
+        print('"{}" took {:.3f} ms to execute'.format(my_func.__name__, diff))
+        return output, diff
     return timed
 
 def call_counter(my_func):
@@ -59,9 +59,13 @@ class System:
     def extract_paths_details(self, paths):
         paths_found = [path for path in paths.values() if path != "not found"]
         len_path_sum = sum([self.find_steps_from_paths(path) for path in paths_found])
-        print(f"Paths found: {len(paths_found)}")
-        print(f"% of paths found: {len(paths_found)/len(paths)*100}%")
+        num_of_found_paths=len(paths_found)
+        percentage_of_path_found=num_of_found_paths/len(paths)*100
+        print(f"Paths found: {num_of_found_paths}")
+        print(f"% of paths found: {percentage_of_path_found}%")
         print(f"Sum of paths length: {len_path_sum}")
+        return num_of_found_paths, percentage_of_path_found, len_path_sum
+
 
 
     @timeit
@@ -95,3 +99,11 @@ class System:
         
         # TODO: Test if map is the same 
         time.sleep(2)
+    def extract_averages(self, results, name):
+        transpose = list(zip(*results))
+        print(f"""\n-------> Algorithm: {name} <-------
+        Average time: {sum(transpose[0])/len(transpose[0]):.{1}f}ms
+        Average number of paths found: {sum(transpose[1])/len(transpose[1]):.{1}f}
+        Average percentage of paths found: {sum(transpose[2])/len(transpose[2]):.{1}f}%
+        Average path length: {sum(transpose[3])/len(transpose[3]):.{1}f} tiles
+        """)
