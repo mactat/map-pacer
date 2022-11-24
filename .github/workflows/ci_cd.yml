@@ -51,7 +51,7 @@ jobs:
         done
     - name: Deploy Local Services
       run: |
-        kubectl config set-context --current --namespace=mactat-local
+        kubectl config set-context --current --namespace=local-mactat
         LOCAL_SERVICES="broker map-service"
         for service in $LOCAL_SERVICES
         do
