@@ -42,7 +42,7 @@ jobs:
       run: |
         kubectl config set-context --current --namespace=mactat
         helm upgrade -i cloud-broker ./cloud-broker
-        CLOUD_SERVICES="cloud-agent backend frontend"
+        CLOUD_SERVICES="cloud-agent backend frontend performance-test"
         for service in $CLOUD_SERVICES
         do
           echo "Deploying ${service}"
