@@ -36,14 +36,9 @@ spec:
         - name: BROKER_PORT
           value: "1883"
         - name: CLOUD_BROKER_HOSTNAME
-          value: "cloud-broker-service"
+          value: "cloud-broker-mactat.cloud.okteto.net"
         - name: CLOUD_BROKER_PORT
-          value: "1883" 
-        # - name: CLOUD_BROKER_HOSTNAME
-        #   value: "tcp-mo2.mogenius.io"
-        # - name: CLOUD_BROKER_PORT
-        #   value: "10106"
-
+          value: "443" 
 ---
 kind: Service
 apiVersion: v1

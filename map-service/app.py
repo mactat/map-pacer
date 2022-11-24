@@ -7,6 +7,7 @@ import random
 import json
 import numpy as np
 from libs.log_lib import get_default_logger
+import ssl
 
 
 #Get environment variables
@@ -115,7 +116,14 @@ client_local.on_subscribe = on_subscribe
 client_local.on_message = on_message
 client_local.connect(BROKER, BROKER_PORT)
 
-client_cloud = mqtt.Client()
+client_cloud = mqtt.Client(transport='websockets')
+client_cloud.ws_set_options(path="/mqtt", headers=None)
+
+##### COMMENT TO RUN WITH TILT TODO: fix it
+client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
+client_cloud.tls_insecure_set(True)
+#####
+
 client_cloud.username_pw_set(username="agent", password="agent-pass")
 client_cloud.on_subscribe = on_subscribe
 client_cloud.on_message = on_message
