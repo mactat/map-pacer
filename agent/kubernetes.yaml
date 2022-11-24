@@ -5,7 +5,7 @@ metadata:
   labels:
     app: agent
 spec:
-  replicas: 3
+  replicas: 2
   serviceName: agent
   selector:
     matchLabels:
@@ -32,18 +32,13 @@ spec:
         - name: AGENTS_NUMBER
           value: "3"
         - name: BROKER_HOSTNAME
-          value: "broker.hivemq.com"
+          value: "broker"
         - name: BROKER_PORT
-          value: "8000"
+          value: "1883"
         - name: CLOUD_BROKER_HOSTNAME
-          value: "broker.hivemq.com"
+          value: "cloud-broker-mactat.cloud.okteto.net"
         - name: CLOUD_BROKER_PORT
-          value: "8000" 
-        # - name: CLOUD_BROKER_HOSTNAME
-        #   value: "tcp-mo2.mogenius.io"
-        # - name: CLOUD_BROKER_PORT
-        #   value: "10106"
-
+          value: "443" 
 ---
 kind: Service
 apiVersion: v1

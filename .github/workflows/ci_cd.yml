@@ -34,10 +34,29 @@ jobs:
          method: kubeconfig
          kubeconfig: ${{ secrets.KUBECONFIG_OKTETO }}
          namespace: mactat
-    - name: Deploy
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.10.0
+    - name: Deploy Cloud Services
       run: |
-        CLOUD_SERVICES="cloud-agent backend frontend" #cloud broker is not changing for now
+        helm install cloud-broker ./cloud-broker
+        CLOUD_SERVICES="cloud-agent backend frontend"
         for service in $CLOUD_SERVICES
+        do
+          echo "Deploying ${service}"
+          kubectl apply -f ./$service/kubernetes.yaml
+          kubectl rollout restart deployment $service
+        done
+    - uses: azure/k8s-set-context@v2
+      with:
+         method: kubeconfig
+         kubeconfig: ${{ secrets.KUBECONFIG_OKTETO }}
+         namespace: mactat
+    - name: Deploy Local Services
+      run: |
+        LOCAL_SERVICES="broker agent map-service"
+        for service in $LOCAL_SERVICES
         do
           echo "Deploying ${service}"
           kubectl apply -f ./$service/kubernetes.yaml

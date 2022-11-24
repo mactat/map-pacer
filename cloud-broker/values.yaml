@@ -7,8 +7,8 @@ image:
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
-nameOverride: "broker"
-fullnameOverride: "broker"
+nameOverride: "cloud-broker"
+fullnameOverride: "cloud-broker"
 
 serviceAccount:
   # Specifies whether a service account should be created
