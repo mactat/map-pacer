@@ -48,9 +48,17 @@ class System:
         paths = requests.get(f"{self.backend}/get_paths")
         return paths.json()
 
+    def find_steps_from_paths(self, path):
+        num_of_steps = len(path) + 1
+        for step in path[::-1]:
+            if step == path[-1]:
+                num_of_steps -= 1
+            else: break
+        return num_of_steps
+
     def extract_paths_details(self, paths):
         paths_found = [path for path in paths.values() if path != "not found"]
-        len_path_sum = sum([len(path) for path in paths_found])
+        len_path_sum = sum([self.find_steps_from_paths(path) for path in paths_found])
         print(f"Paths found: {len(paths_found)}")
         print(f"% of paths found: {len(paths_found)/len(paths)*100}%")
         print(f"Sum of paths length: {len_path_sum}")

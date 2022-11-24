@@ -142,7 +142,7 @@ label[for=black],
 <div style="display:flex; width:100%; align-items:center; flex-direction:column; height: 100%; justify-content: space-around;">
 
 <div style="display:flex; width:100%; align-items: center;">
-  <button class="button-78" role="button" onclick="save_map()">Save map</button>
+  <button class="button-78" role="button" onclick="download_map()">Save map</button>
   <button class="button-78" role="button" onclick="adopt_map()">Adopt map</button>
   <button class="button-78" role="button" onclick="go_back()">Go back</button>
 </div>
@@ -245,8 +245,6 @@ function boardToList(remove_agents) {
             }
         }
     }
-    //console.log(boardList);
-    //download(JSON.stringify(boardList), "board.json", "text/plain");
     return boardList;
 }
 // eventListener to listen to click events on the game board
@@ -273,8 +271,9 @@ board.addEventListener('click', e => {
   }
 });
 
-function download(data, filename, type) {
-    var file = new Blob([data], {type: type});
+function download_map() {
+    let filename = "board.json"
+    var file = new Blob([JSON.stringify(boardToList(false))], {type: "text/plain"});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others

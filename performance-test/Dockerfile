@@ -10,7 +10,7 @@ RUN apk --no-cache --update-cache add  python3 py3-pip
 ADD ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-ADD ./test.py ./helpers.py ./
+ADD ./test.py ./backend_api.py ./
 ADD ./maps/ ./maps/
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]

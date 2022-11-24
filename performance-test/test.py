@@ -1,7 +1,8 @@
 import os
-from helpers import System, call_counter
+from backend_api import System, call_counter
 
 BACKEND_URL = os.environ.get('BACKEND_URL')
+
 
 @call_counter
 def test_ca_star_local(map_name):
@@ -10,6 +11,7 @@ def test_ca_star_local(map_name):
     paths = system.wait_for_paths()
     system.extract_paths_details(paths)
 
+
 @call_counter
 def test_ca_star_cloud(map_name):
     system.load_map(map_name)
@@ -17,9 +19,10 @@ def test_ca_star_cloud(map_name):
     paths = system.wait_for_paths()
     system.extract_paths_details(paths)
 
+
 print("================== Test Setup ==================")
 system = System(BACKEND_URL)
-maps = ["small", "two_traped", "big_and_empty"]
+maps = ["small", "small_2", "two_traped", "spider", "big_and_empty"]
 
 print(f"Number of agents {len(system.get_agents())}")
 print(f"Leader: {system.get_leader()}")

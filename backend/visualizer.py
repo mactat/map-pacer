@@ -35,14 +35,12 @@ def map_to_string(my_map):
 def mark_paths(normal_map, paths):
     if len(paths) == 0:
         return [normal_map]
-    for path in paths:
-        if path == "not found":
-            paths.remove(path)
+    paths = [path for path in paths if path != "not found"]
+
     # find longest path
     longest_path = len(max(paths, key=len))
     # create an array with longest path * map
     marked_map_times = [copy.deepcopy(normal_map) for _ in range(longest_path)]
-
     for timestamp in range(longest_path):
         for agent_num, path in enumerate(paths):
             start_tile, end_tile = path[0], path[-1]
