@@ -1,5 +1,5 @@
 from visualizer import visualize_paths
-from log_lib import get_default_logger
+from libs.log_lib import get_default_logger
 from flask import Flask, render_template, request
 from flask_mqtt import Mqtt
 import socket
