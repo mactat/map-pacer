@@ -106,14 +106,14 @@ cloud-build:
 	docker build -t $(DOCKER_USERNAME)/map-pacer-backend:latest -f ./backend/Dockerfile .
 	docker build -t $(DOCKER_USERNAME)/map-pacer-agent:latest -f ./agent/Dockerfile .
 	docker build -t $(DOCKER_USERNAME)/map-pacer-map-service:latest -f ./map-service/Dockerfile .
-	docker build -t $(DOCKER_USERNAME)/map-pacer-performace-test:latest -f ./performace-test/Dockerfile ./performace-test
+	docker build -t $(DOCKER_USERNAME)/map-pacer-performance-test:latest -f ./performace-test/Dockerfile ./performance-test
 	echo "Pushing images"
 	docker push $(DOCKER_USERNAME)/map-pacer-cloud-agent:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-frontend:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-backend:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-agent:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-map-service:latest
-	docker push $(DOCKER_USERNAME)/map-pacer-performace-test:latest
+	docker push $(DOCKER_USERNAME)/map-pacer-performance-test:latest
 
 .PHONY: pdf
 pdf:
