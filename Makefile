@@ -106,7 +106,7 @@ cloud-build:
 	docker build -t $(DOCKER_USERNAME)/map-pacer-backend:latest -f ./backend/Dockerfile .
 	docker build -t $(DOCKER_USERNAME)/map-pacer-agent:latest -f ./agent/Dockerfile .
 	docker build -t $(DOCKER_USERNAME)/map-pacer-map-service:latest -f ./map-service/Dockerfile .
-	docker build -t $(DOCKER_USERNAME)/map-pacer-performance-test:latest -f ./performace-test/Dockerfile ./performance-test
+	docker build -t $(DOCKER_USERNAME)/map-pacer-performance-test:latest -f ./performance-test/Dockerfile ./performance-test
 	echo "Pushing images"
 	docker push $(DOCKER_USERNAME)/map-pacer-cloud-agent:latest
 	docker push $(DOCKER_USERNAME)/map-pacer-frontend:latest
