@@ -118,8 +118,12 @@ client_local.connect(BROKER, BROKER_PORT)
 
 client_cloud = mqtt.Client(transport='websockets')
 client_cloud.ws_set_options(path="/mqtt", headers=None)
-# client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
-# client_cloud.tls_insecure_set(True)
+
+##### COMMENT TO RUN WITH TILT TODO: fix it
+client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
+client_cloud.tls_insecure_set(True)
+#####
+
 client_cloud.username_pw_set(username="agent", password="agent-pass")
 client_cloud.on_subscribe = on_subscribe
 client_cloud.on_message = on_message
