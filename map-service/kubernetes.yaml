@@ -32,3 +32,5 @@ spec:
           value: "443" 
         - name: SYSTEM_ID
           value: "home_system"
+        - name: TLS
+          value: "true"

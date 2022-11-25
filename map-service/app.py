@@ -18,6 +18,8 @@ BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
 NUM_OF_AGENTS= int(os.environ.get('AGENTS_NUMBER'))
 SYSTEM_ID = os.environ.get('SYSTEM_ID')
+TLS = bool(os.environ.get('TLS'))
+
 agents = []
 map_id = 0
 current_map = []
@@ -119,8 +121,9 @@ client_cloud = mqtt.Client(client_id=MY_NAME, transport='websockets', clean_sess
 client_cloud.ws_set_options(path="/mqtt", headers=None)
 
 ##### COMMENT TO RUN WITH TILT TODO: fix it
-client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
-client_cloud.tls_insecure_set(True)
+if TLS:
+    client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
+    client_cloud.tls_insecure_set(True)
 #####
 
 client_cloud.username_pw_set(username="agent", password="agent-pass")

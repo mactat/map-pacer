@@ -7,10 +7,11 @@ k8s_yaml(helm("cloud-broker", name="cloud-broker", values="./cloud-broker/values
 k8s_resource('cloud-broker', labels=["core-module-cloud"])
 
 # Agent
-objects = read_yaml_stream('./agent/kubernetes.yaml')
-objects[0]['spec']['template']['spec']['containers'][0]['env'][3]['value'] = 'cloud-broker'
-objects[0]['spec']['template']['spec']['containers'][0]['env'][4]['value'] = '9001'
-k8s_yaml(encode_yaml_stream(objects))
+agent = read_yaml_stream('./agent/kubernetes.yaml')
+agent[0]['spec']['template']['spec']['containers'][0]['env'][3]['value'] = 'cloud-broker'
+agent[0]['spec']['template']['spec']['containers'][0]['env'][4]['value'] = '9001'
+agent[0]['spec']['template']['spec']['containers'][0]['env'][5]['value'] = 'false'
+k8s_yaml(encode_yaml_stream(agent))
 k8s_resource('agent',  labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-agent', './', dockerfile='./agent/Dockerfile')
 
@@ -49,10 +50,11 @@ cmd_button('performance-test:start test',
 )
 
 # Map-service
-objects = read_yaml_stream('./map-service/kubernetes.yaml')
-objects[0]['spec']['template']['spec']['containers'][0]['env'][3]['value'] = 'cloud-broker'
-objects[0]['spec']['template']['spec']['containers'][0]['env'][4]['value'] = '9001'
-k8s_yaml(encode_yaml_stream(objects))
+map_service = read_yaml_stream('./map-service/kubernetes.yaml')
+map_service[0]['spec']['template']['spec']['containers'][0]['env'][3]['value'] = 'cloud-broker'
+map_service[0]['spec']['template']['spec']['containers'][0]['env'][4]['value'] = '9001'
+map_service[0]['spec']['template']['spec']['containers'][0]['env'][5]['value'] = 'false'
+k8s_yaml(encode_yaml_stream(map_service))
 k8s_resource('map-service',  labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-map-service', './', dockerfile='./map-service/Dockerfile')
 
@@ -67,8 +69,6 @@ k8s_yaml('./agent/kubernetes_foreign.yaml')
 k8s_resource('agent-foreign',  labels=["foreign-system"], resource_deps=['broker', 'cloud-broker'])
 
 # Map-service
-k8s_yaml('./map-service/kubernetes _foreign.yaml')
+k8s_yaml('./map-service/kubernetes_foreign.yaml')
 k8s_resource('map-service-foreign',  labels=["foreign-system"], resource_deps=['broker', 'cloud-broker'])
-# load('ext://helm_resource', 'helm_resource', 'helm_repo')
-# helm_repo('bitnami', 'https://charts.bitnami.com/bitnami')
-# helm_resource('redis', 'bitnami/redis')
+

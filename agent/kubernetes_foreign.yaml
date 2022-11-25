@@ -41,6 +41,9 @@ spec:
           value: "9001"
         - name: SYSTEM_ID
           value: "foreign_system"
+        - name: TLS
+          value: "false"
+
 ---
 kind: Service
 apiVersion: v1
