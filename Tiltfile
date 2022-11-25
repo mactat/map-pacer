@@ -15,8 +15,11 @@ k8s_resource('agent',  labels=["core-module"], resource_deps=['broker', 'cloud-b
 docker_build('mactat/map-pacer-agent', './', dockerfile='./agent/Dockerfile')
 
 # Database
+k8s_yaml('./database/pv.yaml')
+k8s_resource('database', labels=["visualization-module"])
 k8s_yaml('./database/kubernetes.yaml')
 k8s_resource('database', labels=["visualization-module"])
+
 
 # Backend
 k8s_yaml('./backend/kubernetes.yaml')
