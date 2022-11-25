@@ -18,7 +18,7 @@ BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
 NUM_OF_AGENTS= int(os.environ.get('AGENTS_NUMBER'))
 SYSTEM_ID = os.environ.get('SYSTEM_ID')
-TLS = bool(os.environ.get('TLS'))
+TLS = os.environ.get('TLS') == "true"
 
 agents = []
 map_id = 0

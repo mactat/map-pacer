@@ -87,12 +87,25 @@ class System:
     def trigger_ca_star_cloud(self):
         requests.get(f"{self.backend}/sequence_calculate_cloud?system_id={self.system}")
         return None
-    
+
+    def replace_agents(self, cur_map):
+        agents = self.get_agents()
+        for agent_old, agent_new in zip(["agent-0", "agent-1", "agent-2"], agents):
+            for i, row in enumerate(cur_map):
+                for j, cell in enumerate(row):
+                    if cell == f"{agent_old}-start": 
+                            cur_map[i][j] = f"{agent_new}-start"
+                    elif cell == f"{agent_old}-end":
+                            cur_map[i][j] = f"{agent_new}-end"
+        return cur_map
+
+
     def load_map(self, map_name):
         requests.get(f"{self.backend}/clear_paths?system_id={self.system}")
         time.sleep(1)
         with open(f"./maps/{map_name}.json") as map_file:
-            new_map = json.load(map_file)
+            raw_map = json.load(map_file)
+            new_map = self.replace_agents(raw_map)
             print(f"Map name: {map_name}, Map size: {len(new_map)}")
             requests.post(
                 f"{self.backend}/adopt_map?system_id={self.system}",

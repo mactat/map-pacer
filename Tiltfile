@@ -10,7 +10,7 @@ k8s_resource('cloud-broker', labels=["core-module-cloud"])
 agent = read_yaml_stream('./agent/kubernetes.yaml')
 agent[0]['spec']['template']['spec']['containers'][0]['env'][3]['value'] = 'cloud-broker'
 agent[0]['spec']['template']['spec']['containers'][0]['env'][4]['value'] = '9001'
-agent[0]['spec']['template']['spec']['containers'][0]['env'][5]['value'] = 'false'
+agent[0]['spec']['template']['spec']['containers'][0]['env'][6]['value'] = 'false'
 k8s_yaml(encode_yaml_stream(agent))
 k8s_resource('agent',  labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-agent', './', dockerfile='./agent/Dockerfile')
@@ -53,7 +53,7 @@ cmd_button('performance-test:start test',
 map_service = read_yaml_stream('./map-service/kubernetes.yaml')
 map_service[0]['spec']['template']['spec']['containers'][0]['env'][3]['value'] = 'cloud-broker'
 map_service[0]['spec']['template']['spec']['containers'][0]['env'][4]['value'] = '9001'
-map_service[0]['spec']['template']['spec']['containers'][0]['env'][5]['value'] = 'false'
+map_service[0]['spec']['template']['spec']['containers'][0]['env'][6]['value'] = 'false'
 k8s_yaml(encode_yaml_stream(map_service))
 k8s_resource('map-service',  labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-map-service', './', dockerfile='./map-service/Dockerfile')

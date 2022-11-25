@@ -14,7 +14,7 @@ BROKER_PORT = int(os.environ.get('BROKER_PORT'))
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
 SYSTEM_ID = os.environ.get('SYSTEM_ID')
-TLS = bool(os.environ.get('TLS'))
+TLS = os.environ.get('TLS') == "true"
 
 # Set logging
 logger = get_default_logger(MY_NAME)
