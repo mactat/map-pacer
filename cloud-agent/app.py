@@ -103,7 +103,7 @@ def on_message(client_local, userdata, msg):
             logger.info(f"From topic: {msg.topic} | msg: {msg_str}")
 
 
-client_cloud = mqtt.Client()
+client_cloud = mqtt.Client(client_id=MY_NAME, clean_session=False)
 client_cloud.username_pw_set(username="agent", password="agent-pass")
 client_cloud.on_subscribe = on_subscribe
 client_cloud.on_message = on_message

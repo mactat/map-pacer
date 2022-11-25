@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, send_from_directory
 from flask_cors import CORS
 import os
+from waitress import serve
+
 app = Flask(__name__)
 CORS(app)
 BACKEND_URL = os.environ.get('BACKEND_URL')
@@ -13,7 +15,7 @@ def favicon():
 
 
 @app.route("/")
-def serve():
+def main():
     return render_template("main.html", backend_url=BACKEND_URL)
 
 @app.route("/map-creator")
@@ -34,4 +36,5 @@ def map_creator():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8888, debug=True)
+    serve(app, port='8888')
+    #app.run(host='0.0.0.0', port=8888, debug=True)

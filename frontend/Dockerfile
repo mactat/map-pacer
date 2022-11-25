@@ -1,9 +1,9 @@
 FROM python:3.11.0b5-alpine3.16
 
 # Default value; will be overridden by build-args, if passed
-ARG flask_env=production
+ARG ENV=production
 
-ENV FLASK_ENV $flask_env
+ENV ENV $ENV
 
 WORKDIR /app
 

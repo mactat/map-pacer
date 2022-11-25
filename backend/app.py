@@ -7,6 +7,7 @@ import os
 import sys
 import json
 from flask_cors import CORS
+from waitress import serve
 
 
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
@@ -65,12 +66,13 @@ def handle_logging(client, userdata, level, buf):
     print(level, buf)
 
 @app.route("/backend/test")
-def serve():
+def test():
     return "Hi there, I am a backend service!"
 
 @app.route("/backend/discovery")
 def trigger_discovery():
     mqtt.publish("agents/discovery/start", "Backend service is here!", qos=2)
+    logger.info("Published: agents/discovery/start")
     return "Discovery triggered!"
 
 @app.route("/backend/new-map")
@@ -79,6 +81,7 @@ def generate_map():
     paths.clear()
     size = args.get("size", default="10")
     mqtt.publish("map-service/random-map", size, qos=2)
+    logger.info("Published: map-service/random-map")
     return "New map requested!"
 
 @app.route("/backend/map-from-file")
@@ -87,6 +90,7 @@ def get_map_from_file():
     paths.clear()
     map_file = args.get("map_file", default="random")
     mqtt.publish("map-service/map-from-file", f"{map_file}.txt", qos=2)
+    logger.info("Published: map-service/map-from-file")
     return "New map requested!"
 
 @app.route("/backend/refresh-info")
@@ -158,4 +162,5 @@ def adopt_new_map():
     return "ok"
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8888, debug=True)
+    serve(app, port='8888')
+    #app.run(host='0.0.0.0', port=8888, debug=True)
