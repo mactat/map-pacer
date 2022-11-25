@@ -76,8 +76,7 @@ def announce_new_map():
     logger.info("Announcing new map")
     # map to json
     map_json = json.dumps(current_map)
-    client_local.publish(f"{SYSTEM_ID}/agents/map/new", map_json, qos=2)
-    client_cloud.publish("cloud-agent/map/new", map_json, qos=2)
+    client_local.publish(f"{SYSTEM_ID}/agents/map/new", map_json, qos=0)
 
 def on_subscribe(client_local, userdata, mid, granted_qos):
     logger.info("Subscribed to topic")
@@ -120,8 +119,8 @@ client_cloud = mqtt.Client(client_id=MY_NAME, transport='websockets', clean_sess
 client_cloud.ws_set_options(path="/mqtt", headers=None)
 
 ##### COMMENT TO RUN WITH TILT TODO: fix it
-client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
-client_cloud.tls_insecure_set(True)
+# client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
+# client_cloud.tls_insecure_set(True)
 #####
 
 client_cloud.username_pw_set(username="agent", password="agent-pass")
@@ -130,11 +129,11 @@ client_cloud.on_message = on_message
 client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT)
 
 # Subscribe for related topics
-client_local.subscribe(f"{SYSTEM_ID}/map-service/#", qos=2)
-client_cloud.subscribe(f"{SYSTEM_ID}/map-service/#", qos=2)
+client_local.subscribe(f"{SYSTEM_ID}/map-service/#", qos=0)
+client_cloud.subscribe(f"{SYSTEM_ID}/map-service/#", qos=0)
 
 # Restart discovery of agents
-client_local.publish(f"{SYSTEM_ID}/agents/discovery/start","It's map-service looking for ya" , qos=2)
+client_local.publish(f"{SYSTEM_ID}/agents/discovery/start","It's map-service looking for ya" , qos=0)
 
 while 1:
     client_local.loop(0.01)

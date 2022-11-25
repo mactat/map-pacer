@@ -24,8 +24,6 @@ spec:
           value: "cloud-broker"
         - name: CLOUD_BROKER_PORT
           value: "1883" 
-        - name: SYSTEM_ID
-          value: "CI_CD" 
 ---
 kind: Service
 apiVersion: v1

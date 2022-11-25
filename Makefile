@@ -33,7 +33,7 @@ dev:
 	tilt up
 .PHONY: performance
 performance:
-	kubectl exec $(PERFORMANCE_POD) -- python3 /app/test.py
+	kubectl exec $(PERFORMANCE_POD) -- python3 /app/test.py --system_id=$(SYSTEM_ID)
 
 .PHONY: local-observability
 local-observability:

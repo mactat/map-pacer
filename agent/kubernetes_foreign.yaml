@@ -36,16 +36,11 @@ spec:
         - name: BROKER_PORT
           value: "1883"
         - name: CLOUD_BROKER_HOSTNAME
-          value: "cloud-broker-service"
+          value: "cloud-broker"
         - name: CLOUD_BROKER_PORT
-          value: "1883"
+          value: "9001"
         - name: SYSTEM_ID
           value: "foreign_system"
-        # - name: CLOUD_BROKER_HOSTNAME
-        #   value: "tcp-mo2.mogenius.io"
-        # - name: CLOUD_BROKER_PORT
-        #   value: "10106"
-
 ---
 kind: Service
 apiVersion: v1

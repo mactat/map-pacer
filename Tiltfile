@@ -4,7 +4,7 @@ k8s_resource('broker', labels=["core-module"])
 
 # Cloud-Broker
 k8s_yaml(helm("cloud-broker", name="cloud-broker", values="./cloud-broker/values.yaml"))
-k8s_resource('cloud-broker', labels=["core-module"])
+k8s_resource('cloud-broker', labels=["core-module-cloud"])
 
 # Agent
 objects = read_yaml_stream('./agent/kubernetes.yaml')
@@ -13,20 +13,6 @@ objects[0]['spec']['template']['spec']['containers'][0]['env'][4]['value'] = '90
 k8s_yaml(encode_yaml_stream(objects))
 k8s_resource('agent',  labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-agent', './', dockerfile='./agent/Dockerfile')
-
-# Map-service
-k8s_yaml('./map-service/kubernetes.yaml')
-k8s_resource('map-service',  labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
-docker_build('mactat/map-pacer-map-service', './', dockerfile='./map-service/Dockerfile')
-
-# Cloud-Broker
-k8s_yaml('./cloud-broker/kubernetes.yaml')
-k8s_resource('cloud-broker', labels=["core-module-cloud"])
-
-# Cloud-agent
-k8s_yaml('./cloud-agent/kubernetes.yaml')
-k8s_resource('cloud-agent', labels=["core-module-cloud"], resource_deps=['broker', 'cloud-broker'])
-docker_build('mactat/map-pacer-cloud-agent', './', dockerfile='./cloud-agent/Dockerfile')
 
 # Database
 k8s_yaml('./database/kubernetes.yaml')
@@ -53,7 +39,7 @@ docker_build('mactat/map-pacer-performance-test', './performance-test')
 # button
 load('ext://uibutton', 'cmd_button')
 cmd_button('performance-test:start test',
-        argv=['make', 'performance'],
+        argv=['make', 'performance', "SYSTEM_ID=home_system"],
         resource='performance-test',
         icon_name='rocket_launch',
         text='start test',
@@ -71,6 +57,8 @@ docker_build('mactat/map-pacer-map-service', './', dockerfile='./map-service/Doc
 k8s_yaml('./cloud-agent/kubernetes.yaml')
 k8s_resource('cloud-agent', labels=["core-module"], resource_deps=['broker', 'cloud-broker'])
 docker_build('mactat/map-pacer-cloud-agent', './', dockerfile='./cloud-agent/Dockerfile')
+
+## FOREIGN SYSTEM TEST
 # System-2(foreign)
 k8s_yaml('./agent/kubernetes_foreign.yaml')
 k8s_resource('agent-foreign',  labels=["foreign-system"], resource_deps=['broker', 'cloud-broker'])

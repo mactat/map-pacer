@@ -40,7 +40,7 @@ spec:
         - name: CLOUD_BROKER_PORT
           value: "443"
         - name: SYSTEM_ID
-          value: "CI_CD" 
+          value: "home_system" 
 
 ---
 kind: Service

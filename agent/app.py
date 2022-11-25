@@ -26,6 +26,7 @@ start,end = None, None
 current_election = {}
 CUR_HIGHEST_ELECTION = 0
 current_map = []
+raw_map = []
 election_started = False
 
 # Parameters
@@ -47,17 +48,15 @@ logger.info(f"My name is {MY_NAME}, System Id: {SYSTEM_ID},Broker: {BROKER}")
 def start_discovery():
     global leader, current_map
     logger.debug(f"Starting local discovery")
-    client_local.publish(f"{SYSTEM_ID}/agents/discovery/start", f"Initiate discovery!", qos=2)
+    client_local.publish(f"{SYSTEM_ID}/agents/discovery/start", f"Initiate discovery!", qos=0)
     if leader == MY_NAME:
         logger.debug(f"I am the leader, sending info to backend and agents")
-        client_local.publish(f"{SYSTEM_ID}/agents/discovery/leader", json.dumps({"leader": MY_NAME, "map": current_map}), qos=2)
+        client_local.publish(f"{SYSTEM_ID}/agents/discovery/leader", json.dumps({"leader": MY_NAME, "map": current_map}), qos=0)
         send_info_backend()
 
 def send_hello():
-    client_local.publish(f"{SYSTEM_ID}/agents/discovery/hello", f"{MY_NAME}", qos=2)
-    client_local.publish(f"{SYSTEM_ID}/map-service/hello", f"{MY_NAME}", qos=2)
-    client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
-    if CLOUD_MODE: client_cloud.publish(f"cloud-agent/hello", f"{MY_NAME}", qos=2)
+    client_local.publish(f"{SYSTEM_ID}/agents/discovery/hello", f"{MY_NAME}", qos=0)
+    client_local.publish(f"{SYSTEM_ID}/map-service/hello", f"{MY_NAME}", qos=0)
 
 def handle_discovery(candidate):
     global election_started, leader
@@ -67,7 +66,7 @@ def handle_discovery(candidate):
         my_mates_timers[candidate] = AGENT_TTL
         # BUG!!! generate new map, should join the robot to current map instead...
         if MY_NAME == leader: 
-            client_local.publish(f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=2)
+            client_local.publish(f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=0)
 
     elif candidate != MY_NAME and candidate in my_mates:
         my_mates_timers[candidate] = AGENT_TTL
@@ -116,7 +115,7 @@ def start_election():
     random.seed()
     election_number = random.randint(0, 100)
     logger.info(f"Starting election #{election_number}")
-    client_local.publish(f"{SYSTEM_ID}/agents/election/start", f"{election_number}", qos=2)
+    client_local.publish(f"{SYSTEM_ID}/agents/election/start", f"{election_number}", qos=0)
 
 def send_vote(election_number):
     global leader
@@ -125,7 +124,7 @@ def send_vote(election_number):
     vote = random.randint(0, 100)
     # send vote
     logger.debug(f"Sending vote: {vote} in election #{election_number}")
-    client_local.publish(f"{SYSTEM_ID}/agents/election/vote", f"{election_number}, {MY_NAME}, {vote}", qos=2)
+    client_local.publish(f"{SYSTEM_ID}/agents/election/vote", f"{election_number}, {MY_NAME}, {vote}", qos=0)
 
 def receive_vote(election_number, agent, vote):
     global current_election, CUR_HIGHEST_ELECTION, leader
@@ -146,14 +145,22 @@ def receive_vote(election_number, agent, vote):
     leader = MY_NAME
     logger.info(f"I am the leader({MY_NAME})")
 
+def cloud_calculate():
+    logger.info("I will initiate cloud calculation")
+    client_cloud.publish(f"cloud-agent/calculate/sequence_mode", json.dumps({
+        "system_id": SYSTEM_ID,
+        "map": raw_map,
+        "agents": [MY_NAME] + my_mates
+    }), qos=0)
 
 def check_map():
     if leader != MY_NAME or current_map: return
     logger.info(f"No map available. I will generate new map")
-    client_local.publish(f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=2)
+    client_local.publish(f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=0)
 
 def adopt_new_map(new_map):
-    global current_map, start, end
+    global current_map, raw_map, start, end
+    raw_map = copy.deepcopy(new_map)
     current_map, start, end = sanitize_map(new_map)
     logger.info(f"New map adopted start:{start} end:{end}")
 
@@ -183,7 +190,7 @@ def send_info_backend():
         "map": current_map,
         "system_id": SYSTEM_ID
     }
-    client_cloud.publish("backend/agents-info", json.dumps(data), qos=2)
+    client_cloud.publish("backend/agents-info", json.dumps(data), qos=0)
 
 @monitoring_calculate_path_time.time()
 def calculate_single(algo="A*"):
@@ -203,10 +210,10 @@ def calculate_single(algo="A*"):
         # to be changed to dynamic
         full_path = path + [path[-1]*(100-len(path))]
         logger.info(f"Path found: {path}")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": full_path, "system_id": SYSTEM_ID}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": full_path, "system_id": SYSTEM_ID}), qos=0)
     else:
         logger.info(f"Path not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=0)
 
 @monitoring_calculate_path_time.time()
 def calculate_a_star(grid_map, start, end):
@@ -235,7 +242,7 @@ def calculate_sequence(paths, sequence, status, algo="CA_star"):
 
     if not start or not end:
         logger.warning(f"Start or end not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=0)
         possible = False
     else:
         grid_map = setup_map(current_map, paths)
@@ -243,16 +250,16 @@ def calculate_sequence(paths, sequence, status, algo="CA_star"):
     if possible:
         logger.info(f"Path found: {path}")
         paths.append(path)
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": [(x, y) for x,y,_ in path], "system_id": SYSTEM_ID}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": [(x, y) for x,y,_ in path], "system_id": SYSTEM_ID}), qos=0)
     else:
         logger.info(f"Path not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=2)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=0)
     # Last to calculate
     status = "continue"
     if len(sequence) == 1:
         status = "done"
         logger.info("Sequence calculation finished.")
-    client_local.publish(f"{SYSTEM_ID}/agents/calculate/sequence_mode", json.dumps({"paths": paths, "sequence": sequence[1:], "status": status}), qos=2)
+    client_local.publish(f"{SYSTEM_ID}/agents/calculate/sequence_mode", json.dumps({"paths": paths, "sequence": sequence[1:], "status": status}), qos=0)
 
 # ================= mqtt related functions ====================
 def on_subscribe(client_local, userdata, mid, granted_qos):
@@ -292,6 +299,9 @@ def on_message(client_local, userdata, msg):
     elif msg.topic == f"{SYSTEM_ID}/agents/calculate/sequence_mode":
         data = json.loads(msg_str)
         calculate_sequence(data["paths"], data["sequence"], data["status"], algo="CA_star")
+    elif msg.topic== f"{SYSTEM_ID}/agents/calculate/ca_star_cloud":
+        logger.info("Received request to calculate with cloud")
+        if leader == MY_NAME: cloud_calculate()
     else:
         logger.warning("Unknown topic")
         logger.warning(f"From topic: {msg.topic} | msg: {msg_str}")
@@ -314,8 +324,8 @@ client_cloud = mqtt.Client(client_id=MY_NAME, transport='websockets', clean_sess
 client_cloud.ws_set_options(path="/mqtt", headers=None)
 
 ##### COMMENT TO RUN WITH TILT TODO: fix it
-client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
-client_cloud.tls_insecure_set(True)
+# client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
+# client_cloud.tls_insecure_set(True)
 #####
 
 client_cloud.username_pw_set(username="agent", password="agent-pass")
@@ -324,10 +334,10 @@ client_cloud.on_message = on_message
 client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT)
 
 # Subscribe for related topics
-client_local.subscribe(f"{SYSTEM_ID}/{MY_NAME}/#", qos=2)
-client_local.subscribe(f"{SYSTEM_ID}/agents/#", qos=2)
-client_cloud.subscribe(f"{SYSTEM_ID}/{MY_NAME}/#", qos=2)
-client_cloud.subscribe(f"{SYSTEM_ID}/agents/#", qos=2)
+client_local.subscribe(f"{SYSTEM_ID}/{MY_NAME}/#", qos=0)
+client_local.subscribe(f"{SYSTEM_ID}/agents/#", qos=0)
+client_cloud.subscribe(f"{SYSTEM_ID}/{MY_NAME}/#", qos=0)
+client_cloud.subscribe(f"{SYSTEM_ID}/agents/#", qos=0)
 
 
 

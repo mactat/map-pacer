@@ -25,11 +25,12 @@ def call_counter(my_func):
     return helper
 
 class System:
-    def __init__(self, backend_url) -> None:
+    def __init__(self, backend_url, system="home_system") -> None:
+        self.system = system
         self.backend = f"http://{backend_url}/backend"
 
     def get_info(self):
-        raw_info = requests.get(f"{self.backend}/get-info")
+        raw_info = requests.get(f"{self.backend}/get-info?system_id={self.system}")
         return raw_info.json()
 
     def get_agents(self):
@@ -45,7 +46,7 @@ class System:
         return cur_map
 
     def get_paths(self):
-        paths = requests.get(f"{self.backend}/get_paths")
+        paths = requests.get(f"{self.backend}/get_paths?system_id={self.system}")
         return paths.json()
 
     def find_steps_from_paths(self, path):
@@ -80,20 +81,21 @@ class System:
         return paths
     
     def trigger_ca_star_local(self):
-        requests.get(f"{self.backend}/sequence_calculate")
+        requests.get(f"{self.backend}/sequence_calculate?system_id={self.system}")
         return None
 
     def trigger_ca_star_cloud(self):
-        requests.get(f"{self.backend}/sequence_calculate_cloud")
+        requests.get(f"{self.backend}/sequence_calculate_cloud?system_id={self.system}")
         return None
     
     def load_map(self, map_name):
-        requests.get(f"{self.backend}/clear_paths")
+        requests.get(f"{self.backend}/clear_paths?system_id={self.system}")
+        time.sleep(1)
         with open(f"./maps/{map_name}.json") as map_file:
             new_map = json.load(map_file)
             print(f"Map name: {map_name}, Map size: {len(new_map)}")
             requests.post(
-                f"{self.backend}/adopt_map",
+                f"{self.backend}/adopt_map?system_id={self.system}",
                 data=json.dumps(new_map),
                 headers={"Content-Type": "application/json"})
         

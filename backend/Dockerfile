@@ -14,7 +14,7 @@ RUN apk add python3-dev \
             musl-dev \
             gcc
 
-ADD requirements.txt .
+ADD ./backend/requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY ./libs/ /app/libs/
