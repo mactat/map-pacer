@@ -168,7 +168,7 @@ p, li
   font-size: 1.2vmin;
 }
 .maincontainer{
-    display: flex;
+    display: none;
     align-items: center;
     height: 80vh;
     width: 100%;
@@ -234,6 +234,11 @@ p, li
             <button class=text-btn onclick="change_map('cross_10')">Cross</a>
         </div>
     </div>
+    <div class="dropdown">
+        <button class="dropbtn">Systems</button>
+        <div class="dropdown-content"id="system_panel">
+        </div>
+    </div>
     
     <div class="slidercontainer">
         <div class="text-container">
@@ -265,11 +270,13 @@ p, li
     var num_of_agents = 0;
     var main_view = document.getElementById("maincontainer");
     const backend_url = "{{backend_url}}"
+    var system_id = null
 
     // initial settings
     timeframeGauge.innerHTML = slider.value;
     curMap.innerHTML = map[0]
     curMap.style.fontSize = String((60/Math.sqrt(map[0].length)))+"vmin"
+    get_systems()
 
     // Fetch info every second
     agentsInfo()
@@ -277,15 +284,31 @@ p, li
     var ainfo = setInterval(agentsInfo,1000);
     var minfo = setInterval(refreshMap,1000);
 
+    function get_systems() {
+        fetch(`${backend_url}/get_systems`).then(res => {
+            return res.json()
+        }).then(systems => {
+            // Update system list
+            var system_panel = document.getElementById("system_panel");
+            system_panel.innerHTML = ''
+            for (var i = 0; i < systems.length; i++) {
+                button_str=`<button class=text-btn onclick="set_system('${systems[i]}')">${systems[i]}</button>`
+                system_panel.innerHTML+=button_str;
+            }
+            return systems
+        })
+    }
+
     function redirect_to_map_creator() {
         location.href = `http://${window.location.host}/map-creator?num_of_agents=${num_of_agents}`;
     }
     function agentsInfo() {
-        fetch(`${backend_url}/get-info`).then(res => {
+        fetch(`${backend_url}/get-info?system_id=${system_id}`).then(res => {
             return res.json()
         }).then(info => {
             final_str = "Agents:<br>"
             num_of_agents = info.agents.length
+            system_ids = info.systems
             for(num in info.agents) {
                 final_str += "<br>🟢 "+ info.agents[num]
                 if(info.agents[num] == info.leader){
@@ -294,29 +317,30 @@ p, li
             }
             // Hide agents info if no agents
             if (info.agents.length == 0) {
-                agentsText.style.display = "none"
+                maincontainer.style.display = "none"
             } else {
-                agentsText.style.display = "block"
+                maincontainer.style.display = "flex"
             }
             if(agentsText.innerHTML != final_str){
                 agentsText.innerHTML = final_str
             }
+
         }).catch((error) => {
-            agentsText.style.display = "none"
+            maincontainer.style.display = "none"
             console.log(error)
         });
     }
 
     function refreshMap(){
-        fetch(`${backend_url}/get_prerendered_map`).then(res => {
+        fetch(`${backend_url}/get_prerendered_map?system_id=${system_id}`).then(res => {
             return res.json()
         }).then(renderedMap => {
-            // show main container
-            main_view.style.display = "flex"
             // hide map if empty
-            if (renderedMap.map.length == 0) {
+            if (map == "false" || renderedMap.map.length == 0) {
                 curMap.style.display = "none"
             } else {
+                // show main container
+                maincontainer.style.display = "flex"
                 curMap.style.display = "block"
             }
             if(map[0] !== renderedMap[0]){
@@ -329,7 +353,7 @@ p, li
         }).catch((error) => {
             console.log(error)
             //hide main container
-            main_view.style.display = "none"
+            maincontainer.style.display = "none"
         });
     }
     function visualizePath(j) {
@@ -356,7 +380,7 @@ p, li
 
     function calculate_multiple() {
         console.log("Calculating multiple paths");
-        fetch(`${backend_url}/${mode}?algo=${algo}`).then(res => {
+        fetch(`${backend_url}/${mode}?algo=${algo}&system_id=${system_id}`).then(res => {
             return res.text()
         }).then(text => {
             alert(text)
@@ -370,7 +394,7 @@ p, li
         } else {
             path = "map-from-file?map_file=" + name
         }
-        fetch(`${backend_url}/${path}`).then(res => {
+        fetch(`${backend_url}/${path}&system_id=${system_id}`).then(res => {
             return res.text()
         }).then(text => {
             console.log(text)
@@ -381,6 +405,9 @@ p, li
         algo = cur_algo
         mode = cur_mode
         algoText.innerHTML = "<br><br>Algorithm: " + algo + "-" + mode
+    }
+    function set_system(new_system_id) {
+        system_id = new_system_id
     }
 
     // Update the current slider value (each time you drag the slider handle)

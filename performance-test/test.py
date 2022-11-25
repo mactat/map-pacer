@@ -1,6 +1,9 @@
 import os
 from backend_api import System, call_counter
-
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--system_id', type=str, required=True)
+args = parser.parse_args()
 BACKEND_URL = os.environ.get('BACKEND_URL')
 
 
@@ -22,7 +25,8 @@ def test_ca_star_cloud(map_name):
 
 
 print("================== Test Setup ==================")
-system = System(BACKEND_URL)
+print("Test", BACKEND_URL, args.system_id)
+system = System(BACKEND_URL, args.system_id)
 maps = ["small", "small_2", "two_traped", "spider", "big_and_empty"]
 
 print(f"Number of agents {len(system.get_agents())}")

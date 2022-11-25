@@ -7,6 +7,13 @@ ENV ENV $ENV
 
 WORKDIR /app
 
+# Deps for psycopg2
+RUN apk add python3-dev \
+            libpq-dev \
+            postgresql-dev \
+            musl-dev \
+            gcc
+
 ADD ./backend/requirements.txt .
 RUN pip install -r requirements.txt
 

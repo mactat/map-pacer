@@ -20,6 +20,14 @@ spec:
         ports:
         - containerPort: 8888
         env:
+        - name: DB_USERNAME
+          value: "admin"
+        - name: DB_PASSWORD
+          value: "map-pacer"
+        - name: DB_HOSTNAME
+          value: "database"
+        - name: DB_PORT
+          value: "5432"
         - name: CLOUD_BROKER_HOSTNAME
           value: "cloud-broker"
         - name: CLOUD_BROKER_PORT

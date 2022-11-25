@@ -15,10 +15,6 @@ from prometheus_client import start_http_server, Summary, Enum
 MY_NAME = socket.gethostname()
 BROKER_CLOUD = os.environ.get('CLOUD_BROKER_HOSTNAME')
 BROKER_CLOUD_PORT = int(os.environ.get('CLOUD_BROKER_PORT'))
-agents = []
-coords = []
-map_id = 0
-current_map = []
 
 logger = get_default_logger(MY_NAME)
 logger.info(f"My name is {MY_NAME}, Broker: {BROKER_CLOUD}")
@@ -41,24 +37,25 @@ def setup_map(current_map):
     grid_map.load_from_list(temp_map)
     return grid_map
 
-def calculate_sequence(algo="CA_star"):
-    logger.info("I will calculate all paths.")
+def calculate_sequence(new_map, agents, system_id, algo="CA_star"):
+    logger.info(f"I will calculate all paths fo agents {agents} system: {system_id}")
+    current_map, coords = extract_coords(new_map, agents)
     grid_map = setup_map(current_map)
     for agent, (start, end) in zip(agents, coords):
         if not start or not end:
             logger.warning(f"Start or end not found")
-            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found"}), qos=2)
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found", "system_id": system_id}), qos=0)
             possible = False
         else:
             possible, path = calculate_a_star(grid_map, start, end)
         if possible:
             logger.info(f"Path found: {path}")
-            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": [(x, y) for x,y,_ in path]}), qos=2)
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": [(x, y) for x,y,_ in path], "system_id": system_id}), qos=0)
         else:
             logger.info(f"Path not found")
-            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found"}), qos=2)
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found", "system_id": system_id}), qos=0)
 
-def extract_coords(new_map):
+def extract_coords(new_map, agents):
     coords = []
     start, end = None, None
     for agent in agents:
@@ -73,11 +70,6 @@ def extract_coords(new_map):
         coords.append((start, end))
     return new_map, coords
 
-def adopt_new_map(new_map):
-    global current_map, coords
-    current_map, coords = extract_coords(new_map)
-    logger.info(f"New map. Coords: {coords}, Agents: {agents}")
-
 # Form mqtt
 def on_subscribe(client_local, userdata, mid, granted_qos):
     logger.info("Subscribed to topic")
@@ -85,19 +77,9 @@ def on_subscribe(client_local, userdata, mid, granted_qos):
 def on_message(client_local, userdata, msg):
     msg_str = msg.payload.decode()
     match msg.topic:
-        case "cloud-agent/hello":
-            logger.debug(f"Hello from {msg_str}")
-            if msg_str not in agents:
-                agents.append(msg_str)
-                logger.info(f"Agents: {agents}")
-
-        case "cloud-agent/map/new":
-            # map from json
-            new_map = json.loads(msg_str)
-            adopt_new_map(new_map)
         case "cloud-agent/calculate/sequence_mode":
             data = json.loads(msg_str)
-            calculate_sequence(algo="CA_star")
+            calculate_sequence(data["map"], data["agents"], data["system_id"], algo="CA_star")
         case _:
             logger.info("Unknown topic")
             logger.info(f"From topic: {msg.topic} | msg: {msg_str}")
@@ -110,11 +92,8 @@ client_cloud.on_message = on_message
 client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT)
 
 # Subscribe for related topics
-client_cloud.subscribe(f"cloud-agent/#", qos=2)
+client_cloud.subscribe(f"cloud-agent/#", qos=0)
 
-# Restart discovery of agents
-client_cloud.publish("agents/discovery/start","It's cloud-agent looking for ya" , qos=2)
-client_cloud.publish("map-service/re-announce-map","It's cloud-agent looking for ya" , qos=2)
 
 while 1:
     client_cloud.loop(0.01)

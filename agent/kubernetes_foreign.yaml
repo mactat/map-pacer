@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: agent
+  name: agent-foreign
   labels:
-    app: agent
+    app: agent-foreign
 spec:
   replicas: 3
-  serviceName: agent
+  serviceName: agent-foreign
   selector:
     matchLabels:
-      app: agent
+      app: agent-foreign
   template:
     metadata:
       labels:
-        app: agent
+        app: agent-foreign
     spec:
       containers:
-      - name: agent
+      - name: agent-foreign
         image: mactat/map-pacer-agent:latest
         resources:
           limits:
@@ -36,24 +36,24 @@ spec:
         - name: BROKER_PORT
           value: "1883"
         - name: CLOUD_BROKER_HOSTNAME
-          value: "cloud-broker-mactat.cloud.okteto.net"
+          value: "cloud-broker"
         - name: CLOUD_BROKER_PORT
-          value: "443"
+          value: "9001"
         - name: SYSTEM_ID
-          value: "home_system" 
+          value: "foreign_system"
         - name: TLS
-          value: "true"
+          value: "false"
 
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: agent
+  name: agent-foreign
   labels:
-    app: agent
+    app: agent-foreign
 spec:
   selector:
-    app: agent
+    app: agent-foreign
   ports:
   - name: metrics
     port: 8080
