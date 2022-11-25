@@ -90,7 +90,7 @@ class System:
 
     def replace_agents(self, cur_map):
         agents = self.get_agents()
-        for agent_old, agent_new in zip(["agent-0", "agent-1", "agent-2"], agents):
+        for agent_old, agent_new in zip(["agent-1", "agent-0", "agent-2"], agents):
             for i, row in enumerate(cur_map):
                 for j, cell in enumerate(row):
                     if cell == f"{agent_old}-start": 
