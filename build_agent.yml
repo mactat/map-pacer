@@ -8,8 +8,8 @@ variables:
   tag: '$(Build.BuildId)'
 
 stages:
-- stage: Build  
-  displayName: Build image
+- stage: Build_and_deploy
+  displayName: Build image and deploy on prem
   jobs:
   - job: Build_and_Push
     displayName: Build and Push
@@ -33,3 +33,17 @@ stages:
         Dockerfile: 'map-service/Dockerfile'
         buildContext: '.'
         tags: 'arm-latest'
+  - job: Deploy
+    displayName: Deploy on prem
+    pool:
+       name: rpi-cluster
+       demands:
+        - agent.name -equals pi4-rpios-1
+    steps:
+    - checkout: self
+    - bash: |
+        sudo docker stack up map-pacer --compose-file map-pacer.yaml
+        sudo docker service update map-pacer_agent --image mactat/map-pacer-agent:arm-latest --force
+        sudo docker service update map-pacer_map-service --image mactat/map-pacer-map-service:arm-latest --force
+
+
