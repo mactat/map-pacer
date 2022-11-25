@@ -11,21 +11,21 @@ data:
   POSTGRES_PASSWORD: map-pacer
 ---
 # Persistent volume
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: postgres-pv-volume 
-  labels:
-    type: local
-    app: postgres
-spec:
-  storageClassName: standard
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: "/mnt/data/postgres"
+# kind: PersistentVolume
+# apiVersion: v1
+# metadata:
+#   name: postgres-pv-volume 
+#   labels:
+#     type: local
+#     app: postgres
+# spec:
+#   storageClassName: standard
+#   capacity:
+#     storage: 5Gi
+#   accessModes:
+#     - ReadWriteMany
+#   hostPath:
+#     path: "/mnt/data/postgres"
 ---
 # Volume claim
 kind: PersistentVolumeClaim
@@ -35,7 +35,6 @@ metadata:
   labels:
     app: database
 spec:
-  storageClassName: standard
   accessModes:
     - ReadWriteMany
   resources:
