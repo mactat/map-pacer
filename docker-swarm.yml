@@ -13,6 +13,7 @@ services:
       BROKER_PORT: "1883"
       CLOUD_BROKER_HOSTNAME: "cloud-broker-mactat.cloud.okteto.net"
       CLOUD_BROKER_PORT: "443"
+      SYSTEM_ID: on_prem
   
   map-service:
     image: mactat/map-pacer-map-service:arm-latest
@@ -29,6 +30,7 @@ services:
       BROKER_PORT: "1883"
       CLOUD_BROKER_HOSTNAME: "cloud-broker-mactat.cloud.okteto.net"
       CLOUD_BROKER_PORT: "443" 
+      SYSTEM_ID: on_prem
 
   broker:
     image: eclipse-mosquitto
