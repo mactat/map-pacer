@@ -15,19 +15,11 @@ def timeit(my_func):
         return output, diff
     return timed
 
-def call_counter(my_func):
-    def helper(*args, **kwargs):
-        helper.calls += 1
-        print(f"\n========> Test {my_func.__name__}")
-        print(f"Test number: {helper.calls}")
-        return my_func(*args, **kwargs)
-    helper.calls = 0
-    return helper
-
 class System:
     def __init__(self, backend_url, system="home_system") -> None:
         self.system = system
         self.backend = f"http://{backend_url}/backend"
+        self.num_of_test = 0
 
     def get_info(self):
         raw_info = requests.get(f"{self.backend}/get-info?system_id={self.system}")
@@ -88,8 +80,20 @@ class System:
         requests.get(f"{self.backend}/sequence_calculate_cloud?system_id={self.system}")
         return None
 
+    def trigger_single_local(self, algo):
+        requests.get(f"{self.backend}/single_calculate?system_id={self.system}&algo={algo}")
+        return None
+
+    def trigger_single_cloud(self, algo):
+        requests.get(f"{self.backend}/single_calculate_cloud?system_id={self.system}&algo={algo}")
+        return None
+    
     def replace_agents(self, cur_map):
+        # TODO: there is a problem when agents, really has the same name as original
+        # Then they are replaced multiple times <- error
         agents = self.get_agents()
+        if "agent-0" in agents and "agent-1" in agents and "agent-2" in agents: return cur_map
+
         for agent_old, agent_new in zip(["agent-1", "agent-0", "agent-2"], agents):
             for i, row in enumerate(cur_map):
                 for j, cell in enumerate(row):
@@ -122,3 +126,22 @@ class System:
         Average percentage of paths found: {sum(transpose[2])/len(transpose[2]):.{1}f}%
         Average path length: {sum(transpose[3])/len(transpose[3]):.{1}f} tiles
         """)
+
+    def test_algorithm(self, map_name, algo_name):
+        print(f"===========> Testing algorithm: {algo_name}")
+        print(f"Test number: {self.num_of_test}")
+        self.load_map(map_name)
+        match algo_name:
+            case "a_star":
+                self.trigger_single_local("A*")
+            case "a_star_cloud":
+                self.trigger_single_cloud("A*")
+            case "ca_star":
+                self.trigger_ca_star_local()
+            case "ca_star_cloud":
+                self.trigger_ca_star_cloud()
+            case _:
+                raise(NameError)
+        paths, time = self.wait_for_paths()
+        self.num_of_test += 1
+        return time, *self.extract_paths_details(paths)

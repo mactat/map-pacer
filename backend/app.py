@@ -165,9 +165,17 @@ def sequence_calculate():
     mqtt.publish(f"{system_id}/agents/calculate/sequence_mode", data, qos=0)
     return f"Calculation requested!"
 
+@app.route("/backend/single_calculate_cloud")
+def single_calculate_cloud():
+    args = request.args
+    system_id = args.get("system_id", default="test")
+    algo = args.get("algo", default="A*")
+    data = json.dumps({"algo":algo})
+    mqtt.publish(f"{system_id}/agents/calculate/single_calculate_cloud", data, qos=0)
+    return f"Calculation requested!"
+
 @app.route("/backend/sequence_calculate_cloud")
 def sequence_calculate_cloud():
-#TODO: Change cloud agent to be multi tenant
     args = request.args
     system_id = args.get("system_id", default="test")
     data = json.dumps({"algo":"CA*"})

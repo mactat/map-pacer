@@ -9,6 +9,7 @@ import json
 import numpy as np
 from libs.log_lib import get_default_logger
 from libs.algo_lib_3d import Grid_map as Grid_map_3d
+from libs.algo_lib import Grid_map
 from prometheus_client import start_http_server, Summary, Enum
 
 #Get environment variables
@@ -36,6 +37,27 @@ def setup_map(current_map):
     grid_map = Grid_map_3d(mode="no_diag", mark_path=True)
     grid_map.load_from_list(temp_map)
     return grid_map
+
+def calculate_single(new_map, agents, system_id, algo="A*"):
+    current_map, coords = extract_coords(new_map, agents)
+    temp_map = copy.deepcopy(current_map)
+    grid_map = Grid_map(mode="no_diag")
+    grid_map.load_from_list(temp_map)
+    for agent, (start, end) in zip(agents, coords):
+        if not start or not end:
+            logger.warning(f"Start or end not found")
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found", "system_id": system_id}), qos=0)
+            possible = False
+        else:
+            possible, path = grid_map.find_path(start, end, algo=algo)
+        if possible:
+            # to be changed to dynamic
+            full_path = path + [path[-1]*(100-len(path))]
+            logger.info(f"Path found: {path}")
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": full_path, "system_id": system_id}), qos=0)
+        else:
+            logger.info(f"Path not found")
+            client_cloud.publish("backend/path", json.dumps({"agent": agent, "path": "not found", "system_id": system_id}), qos=0)
 
 def calculate_sequence(new_map, agents, system_id, algo="CA_star"):
     logger.info(f"I will calculate all paths fo agents {agents} system: {system_id}")
@@ -80,6 +102,9 @@ def on_message(client_local, userdata, msg):
         case "cloud-agent/calculate/sequence_mode":
             data = json.loads(msg_str)
             calculate_sequence(data["map"], data["agents"], data["system_id"], algo="CA_star")
+        case "cloud-agent/calculate/single_mode":
+            data = json.loads(msg_str)
+            calculate_single(data["map"], data["agents"], data["system_id"], algo=data["algo"])
         case _:
             logger.info("Unknown topic")
             logger.info(f"From topic: {msg.topic} | msg: {msg_str}")

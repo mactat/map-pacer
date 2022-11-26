@@ -153,7 +153,14 @@ def cloud_calculate():
         "map": raw_map,
         "agents": [MY_NAME] + my_mates
     }), qos=0)
-
+def single_cloud_calculate(algo="A*"):
+    logger.info("I will initiate cloud calculation")
+    client_cloud.publish(f"cloud-agent/calculate/single_mode", json.dumps({
+        "system_id": SYSTEM_ID,
+        "map": raw_map,
+        "agents": [MY_NAME] + my_mates,
+        "algo": algo
+    }), qos=0)
 def check_map():
     if leader != MY_NAME or current_map: return
     logger.info(f"No map available. I will generate new map")
@@ -203,7 +210,7 @@ def calculate_single(algo="A*"):
 
     logger.info(f"Agent: {MY_NAME} start: {start}, end: {end}")
     # create grid map
-    grid_map = Grid_map(agent_num=MY_NUMBER, mode="no_diag")
+    grid_map = Grid_map(mode="no_diag")
     grid_map.load_from_list(temp_map)
     # get path
     possible, path = grid_map.find_path(start, end, algo=algo)
@@ -303,6 +310,10 @@ def on_message(client_local, userdata, msg):
     elif msg.topic== f"{SYSTEM_ID}/agents/calculate/ca_star_cloud":
         logger.info("Received request to calculate with cloud")
         if leader == MY_NAME: cloud_calculate()
+    elif msg.topic == f"{SYSTEM_ID}/agents/calculate/single_calculate_cloud":
+        logger.info("Received request to calculate single paths with cloud")
+        algo = new_map = json.loads(msg_str)["algo"]
+        if leader == MY_NAME: single_cloud_calculate(algo)
     else:
         logger.warning("Unknown topic")
         logger.warning(f"From topic: {msg.topic} | msg: {msg_str}")
