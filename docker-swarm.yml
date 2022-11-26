@@ -7,6 +7,13 @@ services:
       - map-pacer-net
     deploy:
       mode: global
+      resources:
+        limits:
+          cpus: 0.50
+          memory: 512M
+        reservations:
+          cpus: 0.25
+          memory: 128M
     environment:
       AGENTS_NUMBER: "3"
       BROKER_HOSTNAME: "192.168.1.19"
