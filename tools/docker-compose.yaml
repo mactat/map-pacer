@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  plots:
+    image: mactat/map-pacer-tools:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+     - .:/app
+    command: /bin/sh -c  "python3 make_plots.py < $RESULTS.json"
+  ping:
+    image: mactat/map-pacer-tools:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+     - .:/app
+    command: /bin/sh -c  "python3 ping_test.py"

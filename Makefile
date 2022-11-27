@@ -33,7 +33,15 @@ dev:
 	tilt up
 .PHONY: performance
 performance:
-	kubectl exec $(PERFORMANCE_POD) -- python3 /app/test.py --system_id=$(SYSTEM_ID)
+	kubectl exec $(PERFORMANCE_POD) -- python3 /app/test.py --system_id=$(SYSTEM_ID) $(FLAGS)
+
+.PHONY: plots
+plots:
+	cd ./tools && export RESULTS=$(RESULTS) && docker compose run --rm plots
+
+.PHONY: ping-plots
+ping-plots:
+	cd ./tools && docker compose run --rm ping
 
 .PHONY: local-observability
 local-observability:

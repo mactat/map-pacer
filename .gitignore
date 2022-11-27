@@ -3,3 +3,5 @@ docs/master-thesis-papers/
 /.vscode/
 *pyc
 *.config
+/tools/*png
+/tools/*json
