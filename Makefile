@@ -35,6 +35,9 @@ dev:
 performance:
 	kubectl exec $(PERFORMANCE_POD) -- python3 /app/test.py --system_id=$(SYSTEM_ID) $(FLAGS)
 
+.PHONY: plots
+plots:
+	cd ./tools && export RESULTS=$(RESULTS) && docker compose run --rm plots      
 .PHONY: local-observability
 local-observability:
 	kubectl config use-context kind-kind
