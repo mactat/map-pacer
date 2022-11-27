@@ -37,7 +37,12 @@ performance:
 
 .PHONY: plots
 plots:
-	cd ./tools && export RESULTS=$(RESULTS) && docker compose run --rm plots      
+	cd ./tools && export RESULTS=$(RESULTS) && docker compose run --rm plots
+
+.PHONY: ping-plots
+ping-plots:
+	cd ./tools && docker compose run --rm ping
+
 .PHONY: local-observability
 local-observability:
 	kubectl config use-context kind-kind
