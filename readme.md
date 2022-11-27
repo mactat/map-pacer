@@ -38,13 +38,21 @@ For cloud development add '.env' file with:
 AZURE_SUBSCRIPTION_ID, AZURE_GROUP_NAME, AZURE_CLUSTER_NAME, DOCKER_TOKEN, DOCKER_USERNAME
 
 Usage:
-	make dev                    run dev cluster and tilt
-	make clean                  stop local cluster and tilt
-	make cloud-login            login to azure and setup kubectl
-	make cloud-up               start kubernetes cluster in azure
-	make cloud-down             stop kubernetes cluster in azure
-	make cloud-deploy           deploy to kubernetes cluster in azure
-	make cloud-build			build and push docker images
+	make dev                      run dev cluster and tilt
+	make clean                    stop local cluster and tilt
+	make cloud-login              login to azure and setup kubectl
+	make cloud-up                 start kubernetes cluster in azure
+	make cloud-down               stop kubernetes cluster in azure
+	make cloud-deploy             deploy to kubernetes cluster in azure
+	make cloud-build	      build and push docker images
+	make plots RESULTS=<res_file> creates plots, provide <RESULTS> file
+	make ping-plots		      test RTT time to cloud
+	make pdf		      compile thesis to pdf
+	make local-observability      deploy prometheus and graphana
+	make performance 	      make performance test against
+	  SYSTEM_ID=<system_id>       selected system
+	  FLAGS=<--json > file.json>
+	
 ```
 
 ## Algorithms
@@ -66,10 +74,10 @@ Planning can be based on 2D maps(representing just space) or 3D maps(representin
 ### Principle of graph creation for 3D map:
 ![3D map](./docs/thesis/pictures/map_3d.png)
 
-### Head collision problem for CA* algorithm:
-![Head collision](./docs/thesis/pictures/head_collision_problem.png)
+## Logic for path planning
+![Example](./docs/thesis/pictures/example_planning.png)
 
-### Example of solved map for single agent:
+### Example of planned path:
 ![Solved map](./docs/thesis/pictures/single_path_maze.png)
 
 ### Example of solved map for multiple agents(development vis):
@@ -89,3 +97,7 @@ It can be used in multiple setups:
 
 Example of grafana dashboard:
 ![Grafana dashboard](./docs/thesis/pictures/grafana.png)
+
+## Multi tenancy
+By design this is multi tenant system, tenants can share resources like broker and upstream computation to the cloud:
+![Multi tenancy](./docs/thesis/pictures/multi_tenant_simple.png)
