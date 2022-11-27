@@ -10,12 +10,15 @@
 /backend/map-from-file & map\_file::string & map\_file::random & triggers new map generation & GET \\ \hline
 /backend/refresh-info & none & status string & fetches info from leader & GET \\ \hline
 /backend/get-info & none & \{"agents": {[}{]},"leader": ,"map": \} & none & GET \\ \hline
-/backend/single\_agent\_calculate & algo::\textless{}a\_star|dijkstr|BFS\textgreater{} & status string & request calculation for single agent & GET \\ \hline
+/backend/single\_agent\_calculate & algo::\textless{}a\_star|dijkstra|BFS\textgreater{} & status string & request calculation for single agent & GET \\ \hline
 /backend/sequence\_calculate & none & status\_string & request calculation for multi agent & GET \\ \hline
+/backend/single\_agent\_calculate\_cloud & algo::\textless{}a\_star|dijkstra|BFS\textgreater{} & status string & request calculation for single agent(cloud) & GET \\ \hline
+/backend/sequence\_calculate\_cloud & none & status\_string & request calculation for multi agent(cloud) & GET \\ \hline
 /backend/show\_paths & none & \{”agent”:, “map”: \} & none & GET \\ \hline
+/backend/get\_systems & none & \{”paths”: \} & none & GET \\ \hline
 /backend/get\_prerendered\_map & none & map string & renders map string & GET \\ \hline
 /backend/save\_map & map without agents & ok|error & saves created map & POST \\ \hline
-/backend/adopt\_new\_map & map with agents & ok|error & adopt created map with agents psooitions & POST \\ \hline
+/backend/adopt\_new\_map & map with agents & ok|error & adopt created map with agents positions & POST \\ \hline
 \end{tabular}%
 }
 \caption{Backend enpoints}
