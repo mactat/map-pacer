@@ -21,7 +21,7 @@ class System:
         self.backend = f"http://{backend_url}/backend"
         self.num_of_test = 0
         self.json_output = json_output
-        self.results = {}
+        self.results = []
         agents = self.get_agents()
         leader = self.get_leader()
         self.maybe_print(f"Number of agents in system: {len(agents)}")
@@ -156,10 +156,7 @@ class System:
 
     def test_algorithm(self, map_name, algo_name):
         self.num_of_test += 1
-        # Create a key in result if it does not exist
-        if algo_name not in self.results:
-            self.results[algo_name] = []
-        self.maybe_print(f"===========> Testing algorithm: {algo_name}")
+        self.maybe_print(f"\n===========> Testing algorithm: {algo_name}")
         self.maybe_print(f"Test number: {self.num_of_test}")
         map_size = self.load_map(map_name)
         match algo_name:
@@ -179,15 +176,19 @@ class System:
         self.maybe_print(f"Map name: {map_name}")
         self.maybe_print(f"Map size: {map_size}")
         self.maybe_print(f"Paths found: {num_of_found_paths}")
-        self.maybe_print(f"% of paths found: {percentage_of_path_found}%")
+        self.maybe_print(f"% of paths found: {percentage_of_path_found:.{1}}f%")
         self.maybe_print(f"Sum of paths length: {len_path_sum}")
-        self.maybe_print(f"Time: {time}ms")
-        self.results[algo_name].append((
-            self.num_of_test,
-            map_name, map_size,
-            time, num_of_found_paths,
-            percentage_of_path_found,
-            len_path_sum))
+        self.maybe_print(f"Time: {time:.{1}}fms")
+        self.results.append({
+            "algo_name": algo_name,
+            "test_id": self.num_of_test,
+            "map_name": map_name,
+            "map_size": map_size,
+            "time": time,
+            "num_of_paths_found": num_of_found_paths,
+            "percentage_of_paths_found": percentage_of_path_found,
+            "sum_of_paths_length": len_path_sum
+        })
         return time, num_of_found_paths, percentage_of_path_found, len_path_sum
     def finish_test(self):
         if self.json_output:

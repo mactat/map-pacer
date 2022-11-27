@@ -13,7 +13,7 @@ def maybe_print(string):
 maybe_print("================== Test Setup ==================")
 system = System(
     backend_url=BACKEND_URL,
-    system_id=args.system_id,
+    system=args.system_id,
     json_output=args.json)
 maps = ["small", "small_2", "two_traped", "spider", "big_and_empty"]
 algorithms = ["a_star", "a_star_cloud", "ca_star", "ca_star_cloud"]
