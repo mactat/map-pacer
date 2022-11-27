@@ -26,22 +26,52 @@ df = pd.DataFrame(data['results'])
 algorithm_names = {'a_star':  'A*', 'a_star_cloud' : 'Cloud A*', 'ca_star':'CA*', 'ca_star_cloud': 'Cloud CA*'}
 df['Algorithms'] = df['algo_name'].map(algorithm_names)
 df.drop('algo_name', axis = 1, inplace = True)
-#%% plot linear
-palette = cmr.take_cmap_colors(cmap, len(df['Algorithms'].unique()), return_fmt='hex')
-fig, ax = plt.subplots(1,1)
-ax = sns.lineplot(data = df, y = 'time', x = 'map_name', hue = 'Algorithms', linewidth = 4, palette = palette)
+#%% plot log
+color_ = cmr.take_cmap_colors(cmap, len(df['Algorithms'].unique()), return_fmt='hex')
+palette = dict(zip(list(df['Algorithms'].unique()), color_ ))
+plot1 = df.loc[df['Algorithms'].isin(['CA*', 'Cloud CA*'])]
+plot1.reset_index(drop = True, inplace = True )
+plot2 = df.loc[df['Algorithms'].isin(['A*', 'Cloud A*'])]
+plot2.reset_index(drop = True, inplace = True )
+fig, (ax, ax1) = plt.subplots(2,1)
+ax = sns.lineplot(data = plot2, y = 'time', x = 'map_name', hue = 'Algorithms', linewidth = 4, palette = palette, ax =ax)
 ax.set_ylabel('Time [ms]')
 ax.set_xlabel(None)
 ax.set(yscale="log")
 ax.legend(loc='upper left')
+ax1 = sns.lineplot(data = plot1, y = 'time', x = 'map_name', hue = 'Algorithms', linewidth = 4, palette = palette, ax = ax1)
+ax1.set_ylabel('Time [ms]')
+ax1.set_xlabel(None)
+ax1.set(yscale="log")
+ax1.legend(loc='upper left')
+leg = ax.legend()
+# change the line width for the legend
+for line in leg.get_lines():
+    line.set_linewidth(4)
+leg = ax1.legend()
+# change the line width for the legend
+for line in leg.get_lines():
+    line.set_linewidth(4)
 plt.tight_layout()
 plt.savefig(f'{system}_{backend}_MapName_Algorithms_LOG.png', bbox_inches='tight')
-#%% plot log
-fig, ax = plt.subplots(1,1)
-ax = sns.lineplot(data = df, y = 'time', x = 'map_name', hue = 'Algorithms', linewidth = 4, palette = palette)
+#%% plot linear
+fig, (ax, ax1) = plt.subplots(2,1)
+ax = sns.lineplot(data = plot2, y = 'time', x = 'map_name', hue = 'Algorithms', linewidth = 4, palette = palette, ax =ax)
 ax.set_ylabel('Time [ms]')
 ax.set_xlabel(None)
 ax.legend(loc='upper left')
+ax1 = sns.lineplot(data = plot1, y = 'time', x = 'map_name', hue = 'Algorithms', linewidth = 4, palette = palette, ax = ax1)
+ax1.set_ylabel('Time [ms]')
+ax1.set_xlabel(None)
+ax1.legend(loc='upper left')
+leg = ax.legend()
+# change the line width for the legend
+for line in leg.get_lines():
+    line.set_linewidth(4)
+leg = ax1.legend()
+# change the line width for the legend
+for line in leg.get_lines():
+    line.set_linewidth(4)
 plt.tight_layout()
 plt.savefig(f'{system}_{backend}_MapName_Algorithms_LINEAR.png', bbox_inches='tight')
 #%% plot 
