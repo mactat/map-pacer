@@ -111,13 +111,13 @@ def on_message(client_local, userdata, msg):
         logger.info("Unknown topic")
         logger.info(f"From topic: {msg.topic} | msg: {msg_str}")
 
-client_local = mqtt.Client(client_id=MY_NAME, clean_session=False, keepalive=5)
+client_local = mqtt.Client(client_id=MY_NAME, clean_session=False)
 client_local.username_pw_set(username="agent", password="agent-pass")
 client_local.on_subscribe = on_subscribe
 client_local.on_message = on_message
-client_local.connect(BROKER, BROKER_PORT)
+client_local.connect(BROKER, BROKER_PORT, keepalive=5)
 
-client_cloud = mqtt.Client(client_id=MY_NAME, transport='websockets', clean_session=False, keepalive=5)
+client_cloud = mqtt.Client(client_id=MY_NAME, transport='websockets', clean_session=False)
 client_cloud.ws_set_options(path="/mqtt", headers=None)
 
 ##### COMMENT TO RUN WITH TILT TODO: fix it
@@ -126,10 +126,10 @@ if TLS:
     client_cloud.tls_insecure_set(True)
 #####
 
-client_cloud.username_pw_set(username="agent", password="agent-pass")
+client_cloud.username_pw_set(username=f"map-service-{SYSTEM_ID}", password="agent-pass")
 client_cloud.on_subscribe = on_subscribe
 client_cloud.on_message = on_message
-client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT)
+client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT, keepalive=5)
 
 # Subscribe for related topics
 client_local.subscribe(f"{SYSTEM_ID}/map-service/#", qos=0)
