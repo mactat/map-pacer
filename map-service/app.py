@@ -111,7 +111,7 @@ def on_message(client_local, userdata, msg):
         logger.info("Unknown topic")
         logger.info(f"From topic: {msg.topic} | msg: {msg_str}")
 
-client_local = mqtt.Client(client_id=MY_NAME, clean_session=False)
+client_local = mqtt.Client(client_id=f"{MY_NAME}-{SYSTEM_ID}-local", clean_session=False)
 client_local.username_pw_set(username="agent", password="agent-pass")
 client_local.on_subscribe = on_subscribe
 client_local.on_message = on_message
@@ -126,7 +126,7 @@ if TLS:
     client_cloud.tls_insecure_set(True)
 #####
 
-client_cloud.username_pw_set(username=f"map-service-{SYSTEM_ID}", password="agent-pass")
+client_cloud.username_pw_set(username=f"{MY_NAME}-{SYSTEM_ID}-cloud", password="agent-pass")
 client_cloud.on_subscribe = on_subscribe
 client_cloud.on_message = on_message
 client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT, keepalive=5)
@@ -138,6 +138,6 @@ client_cloud.subscribe(f"{SYSTEM_ID}/map-service/#", qos=0)
 # Restart discovery of agents
 client_local.publish(f"{SYSTEM_ID}/agents/discovery/start","It's map-service looking for ya" , qos=0)
 
-client_local.loop_start()
-client_cloud.loop_start()
-
+while 1:
+    client_local.loop(0.01)
+    client_cloud.loop(0.01)
