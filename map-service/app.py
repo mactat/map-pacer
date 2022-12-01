@@ -138,6 +138,6 @@ client_cloud.subscribe(f"{SYSTEM_ID}/map-service/#", qos=0)
 # Restart discovery of agents
 client_local.publish(f"{SYSTEM_ID}/agents/discovery/start","It's map-service looking for ya" , qos=0)
 
-while 1:
-    client_local.loop(0.01)
-    client_cloud.loop(0.01)
+client_local.loop_start()
+client_cloud.loop_start()
+
