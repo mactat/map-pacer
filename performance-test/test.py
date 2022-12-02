@@ -15,7 +15,7 @@ system = System(
     backend_url=BACKEND_URL,
     system=args.system_id,
     json_output=args.json)
-maps = ["small", "small_2", "two_traped", "spider", "big_and_empty"]
+maps = ["5","7","9","11","13","15","17","19", "21"]
 algorithms = ["a_star", "a_star_cloud", "ca_star", "ca_star_cloud"]
 
 

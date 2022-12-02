@@ -49,11 +49,11 @@ def calculate_single(new_map, agents, system_id, start_time, algo="A*"):
     grid_map = Grid_map(mode="no_diag")
     grid_map.load_from_list(temp_map)
     for agent, (start, end) in zip(agents, coords):
+        possible = False
         if not start or not end:
             logger.warning(f"Start or end not found")
             client_cloud.publish(f"{system_id}/{agent}/path", json.dumps(
                 {"agent": agent, "path": "not found", "system_id": system_id}), qos=0)
-            possible = False
         else:
             possible, path = grid_map.find_path(start, end, algo=algo)
         if possible:
@@ -74,11 +74,11 @@ def calculate_sequence(new_map, agents, system_id, start_time, algo="CA_star"):
     current_map, coords = extract_coords(new_map, agents)
     grid_map = setup_map(current_map)
     for agent, (start, end) in zip(agents, coords):
+        possible = False
         if not start or not end:
             logger.warning(f"Start or end not found")
             client_cloud.publish(f"{system_id}/{agent}/path", json.dumps(
                 {"agent": agent, "path": "not found", "system_id": system_id, "start_time": start_time}), qos=0)
-            possible = False
         else:
             possible, path = calculate_a_star(grid_map, start, end)
         if possible:
