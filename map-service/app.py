@@ -83,6 +83,22 @@ def announce_new_map():
 def on_subscribe(client_local, userdata, mid, granted_qos):
     logger.info("Subscribed to topic")
 
+def on_log(client,userdata,level,buff):
+    print(buff)
+
+def on_connect(client, userdata, flags, rc):
+    global client_cloud, client_local
+    logger.info("Connected with return code: "+str(rc))
+    client_local.subscribe(f"{SYSTEM_ID}/map-service/#", qos=0)
+    client_cloud.subscribe(f"{SYSTEM_ID}/map-service/#", qos=0)
+
+def on_disconnect(client, userdata, rc):
+    global client_cloud, client_local
+    if rc != 0:
+        logger.info("Unexpected MQTT disconnection. Will auto-reconnect")
+    client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT, keepalive=5)
+    client_local.connect(BROKER, BROKER_PORT, keepalive=5)
+
 def on_message(client_local, userdata, msg):
     msg_str = msg.payload.decode()
     if msg.topic == f"{SYSTEM_ID}/map-service/hello":
