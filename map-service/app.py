@@ -131,6 +131,8 @@ client_local = mqtt.Client(client_id=f"{MY_NAME}-{SYSTEM_ID}-local", clean_sessi
 client_local.username_pw_set(username="agent", password="agent-pass")
 client_local.on_subscribe = on_subscribe
 client_local.on_message = on_message
+client_local.on_connect=on_connect
+client_local.on_disconnect=on_disconnect
 client_local.connect(BROKER, BROKER_PORT, keepalive=5)
 
 client_cloud = mqtt.Client(client_id=MY_NAME, transport='websockets', clean_session=False)
@@ -144,6 +146,8 @@ if TLS:
 
 client_cloud.username_pw_set(username=f"{MY_NAME}-{SYSTEM_ID}-cloud", password="agent-pass")
 client_cloud.on_subscribe = on_subscribe
+client_cloud.on_connect=on_connect
+client_cloud.on_disconnect=on_disconnect
 client_cloud.on_message = on_message
 client_cloud.connect(BROKER_CLOUD, BROKER_CLOUD_PORT, keepalive=5)
 
