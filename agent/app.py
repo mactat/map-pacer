@@ -1,13 +1,18 @@
-import copy, os, socket
-import random, time, json
+import copy
+import os
+import socket
+import random
+import time
+import json
 from libs.algo_lib import Grid_map
 from libs.log_lib import get_default_logger
 from libs.algo_lib_3d import Grid_map as Grid_map_3d
+from libs.utils_lib import timeit, Timer
 import paho.mqtt.client as mqtt
 from prometheus_client import start_http_server, Summary, Enum
 import ssl
 
-#Get environment variables
+# Get environment variables
 MY_NAME = socket.gethostname()
 BROKER = os.environ.get('BROKER_HOSTNAME')
 BROKER_PORT = int(os.environ.get('BROKER_PORT'))
@@ -23,41 +28,51 @@ logger = get_default_logger(MY_NAME)
 my_mates = []
 my_mates_timers = {}
 leader = None
-start,end = None, None
+start, end = None, None
 current_election = {}
 CUR_HIGHEST_ELECTION = 0
 current_map = []
 raw_map = []
 election_started = False
+global_timer = Timer()
 
 # Parameters
-POLL_INTERVAL = 1 # seconds
-AGENT_TTL = 40 # seconds
+POLL_INTERVAL = 1  # seconds
+AGENT_TTL = 40  # seconds
 CLOUD_MODE = False
 DEFAULT_MAP_SIZE = 20
 
 # Monitoring
-monitoring_state = Enum(f"agent_state", 'State of the agents', states=['running', 'stopped'])
-monitoring_leader = Enum('leader', 'Leader of the swarm', states=["yes","no"]) 
-monitoring_setup_map_time = Summary('setup_map_time', 'Time spent for map setup')
-monitoring_calculate_path_time = Summary('calculate_path_time', 'Time spent for path calculation')
+monitoring_state = Enum(f"agent_state", 'State of the agents', states=[
+                        'running', 'stopped'])
+monitoring_leader = Enum('leader', 'Leader of the swarm', states=["yes", "no"])
+monitoring_setup_map_time = Summary(
+    'setup_map_time', 'Time spent for map setup')
+monitoring_calculate_path_time = Summary(
+    'calculate_path_time', 'Time spent for path calculation')
 
 start_http_server(8080)
 
 logger.info(f"My name is {MY_NAME}, System Id: {SYSTEM_ID},Broker: {BROKER}")
 
+
 def start_discovery():
     global leader, current_map
     logger.debug(f"Starting local discovery")
-    client_local.publish(f"{SYSTEM_ID}/agents/discovery/start", f"Initiate discovery!", qos=0)
+    client_local.publish(
+        f"{SYSTEM_ID}/agents/discovery/start", f"Initiate discovery!", qos=0)
     if leader == MY_NAME:
         logger.debug(f"I am the leader, sending info to backend and agents")
-        client_local.publish(f"{SYSTEM_ID}/agents/discovery/leader", json.dumps({"leader": MY_NAME, "map": current_map}), qos=0)
+        client_local.publish(f"{SYSTEM_ID}/agents/discovery/leader",
+                             json.dumps({"leader": MY_NAME, "map": current_map}), qos=0)
         send_info_backend()
 
+
 def send_hello():
-    client_local.publish(f"{SYSTEM_ID}/agents/discovery/hello", f"{MY_NAME}", qos=0)
+    client_local.publish(
+        f"{SYSTEM_ID}/agents/discovery/hello", f"{MY_NAME}", qos=0)
     client_local.publish(f"{SYSTEM_ID}/map-service/hello", f"{MY_NAME}", qos=0)
+
 
 def handle_discovery(candidate):
     global election_started, leader
@@ -66,8 +81,9 @@ def handle_discovery(candidate):
         logger.info(f"New mate: {candidate}, My_mates: {my_mates}")
         my_mates_timers[candidate] = AGENT_TTL
         # BUG!!! generate new map, should join the robot to current map instead...
-        if MY_NAME == leader: 
-            client_local.publish(f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=0)
+        if MY_NAME == leader:
+            client_local.publish(
+                f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=0)
 
     elif candidate != MY_NAME and candidate in my_mates:
         my_mates_timers[candidate] = AGENT_TTL
@@ -77,10 +93,12 @@ def handle_discovery(candidate):
         # find better way to initiate election
         start_election()
 
+
 def receive_leader(new_leader, new_map):
-    global leader, election, current_election,CUR_HIGHEST_ELECTION, election_started, current_map
+    global leader, election, current_election, CUR_HIGHEST_ELECTION, election_started, current_map
     election_started = False
-    if new_leader == leader: return
+    if new_leader == leader:
+        return
     elif not leader:
         leader = new_leader
         current_election.clear()
@@ -90,8 +108,10 @@ def receive_leader(new_leader, new_map):
         # how to get new_position ?
         logger.info(f"Got leader info, leader is {leader}")
     else:
-        logger.warning(f"Leader mismatch, old: {leader}, new: {new_leader}. Initiating election")
+        logger.warning(
+            f"Leader mismatch, old: {leader}, new: {new_leader}. Initiating election")
         start_election()
+
 
 def check_liveness(seconds):
     global leader
@@ -107,6 +127,7 @@ def check_liveness(seconds):
                 start_election()
             logger.info(f"Current mates: {my_mates}")
 
+
 def start_election():
     global leader, election_started
     election_started = True
@@ -116,7 +137,9 @@ def start_election():
     random.seed()
     election_number = random.randint(0, 100)
     logger.info(f"Starting election #{election_number}")
-    client_local.publish(f"{SYSTEM_ID}/agents/election/start", f"{election_number}", qos=0)
+    client_local.publish(
+        f"{SYSTEM_ID}/agents/election/start", f"{election_number}", qos=0)
+
 
 def send_vote(election_number):
     global leader
@@ -125,11 +148,14 @@ def send_vote(election_number):
     vote = random.randint(0, 100)
     # send vote
     logger.debug(f"Sending vote: {vote} in election #{election_number}")
-    client_local.publish(f"{SYSTEM_ID}/agents/election/vote", f"{election_number}, {MY_NAME}, {vote}", qos=0)
+    client_local.publish(f"{SYSTEM_ID}/agents/election/vote",
+                         f"{election_number}, {MY_NAME}, {vote}", qos=0)
+
 
 def receive_vote(election_number, agent, vote):
     global current_election, CUR_HIGHEST_ELECTION, leader
-    if election_number < CUR_HIGHEST_ELECTION: return
+    if election_number < CUR_HIGHEST_ELECTION:
+        return
     elif election_number == CUR_HIGHEST_ELECTION:
         current_election[agent] = vote
     elif election_number > CUR_HIGHEST_ELECTION:
@@ -137,34 +163,55 @@ def receive_vote(election_number, agent, vote):
         logger.info(f"More important election #{election_number} started")
         current_election.clear()
         current_election[agent] = vote
-    logger.debug(f"Receiving vote in election #{election_number}: {agent} - {vote}")
+    logger.debug(
+        f"Receiving vote in election #{election_number}: {agent} - {vote}")
     # current_election[agent] = vote
-    if len(current_election) != len(my_mates): return
+    if len(current_election) != len(my_mates):
+        return
     # find winner
     winner = max(current_election, key=current_election.get)
-    if winner != MY_NAME: return
+    if winner != MY_NAME:
+        return
     leader = MY_NAME
     logger.info(f"I am the leader({MY_NAME})")
+
 
 def cloud_calculate():
     logger.info("I will initiate cloud calculation")
     client_cloud.publish(f"cloud-agent/calculate/sequence_mode", json.dumps({
         "system_id": SYSTEM_ID,
         "map": raw_map,
-        "agents": [MY_NAME] + my_mates
+        "agents": [MY_NAME] + my_mates,
+        "start_time": Timer().start()
     }), qos=0)
+
+
 def single_cloud_calculate(algo="A*"):
     logger.info("I will initiate cloud calculation")
     client_cloud.publish(f"cloud-agent/calculate/single_mode", json.dumps({
         "system_id": SYSTEM_ID,
         "map": raw_map,
         "agents": [MY_NAME] + my_mates,
-        "algo": algo
+        "algo": algo,
+        "start_time": Timer().start()
     }), qos=0)
+
+def cloud_calc_finished(results):
+    timer = Timer()
+    result_dict = json.loads(results)
+    timer.start_time = result_dict["start_time"]
+    result_dict.pop("start_time")
+    timer.stop()
+    logger.info(f"Path found with help of cloud: {result_dict['path']}. Time: {timer.time()}")
+    client_cloud.publish("backend/path", json.dumps(result_dict), qos=0)
+
 def check_map():
-    if leader != MY_NAME or current_map: return
+    if leader != MY_NAME or current_map:
+        return
     logger.info(f"No map available. I will generate new map")
-    client_local.publish(f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=0)
+    client_local.publish(
+        f"{SYSTEM_ID}/map-service/random-map", f"{DEFAULT_MAP_SIZE}", qos=0)
+
 
 def adopt_new_map(new_map):
     global current_map, raw_map, start, end
@@ -172,37 +219,42 @@ def adopt_new_map(new_map):
     current_map, start, end = sanitize_map(new_map)
     logger.info(f"New map adopted start:{start} end:{end}")
 
+
 def sanitize_map(new_map):
     start, end = None, None
     # Sanitize map from other agents
     for i, row in enumerate(new_map):
         for j, cell in enumerate(row):
-            if cell == f"{MY_NAME}-start": 
-                    start = (i,j)
-                    new_map[i][j] = 0
+            if cell == f"{MY_NAME}-start":
+                start = (i, j)
+                new_map[i][j] = 0
             elif cell == f"{MY_NAME}-end":
-                    end = (i,j)
-                    new_map[i][j] = 0
+                end = (i, j)
+                new_map[i][j] = 0
             elif cell == 0 or cell == 1:
-                    pass
+                pass
             else:
-                    new_map[i][j] = 0
+                new_map[i][j] = 0
     return new_map, start, end
+
 
 def send_info_backend():
     global current_map, leader, my_mates
     logger.debug(f"Sending info to backend")
     data = {
         "leader": MY_NAME,
-        "agents": my_mates+ [MY_NAME],
+        "agents": my_mates + [MY_NAME],
         "map": current_map,
         "system_id": SYSTEM_ID
     }
     client_cloud.publish("backend/agents-info", json.dumps(data), qos=0)
 
+
 @monitoring_calculate_path_time.time()
 def calculate_single(algo="A*"):
     global current_map, start, end
+    timer = Timer()
+    timer.start()
     temp_map = copy.deepcopy(current_map)
     if not start or not end:
         logger.warning(f"Start or end not found")
@@ -214,19 +266,24 @@ def calculate_single(algo="A*"):
     grid_map.load_from_list(temp_map)
     # get path
     possible, path = grid_map.find_path(start, end, algo=algo)
+    timer.stop()
     if possible:
         # to be changed to dynamic
-        full_path = path + [path[-1]*(100-len(path))]
-        logger.info(f"Path found: {path}")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": full_path, "system_id": SYSTEM_ID}), qos=0)
+        full_path = path
+        logger.info(f"Path found: {path}. Time: {timer.time()}")
+        client_cloud.publish("backend/path", json.dumps(
+            {"agent": MY_NAME, "path": full_path, "system_id": SYSTEM_ID, "time": timer.time()}), qos=0)
     else:
-        logger.info(f"Path not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=0)
+        logger.info(f"Path not found. Time: {timer.time()}")
+        client_cloud.publish("backend/path", json.dumps(
+            {"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID, "time": timer.time()}), qos=0)
+
 
 @monitoring_calculate_path_time.time()
 def calculate_a_star(grid_map, start, end):
     possible, path = grid_map.a_star(start, end)
     return possible, path
+
 
 @monitoring_setup_map_time.time()
 def setup_map(current_map, paths):
@@ -237,10 +294,14 @@ def setup_map(current_map, paths):
         grid_map.mark_path_on_grid(path)
     return grid_map
 
+
 def calculate_sequence(paths, sequence, status, algo="CA_star"):
     global current_map, leader
+    timer = Timer()
+    timer.start()
     if status == "start":
-        if leader != MY_NAME: return
+        if leader != MY_NAME:
+            return
         logger.info("I will initiate the sequence calculation")
         sequence = [MY_NAME] + my_mates
         paths = []
@@ -250,28 +311,34 @@ def calculate_sequence(paths, sequence, status, algo="CA_star"):
 
     if not start or not end:
         logger.warning(f"Start or end not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=0)
         possible = False
     else:
         grid_map = setup_map(current_map, paths)
         possible, path = calculate_a_star(grid_map, start, end)
+    timer.stop()
     if possible:
-        logger.info(f"Path found: {path}")
+        logger.info(f"Path found: {path}. Time: {timer.time()}")
         paths.append(path)
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": [(x, y) for x,y,_ in path], "system_id": SYSTEM_ID}), qos=0)
+        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": [
+                             (x, y) for x, y, _ in path], "system_id": SYSTEM_ID, "time": timer.time()}), qos=0)
     else:
-        logger.info(f"Path not found")
-        client_cloud.publish("backend/path", json.dumps({"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID}), qos=0)
+        logger.info(f"Path not found. Time: {timer.time()}")
+        client_cloud.publish("backend/path", json.dumps(
+            {"agent": MY_NAME, "path": "not found", "system_id": SYSTEM_ID, "time": timer.time()}), qos=0)
     # Last to calculate
     status = "continue"
     if len(sequence) == 1:
         status = "done"
         logger.info("Sequence calculation finished.")
-    client_local.publish(f"{SYSTEM_ID}/agents/calculate/sequence_mode", json.dumps({"paths": paths, "sequence": sequence[1:], "status": status}), qos=0)
+    client_local.publish(f"{SYSTEM_ID}/agents/calculate/sequence_mode", json.dumps(
+        {"paths": paths, "sequence": sequence[1:], "status": status}), qos=0)
 
 # ================= mqtt related functions ====================
+
+
 def on_subscribe(client_local, userdata, mid, granted_qos):
     logger.info("Subscribed to topic")
+
 
 def on_message(client_local, userdata, msg):
     global leader
@@ -299,32 +366,40 @@ def on_message(client_local, userdata, msg):
         adopt_new_map(new_map)
 
     elif msg.topic == f"{SYSTEM_ID}/agents/info/all":
-        if leader == MY_NAME: send_info_backend()
+        if leader == MY_NAME:
+            send_info_backend()
 
     elif msg.topic == f"{SYSTEM_ID}/agents/calculate/single_mode":
         logger.info(f"Calculating single path...")
         calculate_single(algo=msg_str)
     elif msg.topic == f"{SYSTEM_ID}/agents/calculate/sequence_mode":
         data = json.loads(msg_str)
-        calculate_sequence(data["paths"], data["sequence"], data["status"], algo="CA_star")
-    elif msg.topic== f"{SYSTEM_ID}/agents/calculate/ca_star_cloud":
+        calculate_sequence(data["paths"], data["sequence"],
+                           data["status"], algo="CA_star")
+    elif msg.topic == f"{SYSTEM_ID}/agents/calculate/ca_star_cloud":
         logger.info("Received request to calculate with cloud")
-        if leader == MY_NAME: cloud_calculate()
+        if leader == MY_NAME:
+            cloud_calculate()
     elif msg.topic == f"{SYSTEM_ID}/agents/calculate/single_calculate_cloud":
         logger.info("Received request to calculate single paths with cloud")
         algo = new_map = json.loads(msg_str)["algo"]
-        if leader == MY_NAME: single_cloud_calculate(algo)
+        if leader == MY_NAME:
+            single_cloud_calculate(algo)
+    elif msg.topic == f"{SYSTEM_ID}/{MY_NAME}/path":
+        cloud_calc_finished(msg_str)
     else:
         logger.warning("Unknown topic")
         logger.warning(f"From topic: {msg.topic} | msg: {msg_str}")
 
+
 def monitor():
     global leader
     monitoring_state.state('running')
-    if MY_NAME==leader:
+    if MY_NAME == leader:
         monitoring_leader.state('yes')
     else:
         monitoring_leader.state('no')
+
 
 client_local = mqtt.Client(client_id=MY_NAME, clean_session=False)
 client_local.username_pw_set(username="agent", password="agent-pass")
@@ -332,10 +407,11 @@ client_local.on_subscribe = on_subscribe
 client_local.on_message = on_message
 client_local.connect(BROKER, BROKER_PORT)
 
-client_cloud = mqtt.Client(client_id=MY_NAME, transport='websockets', clean_session=False)
+client_cloud = mqtt.Client(
+    client_id=MY_NAME, transport='websockets', clean_session=False)
 client_cloud.ws_set_options(path="/mqtt", headers=None)
 
-##### COMMENT TO RUN WITH TILT TODO: fix it
+# COMMENT TO RUN WITH TILT TODO: fix it
 if TLS:
     client_cloud.tls_set(tls_version=2, cert_reqs=ssl.CERT_NONE)
     client_cloud.tls_insecure_set(True)
@@ -353,7 +429,6 @@ client_cloud.subscribe(f"{SYSTEM_ID}/{MY_NAME}/#", qos=0)
 client_cloud.subscribe(f"{SYSTEM_ID}/agents/#", qos=0)
 
 
-
 client_local.loop_start()
 client_cloud.loop_start()
 
@@ -364,6 +439,3 @@ while 1:
     check_map()
     monitor()
     time.sleep(POLL_INTERVAL)
-
-
-

@@ -64,6 +64,11 @@ class System:
             f"{self.backend}/get_paths?system_id={self.system}")
         return paths.json()
 
+    def get_paths(self):
+        paths = requests.get(
+            f"{self.backend}/get_times?system_id={self.system}")
+        return paths.json()
+
     def find_steps_from_paths(self, path):
         num_of_steps = len(path) + 1
         for step in path[::-1]:
@@ -170,7 +175,9 @@ class System:
                 self.trigger_ca_star_cloud()
             case _:
                 raise(NameError)
-        paths, time = self.wait_for_paths()
+        paths = self.wait_for_paths()
+        times = self.get_times()
+        time = max(list(times.values()))
         num_of_found_paths, percentage_of_path_found, len_path_sum = self.extract_paths_details(
             paths)
         self.maybe_print(f"Map name: {map_name}")
