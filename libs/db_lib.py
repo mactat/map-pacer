@@ -52,7 +52,8 @@ class Database:
             AGENTS           TEXT    NOT NULL,
             LEADER           TEXT    NOT NULL,
             MAP              TEXT    NOT NULL,
-            PATHS            TEXT    NOT NULL); '''
+            PATHS            TEXT    NOT NULL,
+            TIMES            TEXT    NOT NULL); '''
         # Execute a command: this creates a new table
         self.execute_query(create_table_query)
         print("Table created successfully in PostgreSQL")
@@ -65,15 +66,17 @@ class Database:
         leader = data['leader']
         cur_map = json.dumps(data['map'])
         paths = json.dumps(data['paths'])
+        times = json.dumps(data['times'])
 
         update_or_insert_query = f'''
-        INSERT INTO {self.table_name} (SYSTEM_ID, AGENTS, LEADER, MAP, PATHS)
-        VALUES ('{system_id}', '{agents}', '{leader}', '{cur_map}', '{paths}')
+        INSERT INTO {self.table_name} (SYSTEM_ID, AGENTS, LEADER, MAP, PATHS, TIMES)
+        VALUES ('{system_id}', '{agents}', '{leader}', '{cur_map}', '{paths}', '{times}')
         ON CONFLICT (SYSTEM_ID) DO UPDATE
         SET AGENTS = excluded.AGENTS,
             LEADER = excluded.LEADER,
             MAP = excluded.MAP,
-            PATHS = excluded.PATHS;
+            PATHS = excluded.PATHS,
+            TIMES = excluded.TIMES;
         '''
         self.execute_query(update_or_insert_query)
         return True
@@ -83,7 +86,7 @@ class Database:
         SELECT * FROM {self.table_name} WHERE SYSTEM_ID = '{system_id}'
         '''
         raw_data=self.execute_query(query, return_value=True)
-        if not raw_data: return None, None, None, None
+        if not raw_data: return None, None, None, None, None
         raw_data=raw_data[0]
         system=raw_data[0]
         agents=json.loads(raw_data[1])
@@ -91,7 +94,8 @@ class Database:
         print(leader)
         cur_map=json.loads(raw_data[3])
         paths = json.loads(raw_data[4])
-        return agents, leader, cur_map, paths
+        times = json.loads(raw_data[5])
+        return agents, leader, cur_map, paths, times
 
     def get_systems(self):
         query = f'''

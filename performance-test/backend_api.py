@@ -1,19 +1,6 @@
 import requests
-import time
-from functools import wraps
 import json
-
-
-def timeit(my_func):
-    @wraps(my_func)
-    def timed(*args, **kw):
-        tstart = time.time()
-        output = my_func(*args, **kw)
-        tend = time.time()
-        diff = (tend - tstart) * 1000
-        return output, diff
-    return timed
-
+import time
 
 class System:
     def __init__(self, backend_url, system="home_system", json_output=False) -> None:
@@ -64,6 +51,11 @@ class System:
             f"{self.backend}/get_paths?system_id={self.system}")
         return paths.json()
 
+    def get_times(self):
+        times = requests.get(
+            f"{self.backend}/get_times?system_id={self.system}")
+        return times.json()
+
     def find_steps_from_paths(self, path):
         num_of_steps = len(path) + 1
         for step in path[::-1]:
@@ -81,7 +73,6 @@ class System:
         percentage_of_path_found = num_of_found_paths/len(paths)*100
         return num_of_found_paths, percentage_of_path_found, len_path_sum
 
-    @timeit
     def wait_for_paths(self):
         agents = self.get_agents()
         paths = self.get_paths()
@@ -148,10 +139,10 @@ class System:
     def extract_averages(self, results, name):
         transpose = list(zip(*results))
         self.maybe_print(f"""\n-------> Algorithm: {name} <-------
-        Average time: {sum(transpose[0])/len(transpose[0]):.{1}f}ms
-        Average number of paths found: {sum(transpose[1])/len(transpose[1]):.{1}f}
-        Average percentage of paths found: {sum(transpose[2])/len(transpose[2]):.{1}f}%
-        Average path length: {sum(transpose[3])/len(transpose[3]):.{1}f} tiles
+        Average time: {sum(transpose[0])/len(transpose[0]):.1f}ms
+        Average number of paths found: {sum(transpose[1])/len(transpose[1]):.1f}
+        Average percentage of paths found: {sum(transpose[2])/len(transpose[2]):.1f}%
+        Average path length: {sum(transpose[3])/len(transpose[3]):.1f} tiles
         """)
 
     def test_algorithm(self, map_name, algo_name):
@@ -170,15 +161,17 @@ class System:
                 self.trigger_ca_star_cloud()
             case _:
                 raise(NameError)
-        paths, time = self.wait_for_paths()
+        paths = self.wait_for_paths()
+        times = self.get_times()
+        time = max(list(times.values()))
         num_of_found_paths, percentage_of_path_found, len_path_sum = self.extract_paths_details(
             paths)
         self.maybe_print(f"Map name: {map_name}")
         self.maybe_print(f"Map size: {map_size}")
         self.maybe_print(f"Paths found: {num_of_found_paths}")
-        self.maybe_print(f"% of paths found: {percentage_of_path_found:.{1}}f%")
+        self.maybe_print(f"% of paths found: {percentage_of_path_found:.1f}%")
         self.maybe_print(f"Sum of paths length: {len_path_sum}")
-        self.maybe_print(f"Time: {time:.{1}}fms")
+        self.maybe_print(f"Time: {time:.1f}ms")
         self.results.append({
             "algo_name": algo_name,
             "test_id": self.num_of_test,
