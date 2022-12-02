@@ -1,4 +1,4 @@
-FROM alpine:3.16
+FROM alpine:3.17
 
 ARG ENVIROMENT=production
 ENV PYTHONUNBUFFERED=1
@@ -8,7 +8,10 @@ WORKDIR /app
 
 ADD ./cloud-agent/requirements.txt .
 
-RUN apk --no-cache --update-cache add  python3 py3-pip py3-arrow  py3-numpy
+# Python 3.11 from edge
+RUN apk add python3 --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
+RUN apk add py3-pip py3-arrow py3-numpy --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./libs/ /app/libs/

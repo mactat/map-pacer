@@ -110,7 +110,7 @@ def trigger_discovery():
 @app.route("/backend/new-map")
 def generate_map():
     args = request.args
-    paths.clear()
+    clear_paths()
     size = args.get("size", default="10")
     system_id = args.get("system_id", default="test")
     mqtt.publish(f"{system_id}/map-service/random-map", size, qos=0)
