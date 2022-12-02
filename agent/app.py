@@ -202,6 +202,7 @@ def cloud_calc_finished(results):
     timer.start_time = result_dict["start_time"]
     result_dict.pop("start_time")
     timer.stop()
+    result_dict['time'] = timer.time()
     logger.info(f"Path found with help of cloud: {result_dict['path']}. Time: {timer.time()}")
     client_cloud.publish("backend/path", json.dumps(result_dict), qos=0)
 
@@ -258,14 +259,14 @@ def calculate_single(algo="A*"):
     temp_map = copy.deepcopy(current_map)
     if not start or not end:
         logger.warning(f"Start or end not found")
-        return
-
-    logger.info(f"Agent: {MY_NAME} start: {start}, end: {end}")
-    # create grid map
-    grid_map = Grid_map(mode="no_diag")
-    grid_map.load_from_list(temp_map)
-    # get path
-    possible, path = grid_map.find_path(start, end, algo=algo)
+        possible = False
+    else: 
+        logger.info(f"Agent: {MY_NAME} start: {start}, end: {end}")
+        # create grid map
+        grid_map = Grid_map(mode="no_diag")
+        grid_map.load_from_list(temp_map)
+        # get path
+        possible, path = grid_map.find_path(start, end, algo=algo)
     timer.stop()
     if possible:
         # to be changed to dynamic

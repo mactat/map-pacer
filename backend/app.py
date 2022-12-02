@@ -80,8 +80,8 @@ def handle_mqtt_message(client, userdata, message):
             database.update_data(
                 system_id=temp_info['system_id'], data=full_data)
         case "backend/path":
-            logger.info("Path received")
             data = json.loads(payload)
+            logger.info(f"Path received: {data['system_id']}, {data['agent']}, {data['time']}")
             save_path(data['system_id'], data["agent"],
                       data["path"], data["time"])
         case _:
