@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 #%% ping responsen 
-N = 109
+N = 210
 response_list = ping('cloud-broker-mactat.cloud.okteto.net', size=40, count=N)
 responses = response_list._responses
 time = [res.time_elapsed_ms for res in responses]
@@ -22,7 +22,7 @@ avg_points = 10
 time_avg = moving_average(time, 10)
 fig, ax = plt.subplots(1,1)
 ax = sns.lineplot(y = time_avg, x = (np.arange(0,N-avg_points+1)+1), linewidth = 4, color = colors[0])
-ax.hlines(np.mean(time_avg), xmin = 0, xmax = 100, color = colors[1], label = 'Mean time', lw = 4, linestyles='--')
+ax.hlines(np.mean(time_avg), xmin = 0, xmax = 200, color = colors[1], label = 'Mean time', lw = 4, linestyles='--')
 ax.set_ylabel('Response time [ms]')
 ax.set_xlabel('Ping')
 plt.legend()

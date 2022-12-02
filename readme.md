@@ -101,3 +101,16 @@ Example of grafana dashboard:
 ## Multi tenancy
 By design this is multi tenant system, tenants can share resources like broker and upstream computation to the cloud:
 ![Multi tenancy](./docs/thesis/pictures/multi_tenant_simple.png)
+
+# Results
+## Path finding time
+![Path finding time](./docs/thesis/pictures/on_prem_test_time.png)
+
+## Path finding time(log)
+![Path finding time log](./docs/thesis/pictures/on_prem_test_time_log.png)
+
+## Other stats
+![other stats](./docs/thesis/pictures/on_prem_test_subplot.png)
+
+## Agent - Cloud - RTT
+![RTT](./docs/thesis/pictures/ping.png)
