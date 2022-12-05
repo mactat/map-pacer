@@ -32,7 +32,7 @@ class Cell:
         self.x = x
         self.y = y
         self.z = z
-        self.g = 0
+        self.g = float("inf")
         self.h = 0
         self.f = 0
         self.visited = False
@@ -252,7 +252,6 @@ class Grid_map:
                         f"Obstacle in the neibours! current: {current.x} {current.y} {current.z} neibour: {x} {y} {z}")
                 if self.grid[z][x][y].visited:
                     continue
-                frontier.put((self.grid[z][x][y].f, self.grid[z][x][y]))
                 self.grid[z][x][y].visited = True
                 visited.append((z, x, y))
                 self.grid[z][x][y].parents.append(
@@ -262,6 +261,7 @@ class Grid_map:
                 self.grid[z][x][y].h = heuristic_func(x, y)
                 self.grid[z][x][y].f = self.grid[z][x][y].g + \
                     self.grid[z][x][y].h
+                frontier.put((self.grid[z][x][y].f, self.grid[z][x][y]))
 
                 # Early stop if timespace is free for the rest of the sim
                 if (x, y) == end and (not np.any(np_isinstance(self.grid[z:, x, y], Obstacle)) or z == self.time_limit-1):

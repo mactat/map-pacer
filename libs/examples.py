@@ -110,7 +110,7 @@ def random_map_3d(map_size, num_of_agent):
 if __name__ == "__main__":
     simple_map_3d()
     medium_map_3d()
-    # random_map_3d(20, 20)
+    random_map_3d(20, 20)
 
 
 
