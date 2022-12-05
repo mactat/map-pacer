@@ -1,5 +1,6 @@
 import numpy as np
-import time,os
+import time,os,math
+from queue import PriorityQueue
 
 PATH_TILES_DICT = {
     0: "🟥",
@@ -39,6 +40,15 @@ class Cell:
 
     def __str__(self):
         return "⬜"
+
+    def __lt__(self, other):
+        return self.f < other.f
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
+    def __gt__(self, other):
+        return self.f > other.f
 
 
 class Grid_map:
@@ -80,6 +90,7 @@ class Grid_map:
         self.remove_from_neighbors(full_path)
         self.mark_path_as_obstacle(path)
         self.mark_goal_as_obstacle(end, goal_timestamp)
+        self.reset_state(reset_graph=False)
 
 
     def get_neighbors(self, cell):
@@ -106,16 +117,32 @@ class Grid_map:
                     cell.g = float("inf")
 
     def remove_from_neighbors(self, points):
-        for i,timeframe in enumerate(self.grid):
-            for j,row in enumerate(timeframe):
-                for k,cell in enumerate(row):
-                    if not isinstance(cell, Cell): continue
-                    cell.parents = []
-                    cell.visited = False
-                    for point in points:
-                        if tuple(point) in cell.neighbors:
-                            self.grid[i][j][k].neighbors.remove(tuple(point))
-                    cell.g = float("inf")
+        # Remove point from its neighbors, point can only 
+        # be a neighbor of the point before and after it
+        # so only 8 adjacent cells need to be checked
+        # There is a room for improvement here, because
+        # we shouldn't check all 8 cells, only the ones
+        # that have timestamp lower than the current point
+
+        for point in points:
+            for x in [-1, 0, 1]:
+                for y in [-1, 0, 1]:
+                    for z in [-1]: # z is the timestamp
+                        if 0 <= point[0] + x < self.x_limit and 0 <= point[1] + y < self.y_limit and 0 <= point[2] + z < self.time_limit:
+                            if not isinstance(self.grid[point[2] + z][point[0] + x][point[1] + y], Cell): continue
+                            if (point[0], point[1], point[2]) in self.grid[point[2] + z][point[0] + x][point[1] + y].neighbors:
+                                self.grid[point[2] + z][point[0] + x][point[1] + y].neighbors.remove(tuple(point))
+        # Old and less efficient way
+        # for i,timeframe in enumerate(self.grid):
+        #     for j,row in enumerate(timeframe):
+        #         for k,cell in enumerate(row):
+        #             if not isinstance(cell, Cell): continue
+        #             cell.parents = []
+        #             cell.visited = False
+        #             for point in points:
+        #                 if tuple(point) in cell.neighbors:
+        #                     self.grid[i][j][k].neighbors.remove(tuple(point))
+        #             cell.g = float("inf")
 
     def avoid_head_collision(self, path):
         prev_point = None
@@ -175,12 +202,12 @@ class Grid_map:
         if heuristic == "manhattan":
             return lambda x, y: abs(x - point[0]) + abs(y - point[1])
         elif heuristic == "euclidean":
-            return lambda x, y: np.sqrt((x - point[0])**2 + (y - point[1])**2)
+            return lambda x, y: math.sqrt((x - point[0])**2 + (y - point[1])**2)
         else:
             raise ValueError("Heuristic not implemented")
 
     def a_star(self, start, end):
-        frontier = []
+        frontier = PriorityQueue()
         starting_cell = self.grid[0][start[0]][start[1]]
         heuristic_func = self.get_heuristic((end[0], end[1]), heuristic="manhattan")
         starting_cell.visited = True
@@ -188,16 +215,15 @@ class Grid_map:
 
         starting_cell.h = heuristic_func(starting_cell.x, starting_cell.y)
         starting_cell.f = starting_cell.g + starting_cell.h
-        frontier.append(starting_cell)
-        while frontier:
+        frontier.put((starting_cell.f, starting_cell))
+        while not frontier.empty():
             # priority queue based on f value
-            frontier.sort(key=lambda x: x.f)
-            current = frontier.pop(0)
+            _, current = frontier.get()
             for (x, y, z) in current.neighbors:
                 if (isinstance(self.grid[z][x][y], Obstacle)): raise ValueError(f"Obstacle in the neibours! current: {current.x} {current.y} {current.z} neibour: {x} {y} {z}")
                 if self.grid[z][x][y].visited:
                     continue
-                frontier.append(self.grid[z][x][y])
+                frontier.put((self.grid[z][x][y].f, self.grid[z][x][y]))
                 self.grid[z][x][y].visited = True
                 self.grid[z][x][y].parents.append((current.x, current.y, current.z))
                 self.grid[z][x][y].parents += current.parents
