@@ -32,7 +32,7 @@ def simple_map_3d():
     end = (4, 4) 
     possible_3, path_3 = grid_map.a_star(start, end)
 
-    grid_map.print_timegrid(speed=2, clear=True)
+    #grid_map.print_timegrid(speed=2, clear=True)
 
 
 def medium_map_3d():
@@ -58,15 +58,17 @@ def medium_map_3d():
     start = (9, 8) 
     end = (5, 5) 
     possible_1, path_1 = grid_map.a_star(start, end)
+    #print(f"Agent 1 done. Path found: {possible_1}")
 
     # A* agent 2
-    grid_map = Grid_map(mode="no_diag"
+    grid_map = Grid_map(mode="no_diag")
     grid_map.load_from_list(large_map)
     grid_map.agent_color = PATH_TILES_DICT[2]
     grid_map.mark_path_on_grid(path_1)
     start = (5, 9) 
     end = (9, 9) 
     possible_2, path_2 = grid_map.a_star(start, end)
+    #print(f"Agent 2 done. Path found: {possible_2}")
 
     # # A* agent 3
     grid_map = Grid_map(mode="no_diag")
@@ -77,16 +79,15 @@ def medium_map_3d():
     start = (9, 9) 
     end = (5, 9) 
     possible_3, path_3 = grid_map.a_star(start, end)
-
-
-    grid_map.print_timegrid(speed=4, clear=True)
+    #print(f"Agent 3 done. Path found: {possible_3}")
+    #grid_map.print_timegrid(speed=4, clear=True)
 
 def random_map_3d(map_size, num_of_agent):
     # Random huge map
     grid_map = Grid_map(mode="no_diag", head_collision_allowed=False, mark_path=True)
     huge_map = []
     for x in range(map_size):
-        huge_map.append(np.random.choice([0,1],map_size,p=[0.7,0.3]).tolist())
+        huge_map.append(np.random.choice([0,1],map_size,p=[1,0]).tolist())
     grid_map.load_from_list(huge_map)
 
     # random start and end, not obstacle
@@ -103,8 +104,8 @@ def random_map_3d(map_size, num_of_agent):
         huge_map, start = random_point(huge_map)
         huge_map, end = random_point(huge_map)
         found, _ = grid_map.a_star(start, end)
-        print(f"Agent {i+1} done. Path found: {found}")
-    grid_map.print_timegrid(speed=4, clear=True)
+        #print(f"Agent {i+1} done. Path found: {found}. Start: {start}, End: {end}")
+    # grid_map.print_timegrid(speed=4, clear=True)
 
 if __name__ == "__main__":
     simple_map_3d()

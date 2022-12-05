@@ -5,3 +5,4 @@ docs/master-thesis-papers/
 *.config
 /tools/*png
 /tools/*json
+**/*pypy**/
