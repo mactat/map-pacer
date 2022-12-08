@@ -67,7 +67,7 @@ steps:
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(Build.ArtifactStagingDirectory)'
-      artifact: 'res.json'
+      artifact: 'cpu_$(limits_cpu)_mem_$(limit_memory)'
       publishLocation: 'pipeline'
 
 
