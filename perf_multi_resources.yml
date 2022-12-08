@@ -48,12 +48,13 @@ steps:
       kubernetesServiceEndpoint: 'okteto-cloud-connection'
       command: login
   - bash: |
+      sudo apt-get install -y docker-compose-plugin # just once
       touch .env # For make
       mkdir cpu_$(reservation_cpu)_mem_$(reservation_memory)
       make performance SYSTEM_ID="on_prem" FLAGS="--json > cpu_$(reservation_cpu)_mem_$(reservation_memory)/res.json"
       cp cpu_$(reservation_cpu)_mem_$(reservation_memory)/res.json ./tools/res.json
       make plots RESULTS="res"
-      cp ./tools/*.png ./cpu_$(reservation_cpu)_mem_$(reservation_memory)/
+      cp $(System.DefaultWorkingDirectory)/tools/*.png $(System.DefaultWorkingDirectory)/cpu_$(reservation_cpu)_mem_$(reservation_memory)/
     displayName: "Performance test for mem: ${ reservation_memory } cpu: ${ reservation_cpu }"
 
   - task: CopyFiles@2
