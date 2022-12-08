@@ -33,13 +33,14 @@ strategy:
 steps:
   - checkout: self
   - bash: |
-      echo "test"
+      python3 .\tools\change_resources.py --limits_cpu $(limits_cpu) --reservation_cpu $(reservation_cpu) --limit_memory $(limit_memory) --reservation_memory $(reservation_memory)
+      cat docker-swarm.yaml
     displayName: Change parameters in yamls
   - bash: |
       sudo docker stack up map-pacer --compose-file docker-swarm.yml
       sudo docker service update map-pacer_agent --image mactat/map-pacer-agent:arm-latest --force
       sudo docker service update map-pacer_map-service --image mactat/map-pacer-map-service:arm-latest --force
-    displayName: "Deploy adjusted services mem: ${ reservation_memory } cpu: ${ reservation_cpu }"
+    displayName: "Deploy adjusted services mem: $(reservation_memory) cpu: $(reservation_cpu)"
 
   - task: Kubernetes@1
     displayName: Login to k8s cluster
@@ -48,14 +49,13 @@ steps:
       kubernetesServiceEndpoint: 'okteto-cloud-connection'
       command: login
   - bash: |
-      sudo apt-get install -y docker-compose-plugin # just once
       touch .env # For make
       mkdir cpu_$(reservation_cpu)_mem_$(reservation_memory)
       make performance SYSTEM_ID="on_prem" FLAGS="--json > cpu_$(reservation_cpu)_mem_$(reservation_memory)/res.json"
       cp cpu_$(reservation_cpu)_mem_$(reservation_memory)/res.json ./tools/res.json
       make plots RESULTS="res"
       cp $(System.DefaultWorkingDirectory)/tools/*.png $(System.DefaultWorkingDirectory)/cpu_$(reservation_cpu)_mem_$(reservation_memory)/
-    displayName: "Performance test for mem: ${ reservation_memory } cpu: ${ reservation_cpu }"
+    displayName: "Performance test for mem: $(reservation_memory) cpu: $(reservation_cpu)"
 
   - task: CopyFiles@2
     inputs:
