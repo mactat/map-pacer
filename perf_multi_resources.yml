@@ -33,7 +33,7 @@ strategy:
 steps:
   - checkout: self
   - bash: |
-      python3 ./tools/change_resources.py --limits_cpu $(limits_cpu) --reservation_cpu $(reservation_cpu) --limit_memory $(limit_memory) --reservation_memory $(reservation_memory)
+      python3 ./tools/change_resources.py --limits-cpu $(limits_cpu) --reservation-cpu $(reservation_cpu) --limit-memory $(limit_memory) --reservation-memory $(reservation_memory)
       cat docker-swarm.yaml
     displayName: Change parameters in yamls
   - bash: |
