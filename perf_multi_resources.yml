@@ -34,7 +34,7 @@ steps:
   - checkout: self
   - bash: |
       python3 ./tools/change_resources.py --limit-cpu $(limits_cpu) --reservation-cpu $(reservation_cpu) --limit-memory $(limit_memory) --reservation-memory $(reservation_memory)
-      cat docker-swarm.yaml
+      cat docker-swarm.yml
     displayName: Change parameters in yamls
   - bash: |
       sudo docker stack up map-pacer --compose-file docker-swarm.yml
