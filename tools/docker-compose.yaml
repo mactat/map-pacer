@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     volumes:
      - .:/app
-    command: /bin/sh -c  "python3 make_plots.py < $RESULTS.json"
+    command: /bin/sh -c  "python3 make_plots.py < ${RESULTS:-res}.json"
   ping:
     image: mactat/map-pacer-tools:latest
     build:
