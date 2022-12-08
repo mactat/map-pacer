@@ -59,7 +59,7 @@ class System:
         agents = self.get_agents()
         for agent in agents:
             if agent not in times_raw:
-                times_raw[agent] = 10 # for now, in future 'timeout'
+                times_raw[agent] = 10000 # for now, in future 'timeout'
         return times_raw
 
     def find_steps_from_paths(self, path):
