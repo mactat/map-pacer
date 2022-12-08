@@ -20,15 +20,15 @@ strategy:
       limit_memory: "128M"
       reservation_memory: "256M"
     'medium_resources_profile':
-      limits_cpu: "0.50"
-      reservation_cpu: "0.25"
-      limit_memory: "128M"
-      reservation_memory: "256M"
+      limits_cpu: "0.75"
+      reservation_cpu: "0.50"
+      limit_memory: "256M"
+      reservation_memory: "512M"
     'high_resources_profile':
-      limits_cpu: "0.50"
-      reservation_cpu: "0.25"
-      limit_memory: "128M"
-      reservation_memory: "256M"
+      limits_cpu: "1.00"
+      reservation_cpu: "0.75"
+      limit_memory: "1000M"
+      reservation_memory: "512M"
 
 steps:
   - checkout: self
@@ -51,13 +51,16 @@ steps:
       touch .env # For make
       mkdir cpu_$(reservation_cpu)_mem_$(reservation_memory)
       make performance SYSTEM_ID="on_prem" FLAGS="--json > cpu_$(reservation_cpu)_mem_$(reservation_memory)/res.json"
+      cp cpu_$(reservation_cpu)_mem_$(reservation_memory)/res.json ./tools/res.json
+      make plots RESULTS="res"
+      cp ./tools/*.png ./cpu_$(reservation_cpu)_mem_$(reservation_memory)/
     displayName: "Performance test for mem: ${ reservation_memory } cpu: ${ reservation_cpu }"
 
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
-        cpu_$(reservation_cpu)_mem_$(reservation_memory)/res.json
+        cpu_$(reservation_cpu)_mem_$(reservation_memory)/*
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishPipelineArtifact@1
