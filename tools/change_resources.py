@@ -15,9 +15,9 @@ with open(args.config, 'r+') as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
     # replace values
     config['services']['agent']['deploy']['resources']['limits']['memory'] = f"{args.limit_memory}"
-    config['services']['agent']['deploy']['resources']['limits']['cpu'] = args.limit_cpu
+    config['services']['agent']['deploy']['resources']['limits']['cpus'] = args.limit_cpu
     config['services']['agent']['deploy']['resources']['reservations']['memory'] = f"{args.reservation_memory}"
-    config['services']['agent']['deploy']['resources']['reservations']['cpu'] = args.reservation_cpu
+    config['services']['agent']['deploy']['resources']['reservations']['cpus'] = args.reservation_cpu
     # write back to file
     f.seek(0)
     yaml.dump(config, f, default_flow_style=False)
