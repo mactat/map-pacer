@@ -177,7 +177,7 @@ class System:
                 raise(NameError)
         paths = self.wait_for_paths()
         times = self.get_times()
-        time = max(list(times.values()))
+        time = sum(list(times.values()))
         num_of_found_paths, percentage_of_path_found, len_path_sum = self.extract_paths_details(
             paths)
         self.maybe_print(f"Map name: {map_name}")
@@ -185,7 +185,7 @@ class System:
         self.maybe_print(f"Paths found: {num_of_found_paths}")
         self.maybe_print(f"% of paths found: {percentage_of_path_found:.1f}%")
         self.maybe_print(f"Sum of paths length: {len_path_sum}")
-        self.maybe_print(f"Time: {time:.1f}ms")
+        self.maybe_print(f"Total Time: {time:.1f}ms")
         self.results.append({
             "algo_name": algo_name,
             "test_id": self.num_of_test,
