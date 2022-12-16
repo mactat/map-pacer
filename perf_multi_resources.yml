@@ -15,30 +15,30 @@ pool:
 strategy:
   matrix:
     'vary_low_resources_profile':
+      limits_cpu: "0.05"
+      reservation_cpu: "0.05"
+      limit_memory: "64M"
+      reservation_memory: "64M"
+    'low_resources_profile':
       limits_cpu: "0.1"
       reservation_cpu: "0.1"
       limit_memory: "128M"
       reservation_memory: "128M"
-    'low_resources_profile':
-      limits_cpu: "0.25"
-      reservation_cpu: "0.25"
-      limit_memory: "256M"
-      reservation_memory: "256M"
-    'medium_resources_profile':
-      limits_cpu: "0.5"
-      reservation_cpu: "0.5"
-      limit_memory: "512M"
-      reservation_memory: "512M"
-    'high_resources_profile':
-      limits_cpu: "0.75"
-      reservation_cpu: "0.75"
-      limit_memory: "700M"
-      reservation_memory: "700M"
-    'very_high_resources_profile':
-      limits_cpu: "1.00"
-      reservation_cpu: "1.00"
-      limit_memory: "800M"
-      reservation_memory: "800M"
+    # 'medium_resources_profile':
+    #   limits_cpu: "0.5"
+    #   reservation_cpu: "0.5"
+    #   limit_memory: "512M"
+    #   reservation_memory: "512M"
+    # 'high_resources_profile':
+    #   limits_cpu: "0.75"
+    #   reservation_cpu: "0.75"
+    #   limit_memory: "700M"
+    #   reservation_memory: "700M"
+    # 'very_high_resources_profile':
+    #   limits_cpu: "1.00"
+    #   reservation_cpu: "1.00"
+    #   limit_memory: "800M"
+    #   reservation_memory: "800M"
 
 steps:
   - checkout: self
