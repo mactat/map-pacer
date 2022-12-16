@@ -16,7 +16,7 @@ system = System(
     system=args.system_id,
     json_output=args.json)
 maps = ["5","7","9","11","13","15","17","19", "21", "23", "25", "27", "29", "31"]
-algorithms = ["a_star", "a_star_cloud", "ca_star", "ca_star_cloud"]
+algorithms = ["a_star", "a_star_cloud", "ca_star_cloud", "ca_star"]
 
 
 maybe_print("================== Test Suite ==================")
