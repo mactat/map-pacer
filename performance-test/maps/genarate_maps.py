@@ -27,7 +27,7 @@ def put_agents_in_map(current_map, agents):
     return current_map
 
 
-sizes= [5,7,9,11,13,15,17,19,21]
+sizes= [21,23,25,27,29,31]
 for size in sizes:
     with open(f'{size}.json', 'w') as outfile:
         json.dump(generate_map(size), outfile)

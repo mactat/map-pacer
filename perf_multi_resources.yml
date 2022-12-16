@@ -1,0 +1,87 @@
+trigger: none
+pr: none
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+pool:
+    name: rpi-cluster
+    demands:
+    - agent.name -equals pi4-rpios-1
+
+strategy:
+  matrix:
+    'very_low_resources_profile':
+      limits_cpu: "0.1"
+      reservation_cpu: "0.1"
+      limit_memory: "128M"
+      reservation_memory: "128M"
+    'low_resources_profile':
+      limits_cpu: "0.2"
+      reservation_cpu: "0.2"
+      limit_memory: "128M"
+      reservation_memory: "128M"
+    'medium_resources_profile':
+      limits_cpu: "0.3"
+      reservation_cpu: "0.3"
+      limit_memory: "256M"
+      reservation_memory: "256M"
+    'very_high_resources_profile':
+      limits_cpu: "1.00"
+      reservation_cpu: "1.00"
+      limit_memory: "800M"
+      reservation_memory: "800M"
+
+steps:
+  - checkout: self
+  - bash: |
+      python3 ./tools/change_resources.py --limit-cpu $(limits_cpu) --reservation-cpu $(reservation_cpu) --limit-memory $(limit_memory) --reservation-memory $(reservation_memory)
+      cat docker-swarm.yml
+    displayName: Change parameters in yamls
+  - bash: |
+      sudo docker stack up map-pacer --compose-file docker-swarm.yml
+      sudo docker service update \
+        --image mactat/map-pacer-agent:arm-latest \
+        --reserve-cpu $(reservation_cpu) \
+        --reserve-memory $(reservation_memory) \
+        --limit-memory $(limit_memory) \
+        --limit-cpu $(limits_cpu) \
+        --force \
+        map-pacer_agent
+  
+      sudo docker service update map-pacer_map-service --image mactat/map-pacer-map-service:arm-latest --force
+    displayName: "Deploy adjusted services mem: $(limit_memory) cpu: $(limits_cpu)"
+
+  - task: Kubernetes@1
+    displayName: Login to k8s cluster
+    inputs:
+      connectionType: 'Kubernetes Service Connection'
+      kubernetesServiceEndpoint: 'okteto-cloud-connection'
+      command: login
+  - bash: |
+      touch .env # For make
+      mkdir cpu_$(limits_cpu)_mem_$(limit_memory)
+      make performance SYSTEM_ID="on_prem" FLAGS="--json > cpu_$(limits_cpu)_mem_$(limit_memory)/res.json"
+      cp cpu_$(limits_cpu)_mem_$(limit_memory)/res.json ./tools/res.json
+      make plots RESULTS="res"
+      cp $(System.DefaultWorkingDirectory)/tools/*.png $(System.DefaultWorkingDirectory)/cpu_$(limits_cpu)_mem_$(limit_memory)/
+    displayName: "Performance test for mem: $(limit_memory) cpu: $(limits_cpu)"
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: |
+        cpu_$(limits_cpu)_mem_$(limit_memory)/*
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)'
+      artifact: 'cpu_$(limits_cpu)_mem_$(limit_memory)'
+      publishLocation: 'pipeline'
+
+
+

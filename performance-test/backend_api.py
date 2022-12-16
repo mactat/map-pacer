@@ -52,9 +52,15 @@ class System:
         return paths.json()
 
     def get_times(self):
-        times = requests.get(
+        times_raw = requests.get(
             f"{self.backend}/get_times?system_id={self.system}")
-        return times.json()
+        times_raw = times_raw.json()
+        # if agent missing, add it with time as timeout
+        agents = self.get_agents()
+        for agent in agents:
+            if agent not in times_raw:
+                times_raw[agent] = 10000 # for now, in future 'timeout'
+        return times_raw
 
     def find_steps_from_paths(self, path):
         num_of_steps = len(path) + 1
@@ -73,12 +79,20 @@ class System:
         percentage_of_path_found = num_of_found_paths/len(paths)*100
         return num_of_found_paths, percentage_of_path_found, len_path_sum
 
-    def wait_for_paths(self):
+    def wait_for_paths(self, timeout=10): # timeout in seconds
         agents = self.get_agents()
         paths = self.get_paths()
-        while not all(agent in paths for agent in agents):
+        cur_time = 0
+        while not all(agent in paths for agent in agents) and cur_time < timeout:
             time.sleep(0.1)
+            cur_time += 0.1
             paths = self.get_paths()
+        if cur_time >= timeout:
+            self.maybe_print("Timeout hit")
+            # add path as not found and time as timeout
+            for agent in agents:
+                if agent not in paths:
+                    paths[agent] = "not found"
         return paths
 
     def trigger_ca_star_local(self):
@@ -163,7 +177,7 @@ class System:
                 raise(NameError)
         paths = self.wait_for_paths()
         times = self.get_times()
-        time = max(list(times.values()))
+        time = sum(list(times.values()))
         num_of_found_paths, percentage_of_path_found, len_path_sum = self.extract_paths_details(
             paths)
         self.maybe_print(f"Map name: {map_name}")
@@ -171,7 +185,7 @@ class System:
         self.maybe_print(f"Paths found: {num_of_found_paths}")
         self.maybe_print(f"% of paths found: {percentage_of_path_found:.1f}%")
         self.maybe_print(f"Sum of paths length: {len_path_sum}")
-        self.maybe_print(f"Time: {time:.1f}ms")
+        self.maybe_print(f"Total Time: {time:.1f}ms")
         self.results.append({
             "algo_name": algo_name,
             "test_id": self.num_of_test,
