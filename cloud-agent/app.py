@@ -58,7 +58,7 @@ def calculate_single(new_map, agents, system_id, start_time, algo="A*"):
             possible, path = grid_map.find_path(start, end, algo=algo)
         if possible:
             # to be changed to dynamic
-            full_path = path + [path[-1]*(100-len(path))]
+            full_path = path
             logger.info(f"Path found: {path}")
             client_cloud.publish(f"{system_id}/{agent}/path", json.dumps(
                 {"agent": agent, "path": full_path, "system_id": system_id, "start_time": start_time}), qos=0)
