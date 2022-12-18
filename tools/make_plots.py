@@ -76,12 +76,12 @@ plt.tight_layout()
 plt.savefig(f'{system}_{backend}_MapName_Algorithms_LINEAR.png', bbox_inches='tight')
 #%% plot 
 fig, ((ax, ax1), (ax2, ax3)) = plt.subplots(2,2)
-ax = sns.barplot(data = df, x = 'Algorithms', y = 'time', ci = 95, ax = ax, palette = palette)
+ax = sns.barplot(data = df, x = 'Algorithms', y = 'time', errorbar = 95, ax = ax, palette = palette)
 ax.set_ylabel('Time [ms]')
 ax.set_xlabel(None)
 ax.set(yscale="log")
 
-ax1 = sns.barplot(data = df, x = 'num_of_paths_found', y = 'Algorithms', ax = ax1, ci = None, palette = palette)
+ax1 = sns.barplot(data = df, x = 'num_of_paths_found', y = 'Algorithms', ax = ax1, errorbar=None, palette = palette)
 ax1.set_ylabel(None)
 ax1.set_xlabel('Number of path found')
 
