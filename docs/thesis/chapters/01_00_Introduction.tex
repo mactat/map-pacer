@@ -1,25 +1,21 @@
 %!TEX root = ../Thesis.tex
 \chapter{Introduction}
-{\color{red}Rework first section to be more undrinkable. What problem you need to solve? }
 
-Path planning is a process of finding a route between starting position and a goal. It is a common task in the current industry setup, used for autonomous navigation. While more mobile robots are being used it becomes important to solve this task efficiently using state of the art approaches. As path planning is computationally intensive in a large setup, it might require more resources than a single agent can provide, therefore this project will explore collaborative computing between the agents as well as edge-cloud collaborative computing. The focus is not only on implementation of the algorithms but rather on overall end-to-end system that can be used both with simulated agents as well as real with edge devices.
+Path planning is a process of finding a route between starting position and a goal. It is a common task in the current industry setup, used for autonomous navigation. While more mobile robots are being used it becomes important to solve this task efficiently using state-of-the-art approaches. As path planning is computationally intensive in a large setup, it might require more resources than a single agent can provide, therefore this project will explore collaborative computing between the agents as well as edge-cloud collaborative computing. The focus is not only on the implementation of the algorithms but rather on an overall end-to-end system that can be used both with simulated agents as well as real edge devices.
 
-{\color{red}Maybe a simple diagram here to draw attention}
+In the second chapter theory behind multi-agent path planning is introduced along with an explanation of standard algorithms designed for this purpose. It also serves as an introduction to the cloud and edge computing as both of those technologies are used in this project. Finally, this section elaborates on standard communication protocols and algorithms used in agent implementation.
 
+The third chapter focuses on the design of the system, with an emphasis on creating a system that can be easily simulated but also embedded in the real robot or stand-alone computing unit. It elaborates on specific communication patterns among the agents and the general architecture of both local/edge and cloud entities.
 
-In second chapter theory behind multi-agent path planing is introduced along with explanation of common algorithms design for this purpose. It also serves as an introduction to cloud and edge computing as both of those technologies are used in this project. Finally this section elaborates on common communication protocols and algorithms which are used in agents implementation.
+The fourth chapter explains in detail how the system was implemented. It starts with a description of the development process and goes deeper into more specific technologies and their placement in the project. It also shows the final look of the system as well as its user interface of it. The system testing approach is explained in the fifth chapter, focusing on reproducible test cases along with test results with different algorithms and resource profiles.
 
-Third chapter focuses on design of the system, with emphasis on creating a system which can be easily simulated but also embedded in the real robot or stand alone computing unit. It elaborates on specific communication patterns among the agents and general architecture of both local/edge and cloud entities.
-
-Fourth chapter explains in detail how system was implemented. It starts with a description of development process and goes deeper in more specific technologies and their placement in the project. It also shows the final look of the system as well as user interface of it. Testing approach for the system is explained in sixth chapter, with focus on reproducible test cases.
-
-Six and  seventh chapters serves as a summary of the project as well as explains what can be improved in future work.
+Six and  seventh chapters serve as a summary of the project as well as explain what can be improved in future work.
 
 \section{Robots fleet in smart factories}
-One of main use cases of proposed system can be robot fleets in factories. Mobile robots are widely use in production plants, but the most popular solution is to use AGV - automated guided vehicle\cite{agv}. Difference between AGV and fully autonomous mobile robot is that AGV will usually follow guided path marked by magnetic or traditional marker. This solution allows to simplify robot setup, by reducing number of sensors, but at the same time it is less flexible and require constant maintenance of marked paths.
+One of the main use cases of the proposed system can be robot fleets in factories. Mobile robots are widely used in production plants, but the most popular solution is to use AGV - an automated guided vehicle\cite{agv}. The difference between AGV and the fully autonomous mobile robot is that AGV will usually follow the guided path marked by the magnetic or traditional marker. This solution allows to simplify robot setup, by reducing the number of sensors, but at the same time, it is less flexible and requires constant maintenance of marked paths.
 
-Using multi-agent path planning, robots are not required to follow any marked path. However they need to have more sensors to locate each other in the factory. This solution enables robots to reach any point in the factory and not collide with each other. It is also very extensible as any number of robots can be added to the fleet without expanding existing infrastructure.
+Using multi-agent path planning, robots are not required to follow any marked path. However, they need to have more sensors to locate each other in the factory. This solution enables robots to reach any point in the factory and not collide with each other. It is also very extensible as any number of robots can be added to the fleet without expanding existing infrastructure.
 
 \section{Smart cars fleet}
 
-\section{Collaborative vacuum cleaners/ grass cutters}
+Another example of a case where this system can be implemented is path planning for autonomous cars. Those, usually have large computing units and most computation can be performed locally, but as maps and the number of cars grows some computations can be upstreamed to the cloud to deal with increased complexity. The introduction of multi-car path planning can lead to lower traffic and better usage of road infrastructure.

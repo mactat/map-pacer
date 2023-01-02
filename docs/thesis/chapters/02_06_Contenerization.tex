@@ -1,0 +1,16 @@
+The whole distributed system will be deployed in the cloud, therefore it is important to use cloud-native technologies such as containerization and micro-services. A container is a technology that allows packaging the code along with all dependencies and os information into one stand-alone image. This image can be later run in any environment, isolated from the rest of the system and other containers\cite{container_technologies}.
+
+Linux LXC methodologies are the foundation of many container systems. Recent Linux distributions include features such as namespaces and cgroups as a method to separate processes and resources on a shared operating system. Using LXC mechanisms, file systems are stacked on top of one another to create a container image. By building on top of basic images, this characteristic may be utilized to produce new images\cite{container_technologies}. This technology has many advantages:
+\begin{itemize}
+    \item Portability - Container image contains everything that the container needs to be run and therefore it can be deployed in multiple environments f.e locally or in the cloud.
+
+    \item  Isolation - Containers are isolated both from the host machine as well as each other. This isolation is also programmable so communication between containers can be allowed or disallowed.
+
+    \item Resource efficiency - Containers are sharing the kernel and resources so those can be easily consumed. Moreover, containers tend to boot and work faster than virtual machines.
+    
+    \item Modularity - Images can be reused to build software on top of existing ones.
+    
+    \item Security - Containers are isolated from each other and from the host system, which can help to reduce the risk of vulnerabilities and attacks.
+\end{itemize}
+
+Micro-services are small autonomous services that cooperate with each other to create certain application logic\cite{building_microservices}. Usually, microservices are deployed as Linux containers and encapsulate logic for a single logical part of the solution. Those services are then communicating whit each other to build bigger, more complex systems.
