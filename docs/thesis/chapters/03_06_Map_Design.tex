@@ -27,7 +27,7 @@ After the path is planned for specific agents, it has to be marked as an obstacl
 Planning multiple agents' paths on a single map leads to a problem when agents are colliding with each other because they are moving in the opposite direction on the same column or row. This situation is shown in figure \ref{fig:head_collision}. Both agents assume that the tile in front of them is not occupied, which is a valid assumption. However, as this is a discrete model, a collision occurs between timeframes. To mitigate this problem, after the path is planned edges in the opposite direction of agent movement need to be removed.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{pictures/head_collision_problem.png}
+    \includegraphics[width=0.7\textwidth]{pictures/head_collision_problem.png}
     \caption{ CA* head collision problem}
     \label{fig:head_collision}
 \end{figure}

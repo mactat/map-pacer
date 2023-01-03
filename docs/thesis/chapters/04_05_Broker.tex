@@ -1,0 +1,12 @@
+To allow the broker to be cloud agnostic, it was deployed as a container. Two main open-source projects were considered Eclipse Mosquitto and HiveMQ Community Edition, both implementing MQTT (Message Queuing Telemetry Transport) protocol.
+
+Differences between the two include:
+
+\begin{itemize}
+    \item Mosquitto is fully open-sourced and maintained by Eclipse Foundation. HiveMQ is an enterprise product with a free community edition version.
+    \item HiveMQ is better suited for a large-scale project, whereas mosquito is designed for small to medium-sized projects.
+    \item HiveMQ has more features but most of them are not included in the community edition.
+    \item Mosquito includes free implementation of MQTT bridge - the connection between two MQTT brokers that allows them to exchange messages with each other.
+\end{itemize}
+
+Both brokers were deployed and tested. Hivemq was easier to manage and deploy to the Kubernetes cluster, but mosquito was faster and more reliable. The feature which decided on choosing mosquito as a broker in this project is the implementation of the MQTT bridge which allows easy connect local and cloud brokers together and isolates traffic between cloud and local deployments.
