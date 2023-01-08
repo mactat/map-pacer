@@ -1,10 +1,10 @@
-Local development of the project was designed to be easy to setup and reproducible in any development machine. For this purpose development virtual machine(dev-vm) is created using infrastructure-as-a-code principle. Tools which are used for reproducible creation of machine were:
+Local development of the project was designed to be easy to set up and reproducible in any development machine. For this purpose development virtual machine(referred as dev-VM) was created using the infrastructure-as-a-code principle. Tools which are used for reproducible creation of machine were:
 \begin{itemize}
-    \item Oracle Virtualbox\cite{virtual_box} - hypervisor which is hosting vm, it was chosen because it supports deployment in 3 most popular operating systems: Micrsoft windows, mac os and Linux.
-    \item HashiCorp Vagrant\cite{vagrant} - tool which help to build development environment as a code. It allows to specify all details of provisioned vm, as well as configure networking and hardware specifications. All files used for development can be found in dev-vm repository\cite{dev_vm}.
+    \item Oracle Virtualbox\cite{virtual_box} - hypervisor which is hosting VM, it was chosen because it supports deployment in the 3 most popular operating systems: Microsoft windows, mac os, and Linux.
+    \item HashiCorp Vagrant\cite{vagrant} - a tool that helps to build a development environment as a code. It allows specifying all details of provisioned VM, as well as configuring networking and hardware specifications. All files used for development can be found in dev-VM repository\cite{dev_vm}.
 \end{itemize}
 
-Base of the development virtual machine is Ubuntu Linux server so it is not shipped with graphical user interface. It was chosen to resemble production environment, lower vm blueprint and increase speed and performance of the setup. To interact with the machine Secure Shell Protocol (SSH) is used, it can be seen on picture \ref{fig:local_development}.
+The base of the development virtual machine is an Ubuntu Linux server, so it is not shipped with the graphical user interface. It was chosen to resemble the production environment, lower the VM blueprint and increase the speed and performance of the setup. To interact with the machine Secure Shell Protocol (SSH) is used, it can be seen in picture \ref{fig:local_development}.
 
 \begin{figure}[H]
     \centering
@@ -13,7 +13,7 @@ Base of the development virtual machine is Ubuntu Linux server so it is not ship
     \label{fig:local_development}
 \end{figure}
 
-By default Kubernetes(k8s) cluster is deployed in dev-vm using tool called kind. It allows to create kubernetes nodes as containers and form a kubernetes(k8s) cluster. It can be then accessed with kubernetes client command line tool called kubectl. To speed up development process and allow continuous testing of both software and deployment, tilt is used. This software interact with k8s cluster by building container images and deploying resources as soon as there is any change in the code. It also includes a dashboard \ref{fig:tilt} which visualize resources deployed in a cluster as well as aggregates the logs and show them in approachable matter.
+By default Kubernetes(k8s) cluster is deployed in dev-VM using a tool called 'kind'. It allows the creation of Kubernetes nodes as containers and forms a Kubernetes (k8s) cluster. It can be then accessed with Kubernetes client command line tool called 'kubectl'. To speed up the development process and allow continuous testing of both software and deployment, software called tilt is used. This software interacts with the k8s cluster by building container images and deploying resources as soon as there is any change in the code. It also includes a dashboard \ref{fig:tilt} which visualizes resources deployed in a cluster as well as aggregates the logs and shows them in an approachable matter.
 
 
 \begin{figure}[H]
@@ -23,17 +23,6 @@ By default Kubernetes(k8s) cluster is deployed in dev-vm using tool called kind.
     \label{fig:tilt}
 \end{figure}
 
-Integration with a azure cloud is made with azure command lines tools along with PAT token. After initial creation of kubernetes cluster in the cloud, interaction are limited to only kubernetes cluster and therefore only kubeconfig file is needed.
+Integration with an azure cloud is made with azure command lines tools along with PAT token. After the initial creation of the Kubernetes cluster in the cloud, interactions are limited to only the Kubernetes cluster and therefore only kubeconfig(Kubernetes configuration) file is needed.
 
-To make it easier to interact with ll resources used in the project, set of make rules was set up and includes:
-\begin{itemize}
-    \item make dev - run dev cluster and tilt
-	\item make clean - stop local cluster and tilt
-	\item make cloud-login - login to azure and setup kubectl
-	\item make cloud-up - start kubernetes cluster in azure
-	\item make cloud-down - stop kubernetes cluster in azure
-	\item make cloud-deploy - deploy to kubernetes cluster in azure
-	\item make cloud-build - build and push docker images
-	\item make local-observability - deploy observability stack to local cluster
-	\item make pdf - generate this document in form of pdf
-\end{itemize}
+To make it easier to interact with all resources used in the project, a set of "make rules" was created, those are abstracting workflow by combining multiple commands into logical components called rules/targets. All the rules are listed in the appendix \ref{sec:app_05}.

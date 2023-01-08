@@ -1,15 +1,9 @@
 %!TEX root = ../Thesis.tex
 \chapter{Introduction}
-Problem statements:
-Is it beneficial to run path planning in the cloud?
-
-For Which algorithm is most beneficial?
-
-Is network jitter causing significant performance degradation?
-
-What is a limit of agent resources that makes it beneficial to run in the cloud?
 
 Path planning is a process of finding a route between starting position and a goal. It is a common task in the current industry setup, used for autonomous navigation. While more mobile robots are being used it becomes important to solve this task efficiently using state-of-the-art approaches. As path planning is computationally intensive in a large setup, it might require more resources than a single agent can provide, therefore this project will explore collaborative computing between the agents as well as edge-cloud collaborative computing. The focus is not only on the implementation of the algorithms but rather on an overall end-to-end system that can be used both with simulated agents as well as real edge devices.
+
+The problem that this master thesis aims to address is how to optimize the performance of path-planning algorithms in a distributed system. Specifically, the research aims to determine whether it is more beneficial to run path planning algorithms in the cloud or locally, and which algorithms are most suitable for different use cases. Additionally, the research aims to investigate the impact of network latency on algorithm performance, and to determine the limits of agent resources that make it more beneficial to run path planning algorithms in the cloud rather than locally. The focus of this master thesis is not just on comparing different path-planning algorithms, but also on the implementation of a distributed system that can effectively utilize these algorithms. The ultimate goal of this research is to provide a robust and scalable system that can meet the needs of a wide range of use cases.
 
 In the second chapter theory behind multi-agent path planning is introduced along with an explanation of standard algorithms designed for this purpose. It also serves as an introduction to the cloud and edge computing as both of those technologies are used in this project. Finally, this section elaborates on standard communication protocols and algorithms used in agent implementation.
 
@@ -17,7 +11,7 @@ The third chapter focuses on the design of the system, with an emphasis on creat
 
 The fourth chapter explains in detail how the system was implemented. It starts with a description of the development process and goes deeper into more specific technologies and their placement in the project. It also shows the final look of the system as well as its user interface of it. The system testing approach is explained in the fifth chapter, focusing on reproducible test cases along with test results with different algorithms and resource profiles.
 
-Six and  seventh chapters serve as a summary of the project as well as explain what can be improved in future work.
+The sixth chapter serves as a summary of the project as well as explains what can be improved in future work.
 
 \section{Robots fleet in smart factories}
 One of the main use cases of the proposed system can be robot fleets in factories. Mobile robots are widely used in production plants, but the most popular solution is to use AGV - an automated guided vehicle\cite{agv}. The difference between AGV and the fully autonomous mobile robot is that AGV will usually follow the guided path marked by the magnetic or traditional marker. This solution allows to simplify robot setup, by reducing the number of sensors, but at the same time, it is less flexible and requires constant maintenance of marked paths.
