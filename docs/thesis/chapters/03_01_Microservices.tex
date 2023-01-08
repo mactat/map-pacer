@@ -17,20 +17,38 @@ When an agent is started, it doesn't belong to any swarm so it will start local 
 This entity contains also all algorithms meant for path planning as in a base case scenario, computation will take place in the agent to obtain the path.
 
 \subsection{Cloud-agent}
-Cloud-agent is an entity to which computation can be upstream to offload the agents. It will have much more computing power, but it might be located in a different geographical location so latency between local agents and this one will matter in the case of total calculation time.
+The cloud-agent is a service that provides computational resources to offload the workload from agents. It is designed to have significantly more computing power than the agents, but it may be located in a different geographical location, which could result in latency issues when transmitting data back and forth.
 
-This microservice will be deployed in the cloud and it will use cloud-broker as a communication medium.
+In order to communicate with the agents, the cloud-agent uses the cloud-broker as a medium. The cloud-broker acts as an intermediary, enabling the cloud-agent and the agents to exchange messages and data.
+
+The cloud-agent is deployed in the cloud and is intended to be used for performing computationally intensive tasks that would be too resource-intensive for the agents to handle on their own. By offloading these tasks to the cloud-agent, the agents are able to operate more efficiently and effectively.
 
 \subsection{Broker}
-Service is responsible for communication between the services. It will be deployed both in the cloud and in the local environment, and those two entities should be connected with a bridge. This will be a single connection point between the cloud and the edge. This entity will use pub/sub approach to handle and distribute the messages.
+This service plays a crucial role in the system, it is responsible for facilitating communication between various services. It is deployed both in the cloud and in local environments, and the two entities are connected by a bridge. The bridge serves as a single connection point between the cloud and the edge, allowing the two to communicate and exchange data.
+
+Alternatively, the cloud and local services can also cross-subscribe to both brokers, allowing them to communicate directly with each other. The service uses a publish-subscribe (pub/sub) approach to handle and distribute messages between the different services.
+
+The service acts as an intermediary, enabling services to exchange messages and data without the need for direct communication. This can help to reduce the complexity of the overall system and make it more scalable and resilient.
 
 \subsection{Map-service}
-Initially, when agents are spawned they do not have any map assigned. After electing a leader he will trigger new map generation, by message passing to map-service. This entity is responsible for creation the map and spawning the agent in it. It is a substitute for sensing for the agent as it gives the robots all information they need for finding in position on a global map.
+This service is responsible for generating maps and spawning agents within them. When an agent is first created, it does not have any map assigned to it. The leader agent will trigger the generation of a new map by sending a message to the map-service. The map-service is responsible for creating the map and spawning the agent within it. Communication between the map-service and the agents is facilitated by the broker service. The broker service acts as an intermediary, enabling the map-service and the agents to exchange messages and data. It is through the broker service that the map-service sends the necessary information to the agents and receives requests and updates from them.
 
-Additionally, pre-defined maps are stored in this service and can be adopted by the agent upon a specific query. Map service can spawn agents in places from which it is not possible to reach the goal, but it is also a valid scenario.
+The map-service serves as a substitute for sensing for the agent, as it provides the robot with all the necessary information for determining its position on a global map. In addition to generating new maps, the map-service also stores pre-defined maps that can be adopted by the agent upon request.
+
+It is possible for the map-service to spawn agents in places that are not reachable from the goal. This is a valid scenario as not all points on the map might be reachable. The map-service is a crucial component for enabling agents to navigate and interact with their environment.
 
 \subsection{Backend}
-It is a service meant for gathering data and interacting with a core module(agent, map service, etc.). It exposes the endpoint through REST API (endpoints in appendix A) and forwards requests to the MQTT broker. It is also receiving data from all the entities and stores it in a database connected to it. The backend is deployed in a cloud and it connects to a cloud broker, endpoints should be exposed to the end-user.
+This service is designed to gather data and facilitate communication with a core module service (such as an agent or map service) through a cloud broker. The service exposes endpoints through a REST API(appendix \ref{app:app_01}), which can be accessed by a frontend application. It also forwards requests to an MQTT broker.
+
+In addition to interacting with other services, this service also receives data from various entities and stores it in a database. The backend of this service is deployed in the cloud, and the endpoints are accessible to end-users. It is equipped with a database for storing data. The database is attached to the service, which means that it is directly accessible and can be used for storing and retrieving data as needed. The service is designed to receive data from various entities, and it stores this data in the attached database for later use.
+
+This service acts as an intermediary between the frontend, the core module service, and the MQTT broker, allowing them to communicate and exchange data. It is deployed in the cloud and connected to a cloud broker, which enables it to access resources and services hosted in the cloud.
 
 \subsection{Frontend}
-The end user graphical interface, deployed as a web service is called frontend. It is taking inputs from the user and triggers specific actions through the backend service API. It is also used for raw data visualization and it is deployed in a cloud and exposed to end users. Its capabilities are explained in \hyperref[sec:0308]{visualization section} of this chapter.
+The frontend of this service is a graphical interface that is deployed as a web service. It is accessed by end users through a web browser and is used to trigger specific actions and perform raw data visualization.
+
+The frontend is responsible for taking input from the end user and sending requests to the backend service through its API. It is also used for visualizing raw data, allowing the end user to view and analyze the data in various ways.
+
+The frontend is deployed in the cloud and is exposed to end users over the internet. Its capabilities are further explained in the \hyperref[sec:0308]{visualization section} section of the documentation.
+
+Frontend serves as the interface between the end user and the backend service, allowing the end user to interact with the service and access its functionality. It is an important component of the service, as it enables the end user to perform various actions and view raw data in an intuitive and user-friendly way.
