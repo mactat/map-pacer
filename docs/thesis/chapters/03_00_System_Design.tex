@@ -1,12 +1,10 @@
 %!TEX root = ../Thesis.tex
 \chapter{System Design}
-The development of multi-agent systems requires spinning multiple instances of identical entities. In a real-world scenario, those entities would be real robots with their own computing unit connected to each other with some kind of networking. To simulate this scenario microservices approach will be used, as it allows to easily separate agents even on a single computer setup as well as put constrain on computing power and memory usage.
+This section provides an overview of the system design for the development of a multi-agent system. The system design involves creating multiple instances of identical entities, simulating a real-world scenario where these entities would be physical robots connected to each other through some form of networking. To achieve this simulation, a microservices approach is employed, allowing for easy separation of agents, even on a single computer setup, and enabling the setup of constraints on computing power and memory usage.
 
-Cloud and edge computing are widely used in this project, cloud for up-streaming the computation, gathering and visualizing the data, edge to model agents behaviour.
+The system design also incorporates the use of cloud and edge computing, with cloud computing being utilized for data gathering, computation, and visualization, and edge computing is utilized to model the behavior of agents. Communication and collaboration among the agents are facilitated through the implementation of mechanisms such as leader election, liveness checks, and local discovery. Additionally, this section will cover the implementation of data gathering and visualization and its integration into the overall system.
 
-Multiple agents will communicate together to agree on certain actions, therefore mechanisms such as leader election an liveness check and local discovery were implemented and will be described in this section.
-
-This section will also explain how data gathering and visualization will be implemented in this project and how it is connected to the whole system.
+Python is chosen as the primary programming language for the implementation of this system. Python is a widely-used, high-level programming language that is known for its simplicity, readability, and flexibility \cite{python_docs}. Moreover, its extensive support for concurrency and parallelism allows for efficient and effective handling of large amounts of messages, which is crucial for the multi-agent system.
 \section{Microservices}
 \input{chapters/03_01_Microservices}
 

@@ -10,11 +10,11 @@ Micro-services are small autonomous services that cooperate with each other to c
 \end{figure}
 
 \subsection{Agent}
-The agent is a microservice which is implementing the logic of the entity which needs to plan a path.  It is meant to have limited resources to simulate a real-world scenario, and the number of its instances will vary.
+An agent microservice is a small, independent microservice that is responsible for implementing the logic of an entity that needs to plan a path. When the agent microservice is started, it begins a process called local discovery to find other instances of the same microservice, which are referred to as its peers. Once its peers are discovered, the agent microservice initiates an election algorithm to determine which agent will be the leader of the group, or "swarm." The leader is responsible for coordinating the actions of the other agents and ensuring that they are working together effectively.
 
-When an agent is started, it doesn't belong to any swarm so it will start local discovery to find its peers. After peers are found, one of the agents has to be elected as a leader and therefore election algorithm will be initiated in one or multiple agents, so one of the agents will be elected to be a swarm leader. An agent will periodically poll his peers to check their liveness and this behavior will be referred to as a liveness check.
+In addition to its responsibilities as a member of a swarm, the agent microservice also performs periodic liveness checks on its peers to verify that they are still active and able to communicate. This is important because it ensures that the swarm remains functional even if one or more agents become unavailable or unresponsive.
 
-This entity contains also all algorithms meant for path planning as in a base case scenario, computation will take place in the agent to obtain the path.
+The agent microservice also contains algorithms for path planning, and in a base-case scenario, it is responsible for performing the computations necessary to determine the optimal path, but it can also outsource the computation to the cloud by sending messages to the cloud agent. The agent microservice communicates with other microservices using a local broker, the number of instances of the agent microservice may vary depending on the needs of the system, and it is designed to have limited resources to simulate a real-world scenario. 
 
 \subsection{Cloud-agent}
 The cloud-agent is a service that provides computational resources to offload the workload from agents. It is designed to have significantly more computing power than the agents, but it may be located in a different geographical location, which could result in latency issues when transmitting data back and forth.

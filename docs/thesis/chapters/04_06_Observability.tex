@@ -11,7 +11,7 @@ Figure \ref{fig:observability_system} shows the design of the observability syst
 
 Two open-source components are used in order to create an observability stack: Grafana and Prometheus. Prometheus is a monitoring solution that scrapes metrics from the HTTP endpoint, in the case of Kubernetes it scrapes metrics from pods whose metric monitor service is exposed. Prometheus later stores collected data in a time-series database and provide a way to query the data using the specific language (Prometheus Query Language)\cite{prometheus_docs}.
 
-Grafana is meant as a visualization tool. It uses Prometheus queries to show data in form of charts, graphs, and other visualizations. In this project, multiple grafana dashboards were created to monitor the status of the system and performance of the solution. An example can be seen in figure \ref{fig:dashboard_grafana}.
+Grafana is meant as a visualization tool. It uses Prometheus queries to show data in form of charts, graphs, and other visualizations. In this project, multiple grafana dashboards were created to monitor the status of the system and the performance of the solution. An example can be seen in figure \ref{fig:dashboard_grafana}.
 
 \begin{figure}[H]
     \centering

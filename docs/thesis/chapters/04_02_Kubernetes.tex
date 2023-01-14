@@ -1,19 +1,19 @@
-Whole project is designed to be deployed in the cloud and in particular in KaaS(kubernetes as a service) solution. For comparison of most popular cloud providers, open-sourced cost calculator\cite{managed_kubernetes_pricing} was used. Result for most popular cloud provider: amazon web services(AWS), azure(AKS), google cloud(GKE) and digital ocean(DO) can be seen on plot below:
+The project is designed to be deployed in the cloud, specifically in a Kubernetes as a Service (KaaS) solution. To evaluate the cost of different cloud providers, an open-sourced cost calculator \cite{managed_kubernetes_pricing} was used. The results for the most popular cloud providers, including Amazon Web Services (AWS), Azure (AKS), Google Cloud (GKE), and Digital Ocean (DO) can be seen in the plot below.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=01\textwidth]{pictures/k8s_cost.png}
-    \caption{ Local development }
+    \includegraphics[width=\textwidth]{pictures/k8s_cost.png}
+    \caption{ Managed Kubernetes cost }
     \label{fig:k8s_cost}
 \end{figure}
 
-The cheapest options for small scale projects are digital ocean and azure because they doesn't charge for the compute used for the control plane. For large projects Google Cloud is the most affordable. 
+For small-scale projects, Digital Ocean and Azure are the most cost-effective options as they do not charge for the compute used for the control plane. For large-scale projects, Google Cloud is the most affordable.
 
-Two cloud  providers were tested for this implementation: Microsoft azure and Okteto Cloud. Both are offering kubernetes as a service, but they have chosen different approaches. 
+Two cloud providers, Microsoft Azure and Okteto Cloud, were evaluated for this implementation. Both providers offer Kubernetes as a Service, but they have adopted different approaches.
 
-In azure kubernetes cluster is being created and then it is mostly managed by the user. It is harder to maintain but also more flexible as cluster can be scaled and extended easily.  
+In Azure, the Kubernetes cluster is created and then primarily managed by the user. This approach is more difficult to maintain, but also more flexible as the cluster can be easily scaled and extended.
 
-Okteto cloud has taken different approach, it is focused on crating development enviroment which is usually not production ready. In free tier they provide namescpace in a cluster(fully managed by okteto) with possibility to deploy up to 10 pods with limitations mentioned below:
+In contrast, Okteto Cloud has adopted a different approach, focusing on creating a development environment that is not typically production-ready. In the free tier, Okteto Cloud provides a namespace in a cluster that is fully managed by Okteto, with the possibility of deploying up to 10 pods with limitations as specified below.
 \begin{itemize}
     \item Namespaces: 5
     \item Pods: 10
@@ -22,4 +22,4 @@ Okteto cloud has taken different approach, it is focused on crating development 
     \item Storage: 5Gi
 \end{itemize}
 
-Bottom line: Okteto for development azure for pruductization.
+The result of the comparison between Azure and Okteto Cloud is that Okteto Cloud is better suited for development purposes while Azure is more suitable for productization. Okteto Cloud is focused on creating development environments that are not typically production-ready, and it's also free, it's limited to 10 pods and not suitable for large projects. On the other hand, Azure provides more flexibility and scalability options, but it's harder to maintain and it's more expensive. It's a better fit for large projects and production-ready systems. Based on this evaluation, Okteto Cloud will be used for the implementation of this project, as it provides an appropriate development environment and is cost-effective.

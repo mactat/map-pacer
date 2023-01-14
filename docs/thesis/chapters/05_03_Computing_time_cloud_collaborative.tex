@@ -13,11 +13,6 @@ Test results for real agents were performed for agent devices forced to use half
     \label{fig:on_prem_test_time_log}
 \end{figure}
 
-Findings:
-\begin{itemize}
-    \item Non-collaborative algorithms are significantly faster than collaborative ones as they have lower time complexity. 
-    \item Average time difference between A* and Cloud A* is around 150ms.
-    \item Cloud A* has a higher deviation of the results than A*.
-    \item CA* beats Cloud A* on the smallest map, on any other map Cloud CA* is performing better.
-    \item Cloud CA* is around 10x faster on average than CA*.
-\end{itemize}
+The results of the performance testing indicate that non-collaborative algorithms are significantly faster than collaborative ones. The average time difference between A* and Cloud A* was found to be around 150ms, with A* being faster. Additionally, the results show that Cloud A* has a higher deviation than A*.
+
+When comparing the results of CA* and Cloud CA*, it was found that CA* outperforms Cloud CA* on the smallest map. However, on larger maps, Cloud CA* performed better. The average performance of Cloud CA* was found to be around 10 times faster than CA*.
