@@ -7,6 +7,7 @@ The algorithms were implemented in separate Python libraries to enable reusabili
     \label{fig:single_agent_path}
 \end{figure}
 
+In the implementation of the system, several algorithms were implemented to facilitate the efficient path planning of local agents. These included the Cooperative A* (CA*), A*, Dijkstra and Breadth-First Search (BFS) algorithms. Additionally, to support cloud-enhanced computation, the Cooperative A* (CA*), A* and Dijkstra algorithms were also implemented. The choice of algorithms was based on their computational efficiency, performance, and suitability for the specific problem domain. The system also allows for the flexibility to switch between different algorithms depending on the requirements of the specific task. Furthermore, the system was designed to be modular and extensible, allowing for the integration of additional algorithms in the future as needed by incorporating new algorithms into the existing library.
 
 In the case of multi-agent algorithms, there are also time considerations and thus, the visualizations must include multiple time frames. To demonstrate this scenario, an example of the planned path is illustrated in Figure \ref{fig:multiple_agent_path}. The agents are not colliding, and they may choose sub-optimal paths to avoid collisions. The starting and goal positions are denoted by circles, while the agents are represented by squares.
 
