@@ -3,7 +3,7 @@ This section focuses on the design of the map representation used in the multi-a
 \subsection{Gridmap}
 A grid map is a representation of the possible location of the agent in a discrete space. On the initial map generated for the agents, starting and finishing points of each agent will be indicated. A map will also include an indication of unreachable spots, which will be referred to as "walls" or "obstacles". Two possible map standards will be implemented: space-separated map and JSON-based map. The space-separated map is meant for creating and storing persistent maps, as it is also human-readable. The JSON-based map is mostly meant for machine-to-machine communication, as it is easily parsable. Conversion between those maps, as well as storage, will happen in the map service. It will be also served to the agents from this microservice, which will have the possibility of generating random maps and spawning agents on it.
 
-Before executing an algorithm, the map will have to be translated to a graph, where each tile of the grid map represents one node of the graph. Edges of the graph represent possible agent movement. Two possible modes will be available: with and without diagonal movement\ref{fig:map_2D}. As a default algorithms will use mode without diagonal moves.
+Before executing an algorithm, the map will have to be translated to a graph, where each tile of the grid map represents one node of the graph. Edges of the graph represent possible agent movement. Two possible modes will be available: with and without diagonal movement \ref{fig:map_2D}. By default, algorithms will use mode without diagonal moves.
 
 \begin{figure}[H]
     \centering
