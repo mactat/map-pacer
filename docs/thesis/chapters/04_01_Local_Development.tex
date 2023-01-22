@@ -1,4 +1,4 @@
-Local development of the project was designed to be easy to set up and reproducible in any development machine. For this purpose development virtual machine(referred as dev-VM) was created using the infrastructure-as-a-code principle. Tools which are used for reproducible creation of machine were:
+Local development of the project was designed to be easy to set up and reproducible in any development machine. For this purpose development virtual machine(referred as dev-VM) was created using the infrastructure-as-a-code principle. Tools which are used for reproducible creation of machine are:
 \begin{itemize}
     \item Oracle Virtualbox\cite{virtual_box} - hypervisor which is hosting VM, it was chosen because it supports deployment in the 3 most popular operating systems: Microsoft windows, mac os, and Linux.
     \item HashiCorp Vagrant\cite{vagrant} - a tool that helps to build a development environment as a code. It allows specifying all details of provisioned VM, as well as configuring networking and hardware specifications. All files used for development can be found in dev-VM repository\cite{dev_vm}.
@@ -25,4 +25,4 @@ By default Kubernetes(k8s) cluster is deployed in dev-VM using a tool called 'ki
 
 Integration with an azure cloud is made with azure command lines tools along with PAT token. After the initial creation of the Kubernetes cluster in the cloud, interactions are limited to only the Kubernetes cluster and therefore only kubeconfig(Kubernetes configuration) file is needed.
 
-To make it easier to interact with all resources used in the project, a set of "make rules" was created, those are abstracting workflow by combining multiple commands into logical components called rules/targets. All the rules are listed in the appendix \ref{sec:app_05}.
+In order to improve the ease of interaction with the various resources used in the project, a set of "make rules" were developed. These rules abstract the workflow by consolidating multiple commands into logical components referred to as "rules" or "targets." The entirety of the rules are documented in the appendix \ref{sec:app_05}.
