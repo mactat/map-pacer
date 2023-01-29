@@ -8,7 +8,7 @@ Before executing an algorithm, the map will have to be translated to a graph, wh
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{pictures/map_2d.png}
-    \caption{ 2D map to graph translation }
+    \caption{2D map to graph translation}
     \label{fig:map_2D}
 \end{figure}
 
@@ -20,16 +20,16 @@ For CA* algorithm map has to be translated into a 3d grid map where every layer 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{pictures/map_3D.png}
-    \caption{ 3D map to graph translation }
+    \caption{3D map to graph translation}
     \label{fig:map_3D}
 \end{figure}
 After the path is planned for specific agents, it has to be marked as an obstacle so agents which are planning their paths, later on, would be aware of unreachable/occupied tiles.
 
 \subsection{CA* front collision problem}
-Planning multiple agents' paths on a single map leads to a problem when agents are colliding with each other because they are moving in the opposite direction on the same column or row. This situation is shown in figure \ref{fig:head_collision}. Both agents assume that the tile in front of them is not occupied, which is a valid assumption. However, as this is a discrete model, a collision occurs between timeframes. To mitigate this problem, after the path is planned edges in the opposite direction of agent movement need to be removed.
+Planning multiple agents' paths on a single map leads to a problem when agents are colliding with each other because they are moving in the opposite direction on the same column or row. This situation is shown in Figure \ref{fig:head_collision}. Both agents assume that the tile in front of them is not occupied, which is a valid assumption. However, as this is a discrete model, a collision occurs between timeframes. To mitigate this problem, after the path is planned edges in the opposite direction of agent movement need to be removed.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{pictures/head_collision_problem.png}
-    \caption{ CA* head collision problem}
+    \caption{CA* head collision problem}
     \label{fig:head_collision}
 \end{figure}

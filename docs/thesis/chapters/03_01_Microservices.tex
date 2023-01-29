@@ -1,11 +1,11 @@
 In recent years wide cloud adoption has caused huge momentum in adopting software architecture known as micro-services, as it is a native architecture for the cloud. This project will also adapt this architecture because part of the deployment is being done in the cloud, and a swarm of agents can also be simulated using this approach. Moreover, technologies such as kind and tilt made it easier to develop all services locally using the local Kubernetes cluster.
 
-Micro-services are small autonomous services that cooperate with each other to create certain application logic\cite{building_microservices}. Usually, microservices are deployed as Linux containers and encapsulate logic for a single logical part of the solution. Those services are then communicating whit each other to build bigger, more complex systems.
+Microservices are small autonomous services that cooperate with each other to create certain application logic \cite{building_microservices}. Usually, microservices are deployed as Linux containers and encapsulate logic for a single logical part of the solution. Those services are then communicating whit each other to build bigger, more complex systems.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{pictures/services.png}
-    \caption{ Microservices system design }
+    \caption{Microservices system design}
     \label{fig:micro_services}
 \end{figure}
 
@@ -14,19 +14,19 @@ An agent microservice is a small, independent microservice that is responsible f
 
 In addition to its responsibilities as a member of a swarm, the agent microservice also performs periodic liveness checks on its peers to verify that they are still active and able to communicate. This is important because it ensures that the swarm remains functional even if one or more agents become unavailable or unresponsive.
 
-The agent microservice also contains algorithms for path planning, and in a base-case scenario, it is responsible for performing the computations necessary to determine the optimal path, but it can also outsource the computation to the cloud by sending messages to the cloud agent. The agent microservice communicates with other microservices using a local broker, the number of instances of the agent microservice may vary depending on the needs of the system, and it is designed to have limited resources to simulate a real-world scenario. 
+The agent  also contains algorithms for path planning, and in a base-case scenario, it is responsible for performing the computations necessary to determine the optimal path, but it can also outsource the computation to the cloud by sending messages to the cloud agent. It communicates with other microservices using a local broker, the number of instances of the  microservice may vary depending on the needs of the system, and it is designed to have limited resources to simulate a real-world scenario. 
 
 \subsection{Cloud-agent}
 The cloud-agent is a service that provides computational resources to offload the workload from agents. It is designed to have significantly more computing power than the agents, but it may be located in a different geographical location, which could result in latency issues when transmitting data back and forth.
 
 In order to communicate with the agents, the cloud-agent uses the cloud-broker as a medium. The cloud-broker acts as an intermediary, enabling the cloud-agent and the agents to exchange messages and data.
 
-The cloud-agent is deployed in the cloud and is intended to be used for performing computationally intensive tasks that would be too resource-intensive for the agents to handle on their own. By offloading these tasks to the cloud-agent, the agents are able to operate more efficiently and effectively.
+The cloud-agent is deployed in the cloud and is intended to be used for performing computationally intensive tasks that would be too resource-intensive for the agents to handle on their own. By offloading these tasks to the cloud-agent, the agents may be able to operate more efficiently.
 
 \subsection{Broker}
 This service plays a crucial role in the system, it is responsible for facilitating communication between various services. It is deployed both in the cloud and in local environments, and the two entities are connected by a bridge. The bridge serves as a single connection point between the cloud and the edge, allowing the two to communicate and exchange data.
 
-Alternatively, the cloud and local services can also cross-subscribe to both brokers, allowing them to communicate directly with each other. The service uses a publish-subscribe (pub/sub) approach to handle and distribute messages between the different services.
+Alternatively, the cloud and local services can also cross-subscribe to both brokers, allowing them to communicate directly with each other. The service uses a publish-subscribe approach to handle and distribute messages between the different services.
 
 The service acts as an intermediary, enabling services to exchange messages and data without the need for direct communication. This can help to reduce the complexity of the overall system and make it more scalable and resilient.
 
@@ -38,7 +38,7 @@ The map-service serves as a substitute for sensing for the agent, as it provides
 It is possible for the map-service to spawn agents in places that are not reachable from the goal. This is a valid scenario as not all points on the map might be reachable. The map-service is a crucial component for enabling agents to navigate and interact with their environment.
 
 \subsection{Backend}
-This service is designed to gather data and facilitate communication with a core module service (such as an agent or map service) through a cloud broker. The service exposes endpoints through a REST API(appendix \ref{app:app_01}), which can be accessed by a frontend application. It also forwards requests to an MQTT broker.
+This service is designed to gather data and facilitate communication with a core module service (such as an agent or map service) through a cloud broker. The service exposes endpoints through a REST API (Appendix \ref{app:app_01}), which can be accessed by a frontend application. It also forwards requests to an MQTT broker.
 
 In addition to interacting with other services, this service also receives data from various entities and stores it in a database. The backend of this service is deployed in the cloud, and the endpoints are accessible to end-users. It is equipped with a database for storing data. The database is attached to the service, which means that it is directly accessible and can be used for storing and retrieving data as needed. The service is designed to receive data from various entities, and it stores this data in the attached database for later use.
 

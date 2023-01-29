@@ -1,13 +1,14 @@
-Agents will have to communicate with each other, to allow message exchange two lightweight messaging protocols are being considered Message Queueing Telemetry Transport(MQTT) and Advanced Message Queuing Protocol (AMQP). Both are mature solutions that are using message brokers for facilitating communication between entities.
+Agents will have to communicate with each other, to allow message exchange two lightweight messaging protocols are being considered Message Queueing Telemetry Transport (MQTT) and Advanced Message Queuing Protocol (AMQP). Both are mature solutions that are using message brokers for facilitating communication between entities.
 
 \subsection{MQTT}
 MQTT is a lightweight machine-to-machine messaging protocol that was created to be utilized in scenarios with constrained network capacity or high levels of network latency. This makes it appropriate for Internet of Things (IoT) applications where it is crucial to reduce the overhead of transferring data.
 
-In MQTT, there are three main components: the publisher, the broker, and the subscriber. The publisher is the client that sends the data. It can publish data on a specific topic on the broker. The broker is a server that receives the data and stores it until a subscriber is ready to receive it. The broker is responsible for distributing the data to all subscribed clients. The subscriber is a client that receives the data from the broker. It can subscribe to one or more topics and will receive all messages published to those topics. \cite{mqtt_specification}
+In MQTT, there are three main components: the publisher, the broker, and the subscriber. The publisher is the client that sends the data. It can publish data on a specific topic on the broker. The broker is a server that receives the data and stores it until a subscriber is ready to receive it. The broker is responsible for distributing the data to all subscribed clients. The subscriber is a client that receives the data from the broker. It can subscribe to one or more topics and will receive all messages published to those topics. 
+ \cite{mqtt_specification}
 
-The MQTT protocol uses a publish/subscribe model, where clients can subscribe to topics and receive messages that are published to those topics. The protocol also includes features for Quality of Service (QoS) and reliability, such as message acknowledgments and retries\cite{amqp_vs_mqtt}.
+The MQTT protocol uses a publish/subscribe model, where clients can subscribe to topics and receive messages that are published to those topics. The protocol also includes features for Quality of Service (QoS) and reliability, such as message acknowledgments and retries \cite{amqp_vs_mqtt}.
 
 \subsection{AMQP}
-AMQP uses a point-to-point model, where clients send messages directly to specific queues, it is also able to support publish/subscribe model but it was not primarily designed for that\cite{amqp_specification}. It is more complex than MQTT and it is designed to be secure reliable and performant. Similar to MQTT, it is using TCP as a transport layer, but messages are more complex.
+AMQP uses a point-to-point model, where clients send messages directly to specific queues, it is also able to support publish/subscribe model but it was not primarily designed for that \cite{amqp_specification}. It is more complex than MQTT and it is designed to be secure reliable and performant. Similar to MQTT, it is using TCP as a transport layer, but messages are more complex.
 
 
