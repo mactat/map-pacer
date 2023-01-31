@@ -11,11 +11,11 @@ In the implementation of the system, several algorithms were implemented to faci
 
 In the case of multi-agent algorithms, there are also time considerations and thus, the visualizations must include multiple time frames. To demonstrate this scenario, an example of the planned path is illustrated in Figure \ref{fig:multiple_agent_path}. The agents are not colliding, and they may choose sub-optimal paths to avoid collisions. The starting and goal positions are denoted by circles, while the agents are represented by squares.
 
+All libraries that are necessary for the algorithms and visualizations are included during the building of the Docker image. This ensures that all required dependencies are present and that the libraries are ready for use when the image is deployed. The libraries are then imported into the main program and utilized for the functionality of the system. This approach allows for easy distribution and deployment of the system, as all necessary components are included within the Docker image and can be easily pulled and run on any system that supports Docker. Additionally, this approach ensures that the libraries are available in a consistent and predictable environment, reducing the risk of compatibility issues.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{pictures/example_planning.png}
     \caption{ Example of the planned path for multiple agents } 
     \label{fig:multiple_agent_path}
 \end{figure}
-
-All libraries that are necessary for the algorithms and visualizations are included during the building of the Docker image. This ensures that all required dependencies are present and that the libraries are ready for use when the image is deployed. The libraries are then imported into the main program and utilized for the functionality of the system. This approach allows for easy distribution and deployment of the system, as all necessary components are included within the Docker image and can be easily pulled and run on any system that supports Docker. Additionally, this approach ensures that the libraries are available in a consistent and predictable environment, reducing the risk of compatibility issues.
