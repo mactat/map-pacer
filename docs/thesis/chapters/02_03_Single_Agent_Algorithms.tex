@@ -16,14 +16,14 @@ The execution of the algorithm begins by initializing the starting node as the c
     \caption{General approach for graph-based path planning algorithms}
     \label{fig:simple_path_planning}
 \end{figure}
-\subsection{Dijkstra's Algorithm}
+\subsection{Dijkstra's algorithm}
 Dijkstra's algorithm is a graph traversal technique that assigns a minimal length, represented by the edge value g(n), from a designated starting vertex to every vertex in a graph. The starting vertex is initially assigned a length of 0, while all other vertices are assigned a length of infinity. The algorithm proceeds by iteratively expanding new vertices, specifically those that are neighbours of the vertex with the current lowest length from the starting vertex, and marking them as visited. The process continues until all vertices have been visited or the goal vertex is reached. If the goal is not reached, the expansion process continues. The algorithm is guaranteed to find the shortest path from the starting vertex to the goal, as long as all edges have non-negative weights \cite{basic_algorithms, basic_2}.
 
 \subsection{Greedy Best-First-Search}
 This algorithm is a variant of graph traversal that employs a heuristic function - denoted as h(n), to guide the exploration of vertices. Heuristic function is a formula to determine the cost of reaching a goal. Rather than prioritizing the vertices with the shortest distance from the starting vertex, as in Dijkstra's algorithm, this algorithm prioritizes vertices that are estimated to be closest to the goal vertex using the heuristic function h(n) 
   \cite{a_star_dijkstra}. This approach is referred to as a greedy strategy, as it prioritizes reaching the goal as quickly as possible, without taking into account potential obstacles. The algorithm is fast in terms of computational complexity, but the paths it finds are often sub-optimal.
 
-\subsection{A* Algorithm}
+\subsection{A* algorithm}
 A*(pronounced A star) is the most popular choice for pathfinding, because of its simplicity and robustness. It has also many advanced extensions used in a multi-agent systems approach. It works very similarly to Dijkstra's algorithm, except it is also using heuristics to guide itself. It combines the information about the distance from the start - \(g(n)\) and the heuristic function which is usually a distance to a goal - \(h(n)\). In each iteration, it examines the node that has the lowest sum of \(g(n) + h(n)\) \cite{basic_2}.
 
 The behavior of A* algorithm will vary, depending on the heuristic function that is being used. It is usually faster than Dijkstra when finding a solution, but a result can be sub-optimal so it is a challenge to balance those two.
