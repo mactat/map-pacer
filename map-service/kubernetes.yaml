@@ -31,6 +31,6 @@ spec:
         - name: CLOUD_BROKER_PORT
           value: "443" 
         - name: SYSTEM_ID
-          value: "home_system"
+          value: "cloud_system"
         - name: TLS
           value: "true"
