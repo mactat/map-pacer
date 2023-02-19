@@ -194,7 +194,7 @@ function save_map() {
 
 function adopt_map() {
   // TODO: Change to dynamic system
-  fetch(`${backend_url}/adopt_map?system_id=home_system`, { 
+  fetch(`${backend_url}/adopt_map?system_id=cloud_system`, { 
       method: 'POST', 
       mode: 'cors', 
       body: JSON.stringify(boardToList(false)),
